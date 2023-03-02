@@ -91,6 +91,9 @@ main .ck-editor[role='application'] .ck.ck-content,
     background-color: #e8ebf3;
     min-width: 110px;
 }
+.form-check-input {
+    margin-top: 0;
+}
 @media (min-width: 1400px) {
     .container,
     .container-lg,
