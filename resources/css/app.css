@@ -1,0 +1,108 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.25;
+}
+.h-48 {
+    max-height: 48px;
+}
+.h-56 {
+    max-height: 56px;
+}
+.navbar {
+    --bs-navbar-nav-link-padding-x: 0.75rem;
+}
+.nav-link {
+    color: #031b4e;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 0;
+    transition: all 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+}
+.navbar-nav .nav-link.active,
+.navbar-nav .show>.nav-link,
+.nav-link:focus, .nav-link:hover {
+    color: #0b51b7;
+}
+.nav-link i {
+    font-size: 14px;
+    margin-right: .35rem;
+}
+.list-group-item {
+    font-size: 14px;
+}
+h4.form-title {
+    font-size: 1.20rem;
+}
+a.footer-link:hover {
+    text-decoration: underline !important;
+}
+.add-btn {
+    display: flex;
+    align-items: center;
+}
+.add-btn i {
+    margin-right: .5rem;
+}
+.float-right {
+    float: right;
+}
+.editor__editable,
+/* Classic build. */
+main .ck-editor[role='application'] .ck.ck-content,
+/* Decoupled document build. */
+.ck.editor__editable[role='textbox'],
+.ck.ck-editor__editable[role='textbox'],
+/* Inline & Balloon build. */
+.ck.editor[role='textbox'] {
+	width: 100%;
+	background: #fff;
+	font-size: 1em;
+	line-height: 1.6em;
+	min-height: 260px;
+	padding: 1.5em 2em;
+}
+.ck.ck-editor__editable {
+	background: #fff;
+	border: 1px solid hsl(0, 0%, 70%);
+	width: 100%;
+}
+/* Because of sidebar `position: relative`, Edge is overriding the outline of a focused editor. */
+.ck.ck-editor__editable {
+	position: relative;
+	z-index: var(--ck-sample-editor-z-index);
+}
+.editor-container {
+	display: flex;
+	flex-direction: row;
+    flex-wrap: nowrap;
+    position: relative;
+	width: 100%;
+	justify-content: center;
+}
+.table-payment tr:hover {
+    cursor: pointer;
+}
+.odeme_onayi .input-group-text {
+    font-size: .75rem;
+    background-color: #e8ebf3;
+    min-width: 110px;
+}
+@media (min-width: 1400px) {
+    .container,
+    .container-lg,
+    .container-md,
+    .container-sm,
+    .container-xl,
+    .container-xxl {
+        max-width: 1140px;
+    }
+}
+@media (min-width: 1200px) {
+    .h3, h3 {
+        font-size: 1.35rem;
+    }
+}
