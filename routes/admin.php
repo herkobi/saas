@@ -4,6 +4,9 @@ use App\Http\Controllers\Admin\Account\Profile\ProfileController;
 use App\Http\Controllers\Admin\Customers\CustomersController;
 use App\Http\Controllers\Admin\Payment\PaymentController;
 use App\Http\Controllers\Admin\Plan\PlanController;
+use App\Http\Controllers\Admin\Settings\ContractsController;
+use App\Http\Controllers\Admin\Settings\EmailController;
+use App\Http\Controllers\Admin\Settings\GatewayController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,14 +50,17 @@ Route::prefix('admin')->group(static function () {
         Route::get('/customers', [CustomersController::class, 'index'])->name('admin.customers');
 
         Route::get('/plans', [PlanController::class, 'index'])->name('admin.plans');
+        Route::get('/plans/free', [PlanController::class, 'free'])->name('admin.plans.free');
         Route::get('/plans/new', [PlanController::class, 'create'])->name('admin.plan.create');
 
-        Route::get('/plans/free', [PlanController::class, 'free'])->name('admin.plans.free');
-        Route::get('/plans/free/new', [PlanController::class, 'createfree'])->name('admin.plan.free.create');
-
-
         Route::get('/payments', [PaymentController::class, 'index'])->name('admin.payments');
+        Route::get('/payments/open', [PaymentController::class, 'open'])->name('admin.payments.open');
+        Route::get('/payments/approved', [PaymentController::class, 'approved'])->name('admin.payments.approved');
+        Route::get('/payments/closed', [PaymentController::class, 'closed'])->name('admin.payments.closed');
 
+        Route::get('/settings/gateway', [GatewayController::class, 'index'])->name('admin.settings.gateway');
+        Route::get('/settings/email', [EmailController::class, 'index'])->name('admin.settings.email');
+        Route::get('/settings/contracts', [ContractsController::class, 'index'])->name('admin.settings.contracts');
     });
 });
 

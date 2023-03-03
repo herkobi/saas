@@ -18,9 +18,9 @@ class PaymentController extends Controller
         return view('admin.payment.open');
     }
 
-    public function approve(): View
+    public function approved(): View
     {
-        return view('admin.payment.approve');
+        return view('admin.payment.approved');
     }
 
     public function closed(): View

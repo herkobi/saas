@@ -20,7 +20,7 @@
         </x-navlink>
     </li>
     <li class="nav-item">
-        <x-navlink :href="route('admin.payments')" :active="request()->routeIs('admin.payments')" aria-current="page">
+        <x-navlink :href="route('admin.settings.gateway')" :active="request()->routeIs('admin.settings.gateway')" aria-current="page">
             <i class="ri-list-settings-line"></i> {{ __('Ayarlar') }}
         </x-navlink>
     </li>
