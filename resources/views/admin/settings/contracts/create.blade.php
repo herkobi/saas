@@ -8,7 +8,7 @@
                 @include('admin.settings.partials.header', ['title' => 'Yeni Sözleşme', 'link' => 'admin.settings.contracts', 'linktext' => 'Sözleşmeler' ])
             </div>
             <div class="page-content">
-                <form action="" method="post">
+                <form action="{{ route('admin.settings.contracts.store') }}" method="post">
                     @csrf
                     <div class="mb-2">
                         <x-input-label for="sozlesmeAdi">Sözleşme Adı</x-input-label>

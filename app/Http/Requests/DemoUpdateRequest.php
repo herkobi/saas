@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Http\Requests\Admin\Settings;
+namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ContractUpdateRequest extends FormRequest
+class DemoUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
-        return true;
+        return false;
     }
 
     /**
@@ -24,8 +22,7 @@ class ContractUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['string', 'required', 'max:255'],
-            'content' => ['required'],
+            //
         ];
     }
 }

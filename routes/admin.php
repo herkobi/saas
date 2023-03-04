@@ -5,7 +5,6 @@ use App\Http\Controllers\Admin\Customers\CustomersController;
 use App\Http\Controllers\Admin\Payment\PaymentController;
 use App\Http\Controllers\Admin\Plan\PlanController;
 use App\Http\Controllers\Admin\Settings\ContractsController;
-use App\Http\Controllers\Admin\Settings\EmailController;
 use App\Http\Controllers\Admin\Settings\GatewayController;
 use Illuminate\Support\Facades\Route;
 
@@ -61,6 +60,8 @@ Route::prefix('admin')->group(static function () {
         Route::get('/settings/gateway', [GatewayController::class, 'index'])->name('admin.settings.gateway');
         Route::get('/settings/contracts', [ContractsController::class, 'index'])->name('admin.settings.contracts');
         Route::get('/settings/contract/new', [ContractsController::class, 'create'])->name('admin.settings.contracts.create');
+        Route::post('/settings/contract/new', [ContractsController::class, 'store'])->name('admin.settings.contracts.store');
+
 
     });
 });
