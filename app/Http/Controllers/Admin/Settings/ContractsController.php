@@ -14,7 +14,8 @@ class ContractsController extends Controller
 {
     public function index(): View
     {
-        return view('admin.settings.contracts.index');
+        $contracts = Contract::all();
+        return view('admin.settings.contracts.index', ['contracts' => $contracts]);
     }
 
     public function create(): View
