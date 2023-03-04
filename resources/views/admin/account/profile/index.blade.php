@@ -5,7 +5,7 @@
         </div>
         <div class="col-md-9">
             <div class="page-title d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
-                <h3 class="section-title mb-0">Profilim</h3>
+                @include('admin.account.partials.header', ['title'=>'Bilgilerim'])
             </div>
             <div class="page-content">
                 <div class="mb-5">

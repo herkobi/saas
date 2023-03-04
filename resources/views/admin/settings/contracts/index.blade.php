@@ -43,7 +43,7 @@
                                         <input class="form-check-input shadow-none" type="checkbox" role="switch" id="odemeDurum" checked>
                                     </div>
                                 </td>
-                                <td><a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle"><i class="ri-edit-line"></i></a></td>
+                                <td><a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle"><i class="ri-edit-line"></i> <small>Düzenle</small></a></td>
                             </tr>
                         </tbody>
                     </table>

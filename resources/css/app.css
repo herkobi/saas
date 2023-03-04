@@ -94,6 +94,9 @@ main .ck-editor[role='application'] .ck.ck-content,
 .form-check-input {
     margin-top: 0;
 }
+.page-content .small, .page-content small {
+    font-size: .75rem;
+}
 @media (min-width: 1400px) {
     .container,
     .container-lg,
