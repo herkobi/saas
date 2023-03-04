@@ -5,7 +5,7 @@
         </div>
         <div class="col-md-9">
             <div class="page-title d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
-                @include('admin.settings.partials.header', ['title' => 'Sözleşmeler' ])
+                @include('admin.settings.partials.header', ['title' => 'Sözleşmeler', 'link' => 'admin.settings.contracts.create', 'linktext' => 'Sözleşme Ekle' ])
             </div>
             <div class="page-content">
                 <div class="table-responsive">
@@ -25,7 +25,13 @@
                                         <input class="form-check-input shadow-none" type="checkbox" role="switch" id="odemeDurum" checked>
                                     </div>
                                 </td>
-                                <td><a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle"><i class="ri-edit-line"></i></a></td>
+                                <td>
+                                    <a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <i class="ri-edit-line"></i> <span class="small">Düzenle</span>
+                                        </div>
+                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <td>Kullanım Sözleşmesi</td>
@@ -34,7 +40,13 @@
                                         <input class="form-check-input shadow-none" type="checkbox" role="switch" id="odemeDurum" checked>
                                     </div>
                                 </td>
-                                <td><a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle"><i class="ri-edit-line"></i></a></td>
+                                <td>
+                                    <a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <i class="ri-edit-line"></i> <span class="small">Düzenle</span>
+                                        </div>
+                                    </a>
+                                </td>
                             </tr>
                             <tr>
                                 <td>Üyelik Sözleşmesi</td>
@@ -43,7 +55,13 @@
                                         <input class="form-check-input shadow-none" type="checkbox" role="switch" id="odemeDurum" checked>
                                     </div>
                                 </td>
-                                <td><a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle"><i class="ri-edit-line"></i> <small>Düzenle</small></a></td>
+                                <td>
+                                    <a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <i class="ri-edit-line"></i> <span class="small">Düzenle</span>
+                                        </div>
+                                    </a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

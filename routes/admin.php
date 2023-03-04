@@ -59,8 +59,9 @@ Route::prefix('admin')->group(static function () {
         Route::get('/payments/closed', [PaymentController::class, 'closed'])->name('admin.payments.closed');
 
         Route::get('/settings/gateway', [GatewayController::class, 'index'])->name('admin.settings.gateway');
-        Route::get('/settings/email', [EmailController::class, 'index'])->name('admin.settings.email');
         Route::get('/settings/contracts', [ContractsController::class, 'index'])->name('admin.settings.contracts');
+        Route::get('/settings/contract/new', [ContractsController::class, 'create'])->name('admin.settings.contracts.create');
+
     });
 });
 

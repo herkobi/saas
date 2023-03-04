@@ -13,4 +13,9 @@ class ContractsController extends Controller
         return view('admin.settings.contracts.index');
     }
 
+    public function create(): View
+    {
+        return view('admin.settings.contracts.create');
+    }
+
 }
