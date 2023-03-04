@@ -18,4 +18,9 @@ class ContractsController extends Controller
         return view('admin.settings.contracts.create');
     }
 
+    public function edit(Request $request): View
+    {
+        return view('admin.settings.contracts.edit');
+    }
+
 }
