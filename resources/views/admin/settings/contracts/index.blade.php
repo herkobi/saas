@@ -18,8 +18,9 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @foreach ($contracts as $item)
                             <tr>
-                                <td>Gizlilik Politikası</td>
+                                <td>{{$item->title}}</td>
                                 <td>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input shadow-none" type="checkbox" role="switch" id="odemeDurum" checked>
@@ -33,36 +34,7 @@
                                     </a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>Kullanım Sözleşmesi</td>
-                                <td>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="odemeDurum" checked>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <i class="ri-edit-line"></i> <span class="small">Düzenle</span>
-                                        </div>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Üyelik Sözleşmesi</td>
-                                <td>
-                                    <div class="form-check form-switch">
-                                        <input class="form-check-input shadow-none" type="checkbox" role="switch" id="odemeDurum" checked>
-                                    </div>
-                                </td>
-                                <td>
-                                    <a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <i class="ri-edit-line"></i> <span class="small">Düzenle</span>
-                                        </div>
-                                    </a>
-                                </td>
-                            </tr>
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
