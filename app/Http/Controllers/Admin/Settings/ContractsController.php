@@ -25,8 +25,7 @@ class ContractsController extends Controller
 
     public function store(ContractUpdateRequest $request): RedirectResponse
     {
-        $input=$request->all();
-        Contract::create($input);
+        Contract::create($request->all());
 
         return Redirect::route('admin.settings.contracts')->with('status', 'contract-updated');
     }
