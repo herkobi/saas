@@ -92,7 +92,7 @@ main .ck-editor[role='application'] .ck.ck-content,
     min-width: 110px;
 }
 .form-check-input {
-    margin-top: 0;
+    margin-top: 0.1em;
 }
 .page-content .small, .page-content small {
     font-size: .75rem;
