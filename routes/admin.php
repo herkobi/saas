@@ -61,7 +61,8 @@ Route::prefix('admin')->group(static function () {
         Route::get('/settings/contracts', [ContractsController::class, 'index'])->name('admin.settings.contracts');
         Route::get('/settings/contract/new', [ContractsController::class, 'create'])->name('admin.settings.contracts.create');
         Route::post('/settings/contract/new', [ContractsController::class, 'store'])->name('admin.settings.contracts.store');
-
+        Route::get('/settings/contract/edit/{contract}', [ContractsController::class, 'edit'])->name('admin.settings.contracts.edit');
+        Route::post('/settings/contract/update', [ContractsController::class, 'update'])->name('admin.settings.contracts.update');
 
     });
 });

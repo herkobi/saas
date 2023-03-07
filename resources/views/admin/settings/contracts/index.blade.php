@@ -27,7 +27,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a href="ayarlar-sozlesme-duzenle.html" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle">
+                                    <a href="{{route('admin.settings.contracts.edit', $item->id)}}" class="fs-5 border-0 bg-transparent text-decoration-none text-black-50" title="Düzenle">
                                         <div class="d-flex align-items-center justify-content-between">
                                             <i class="ri-edit-line"></i> <span class="small">Düzenle</span>
                                         </div>

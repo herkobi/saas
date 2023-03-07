@@ -30,9 +30,15 @@ class ContractsController extends Controller
         return Redirect::route('admin.settings.contracts')->with('status', 'contract-updated');
     }
 
-    public function edit(Request $request): View
+    public function edit(Contract $contract)
     {
-        return view('admin.settings.contracts.edit');
+        return view('admin.settings.contracts.edit', compact('contract'));
+    }
+
+    public function update(ContractUpdateRequest $request, Contract $contract): RedirectResponse
+    {
+    
+        return Redirect::route('admin.settings.contracts')->with('status', 'contract-updated');
     }
 
 }

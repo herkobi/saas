@@ -8,16 +8,16 @@
                 @include('admin.settings.partials.header', ['title' => 'Yeni Sözleşme', 'link' => 'admin.settings.contracts', 'linktext' => 'Sözleşmeler' ])
             </div>
             <div class="page-content">
-                <form action="" method="post">
+                <form action="{{ route('admin.settings.contracts.update', $contract->id) }}" method="post">
                     @csrf
                     <div class="mb-2">
                         <x-input-label for="sozlesmeAdi">Sözleşme Adı</x-input-label>
-                        <x-input id="sozlesmeAdi" type="text" name="title" placeholder="Sözleşme Adı" required autofocus />
+                        <x-input id="sozlesmeAdi" type="text" name="title" value="{{ $contract->title }}" placeholder="Sözleşme Adı" required autofocus />
                         <x-input-error :messages="$errors->get('title')" class="mt-1 mb-0" />
                     </div>
                     <div class="mb-3">
                         <x-input-label for="sozlesmeDetay">Sözleşme İçeriği</x-input-label>
-                        <x-textarea id="sozlesmeDetay" name="content" class="editor" required />
+                        <x-textarea id="sozlesmeDetay" name="content" class="editor" required>{{ $contract->content }}</x-textarea>
                         <x-input-error :messages="$errors->get('content')" class="mt-1 mb-0" />
                     </div>
                     <div class="d-grid gap-2">
