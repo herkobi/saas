@@ -1,0 +1,8 @@
+{
+  "enabledPlugins": {
+    "serena@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "code-review@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true
+  }
+}
