@@ -5,7 +5,7 @@ import Card from 'primevue/card';
 import PanelLayout from '@/layouts/Panel.vue';
 import type { Activity, PaginatedData } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     tenant: any;
     activities: PaginatedData<Activity>;
     statistics: Record<string, any>;

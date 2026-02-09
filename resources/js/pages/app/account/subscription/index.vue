@@ -8,6 +8,8 @@ import Message from 'primevue/message';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
+import type { FeatureUsage } from '@/types';
 
 interface SubscriptionDetail {
     id: string;
@@ -18,20 +20,6 @@ interface SubscriptionDetail {
     ends_at: string | null;
     trial_ends_at: string | null;
     grace_ends_at: string | null;
-}
-
-interface FeatureDetail {
-    name: string;
-    unit: string | null;
-    usage: {
-        type: 'boolean' | 'numeric';
-        enabled: boolean;
-        is_unlimited: boolean;
-        limit: number;
-        used: number;
-        remaining: number;
-        percentage: number;
-    };
 }
 
 interface AvailablePlan {
@@ -47,21 +35,14 @@ interface AvailablePlan {
     }>;
 }
 
-const props = defineProps<{
+defineProps<{
     subscription: SubscriptionDetail | null;
-    features: FeatureDetail[];
+    features: FeatureUsage[];
     availablePlans: AvailablePlan[];
     canUpgrade: boolean;
     canDowngrade: boolean;
 }>();
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

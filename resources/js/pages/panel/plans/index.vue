@@ -6,6 +6,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import PanelLayout from '@/layouts/Panel.vue';
+import { formatDate } from '@/composables/useFormatting';
 import type { PaginatedData } from '@/types';
 
 interface PlanItem {
@@ -32,9 +33,6 @@ const toggleArchived = () => {
     router.get('/panel/plans', { archived: showArchived ? undefined : '1' }, { preserveState: true });
 };
 
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

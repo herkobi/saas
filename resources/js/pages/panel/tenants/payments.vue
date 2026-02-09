@@ -6,21 +6,15 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import PanelLayout from '@/layouts/Panel.vue';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import type { PaginatedData } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     tenant: any;
     payments: PaginatedData<any>;
     statistics: Record<string, any>;
 }>();
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

@@ -22,7 +22,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Profile\TwoFactorAuthenticationRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -56,11 +55,10 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
     public function show(TwoFactorAuthenticationRequest $request): Response
     {
         $request->ensureStateIsValid();
-        $user = Auth::user()->fresh();
 
         return Inertia::render('panel/Profile/TwoFactor', [
-            'user' => $user,
-            'twoFactorEnabled' => !is_null($user->two_factor_secret),
+            'user' => $request->user(),
+            'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
             'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
         ]);
     }

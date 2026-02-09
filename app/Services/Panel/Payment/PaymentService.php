@@ -232,6 +232,16 @@ class PaymentService implements PaymentServiceInterface
      * @param string|null $endDate End date filter
      * @return Collection Revenue data collection
      */
+    public function getFailedPayments(int $limit = 10): Collection
+    {
+        return Payment::withoutTenantScope()
+            ->where('status', PaymentStatus::FAILED)
+            ->with('tenant')
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
     public function getRevenueByPeriod(
         string $period = 'month',
         ?string $startDate = null,

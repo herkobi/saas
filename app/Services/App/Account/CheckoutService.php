@@ -260,6 +260,7 @@ class CheckoutService implements CheckoutServiceInterface
             'quantity' => $quantity,
             'subtotal' => round($subtotal, 2),
             'tax_rate' => TaxHelper::rate(),
+            'tax_name' => config('herkobi.payment.tax_name', 'KDV'),
             'tax' => $tax,
             'final_amount' => round($finalAmount, 2),
             'currency' => $addon->currency,
@@ -288,6 +289,7 @@ class CheckoutService implements CheckoutServiceInterface
         return [
             'subtotal' => round($price, 2),
             'tax_rate' => TaxHelper::rate(),
+            'tax_name' => config('herkobi.payment.tax_name', 'KDV'),
             'tax' => $tax,
             'proration_credit' => round($prorationCredit, 2),
             'final_amount' => round($finalAmount, 2),

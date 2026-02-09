@@ -6,6 +6,7 @@ namespace App\Services\App\Account;
 
 use App\Contracts\App\Account\FeatureUsageServiceInterface;
 use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Enums\AddonType;
 use App\Enums\FeatureType;
 use App\Models\Feature;
 use App\Models\Tenant;
@@ -30,10 +31,17 @@ class FeatureUsageService implements FeatureUsageServiceInterface
         $overrides = $tenant->featureOverrides()->with('feature')->get()->keyBy('feature_id');
         $usages = $tenant->usages()->get()->keyBy('feature_id');
 
-        return $planFeatures->map(function ($feature) use ($overrides, $usages) {
+        return $planFeatures->map(function ($feature) use ($tenant, $overrides, $usages) {
             $override = $overrides->get($feature->id);
             $usage = $usages->get($feature->id);
-            $effectiveValue = $override?->value ?? $feature->pivot->value;
+
+            // Addon-aware effective value resolution
+            if ($feature->type === FeatureType::FEATURE) {
+                $effectiveValue = $tenant->hasFeatureAccess($feature) ? '1' : '0';
+            } else {
+                $limit = $tenant->getFeatureLimit($feature);
+                $effectiveValue = $limit === null ? 'unlimited' : (string) (int) $limit;
+            }
 
             return [
                 'id' => $feature->id,
@@ -72,15 +80,17 @@ class FeatureUsageService implements FeatureUsageServiceInterface
             return ['error' => 'Bu özellik mevcut planda tanımlı değil.'];
         }
 
-        $override = $tenant->featureOverrides()
-            ->where('feature_id', $feature->id)
-            ->first();
-
         $usage = $tenant->usages()
             ->where('feature_id', $feature->id)
             ->first();
 
-        $effectiveValue = $override?->value ?? $planFeature->pivot->value;
+        // Addon-aware effective value resolution
+        if ($feature->type === FeatureType::FEATURE) {
+            $effectiveValue = $tenant->hasFeatureAccess($feature) ? '1' : '0';
+        } else {
+            $limit = $tenant->getFeatureLimit($feature);
+            $effectiveValue = $limit === null ? 'unlimited' : (string) (int) $limit;
+        }
 
         return [
             'feature' => [
@@ -136,14 +146,8 @@ class FeatureUsageService implements FeatureUsageServiceInterface
             return false;
         }
 
-        $override = $tenant->featureOverrides()
-            ->where('feature_id', $feature->id)
-            ->first();
-
-        $effectiveValue = $override?->value ?? $planFeature->pivot->value;
-
         if ($feature->type === FeatureType::FEATURE) {
-            return filter_var($effectiveValue, FILTER_VALIDATE_BOOLEAN);
+            return $tenant->hasFeatureAccess($feature);
         }
 
         return true;
@@ -184,6 +188,161 @@ class FeatureUsageService implements FeatureUsageServiceInterface
             'remaining' => $remaining,
             'limit' => $usage['limit'],
             'used' => $usage['used'],
+        ];
+    }
+
+    public function resolveWithReason(Tenant $tenant, string $featureSlug): array
+    {
+        $feature = Feature::where('slug', $featureSlug)->first();
+
+        if (!$feature) {
+            return [
+                'feature' => null,
+                'access' => [
+                    'allowed' => false,
+                    'reason' => 'Özellik bulunamadı.',
+                ],
+            ];
+        }
+
+        $plan = $tenant->currentPlan();
+
+        if (!$plan) {
+            return [
+                'feature' => $this->formatFeatureInfo($feature),
+                'effective_value' => null,
+                'plan_value' => null,
+                'has_override' => false,
+                'override_value' => null,
+                'addon_contributions' => [],
+                'source' => 'plan',
+                'is_unlimited' => false,
+                'usage' => null,
+                'access' => [
+                    'allowed' => false,
+                    'reason' => 'Aktif plan bulunamadı.',
+                ],
+            ];
+        }
+
+        $planFeature = $plan->features()->where('features.id', $feature->id)->first();
+
+        if (!$planFeature) {
+            return [
+                'feature' => $this->formatFeatureInfo($feature),
+                'effective_value' => null,
+                'plan_value' => null,
+                'has_override' => false,
+                'override_value' => null,
+                'addon_contributions' => [],
+                'source' => 'plan',
+                'is_unlimited' => false,
+                'usage' => null,
+                'access' => [
+                    'allowed' => false,
+                    'reason' => 'Bu özellik planınızda tanımlı değil.',
+                ],
+            ];
+        }
+
+        $planValue = $planFeature->pivot->value;
+        $source = 'plan';
+        $hasOverride = false;
+        $overrideValue = null;
+        $isUnlimited = false;
+
+        // Step 1: Check override
+        $override = $tenant->featureOverrides()
+            ->where('feature_id', $feature->id)
+            ->first();
+
+        if ($override) {
+            $hasOverride = true;
+            $overrideValue = $override->value;
+            $source = 'override';
+        }
+
+        // Step 2: Resolve addon contributions
+        $addonContributions = [];
+        $activeAddons = $tenant->addons()
+            ->where('feature_id', $feature->id)
+            ->where('tenant_addons.is_active', true)
+            ->where(function ($q) {
+                $q->whereNull('tenant_addons.expires_at')
+                    ->orWhere('tenant_addons.expires_at', '>', now());
+            })
+            ->get();
+
+        foreach ($activeAddons as $addon) {
+            $addonContributions[] = [
+                'addon_name' => $addon->name,
+                'addon_type' => $addon->addon_type->value,
+                'value' => (int) $addon->value,
+                'quantity' => (int) $addon->pivot->quantity,
+                'effective_bonus' => (int) $addon->value * (int) $addon->pivot->quantity,
+                'expires_at' => $addon->pivot->expires_at?->toISOString(),
+            ];
+
+            if ($addon->addon_type === AddonType::UNLIMITED) {
+                $isUnlimited = true;
+            }
+        }
+
+        if (count($addonContributions) > 0 && $source === 'plan') {
+            $source = $isUnlimited ? 'addon' : 'plan+addon';
+        }
+
+        // Step 3: Calculate final effective value using Tenant model methods
+        if ($feature->type === FeatureType::FEATURE) {
+            $allowed = $tenant->hasFeatureAccess($feature);
+            $effectiveValue = $allowed ? '1' : '0';
+        } else {
+            $limit = $tenant->getFeatureLimit($feature);
+            $isUnlimited = $limit === null;
+            $effectiveValue = $isUnlimited ? 'unlimited' : (string) (int) $limit;
+        }
+
+        // Step 4: Calculate usage
+        $usage = $tenant->usages()
+            ->where('feature_id', $feature->id)
+            ->first();
+
+        $usageData = null;
+        if ($feature->type !== FeatureType::FEATURE) {
+            $used = $usage?->used ?? 0;
+            $limitInt = $isUnlimited ? null : (int) $effectiveValue;
+
+            $usageData = [
+                'used' => $used,
+                'remaining' => $limitInt === null ? null : max(0, $limitInt - $used),
+                'percentage' => ($limitInt === null || $limitInt === 0)
+                    ? 0
+                    : min(100, round(($used / $limitInt) * 100, 2)),
+                'reset_at' => $usage?->cycle_ends_at?->toISOString(),
+            ];
+        }
+
+        // Step 5: Determine access and reason
+        $access = $this->buildAccessReason(
+            $feature,
+            $effectiveValue,
+            $isUnlimited,
+            $hasOverride,
+            $overrideValue,
+            $usageData
+        );
+
+        return [
+            'feature' => $this->formatFeatureInfo($feature),
+            'effective_value' => $effectiveValue,
+            'plan_value' => $planValue,
+            'has_override' => $hasOverride,
+            'override_value' => $overrideValue,
+            'addon_contributions' => $addonContributions,
+            'source' => $source,
+            'is_unlimited' => $isUnlimited,
+            'usage' => $usageData,
+            'access' => $access,
         ];
     }
 
@@ -251,6 +410,61 @@ class FeatureUsageService implements FeatureUsageServiceInterface
         });
     }
 
+    private function formatFeatureInfo(Feature $feature): array
+    {
+        return [
+            'id' => $feature->id,
+            'name' => $feature->name,
+            'slug' => $feature->slug,
+            'type' => $feature->type->value,
+            'unit' => $feature->unit,
+        ];
+    }
+
+    private function buildAccessReason(
+        Feature $feature,
+        string $effectiveValue,
+        bool $isUnlimited,
+        bool $hasOverride,
+        ?string $overrideValue,
+        ?array $usageData
+    ): array {
+        if ($feature->type === FeatureType::FEATURE) {
+            $allowed = filter_var($effectiveValue, FILTER_VALIDATE_BOOLEAN);
+
+            if (!$allowed && $hasOverride) {
+                return [
+                    'allowed' => false,
+                    'reason' => 'Bu özellik yönetici tarafından devre dışı bırakılmış.',
+                ];
+            }
+
+            return [
+                'allowed' => $allowed,
+                'reason' => $allowed ? 'Erişim mevcut.' : 'Bu özellik planınızda bulunmuyor.',
+            ];
+        }
+
+        if ($isUnlimited) {
+            return [
+                'allowed' => true,
+                'reason' => 'Sınırsız erişim.',
+            ];
+        }
+
+        if ($usageData && $usageData['remaining'] !== null && $usageData['remaining'] <= 0) {
+            return [
+                'allowed' => false,
+                'reason' => "Kullanım limitine ulaştınız ({$usageData['used']}/{$effectiveValue}).",
+            ];
+        }
+
+        return [
+            'allowed' => true,
+            'reason' => 'Erişim mevcut.',
+        ];
+    }
+
     private function formatUsage(Feature $feature, string $effectiveValue, ?TenantUsage $usage): array
     {
         if ($feature->type === FeatureType::FEATURE) {
@@ -267,11 +481,11 @@ class FeatureUsageService implements FeatureUsageServiceInterface
         $used = $usage?->used ?? 0;
 
         return [
-            'type' => $feature->type->value,
+            'type' => 'numeric',
             'limit' => $limit,
             'used' => $used,
             'remaining' => $limit === null ? null : max(0, $limit - $used),
-            'percentage' => $limit === null ? 0 : min(100, round(($used / $limit) * 100)),
+            'percentage' => $limit === null ? 0 : ($limit === 0 ? 0 : min(100, round(($used / $limit) * 100))),
             'is_unlimited' => $limit === null,
             'reset_at' => $usage?->cycle_ends_at?->toISOString(),
         ];

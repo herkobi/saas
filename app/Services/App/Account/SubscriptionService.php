@@ -51,6 +51,8 @@ class SubscriptionService implements SubscriptionServiceInterface
                 'has_expired' => $subscription->hasExpired(),
                 'is_valid' => $subscription->isValid(),
                 'days_remaining' => $this->getDaysRemaining($tenant),
+                'custom_price' => $subscription->custom_price,
+                'custom_currency' => $subscription->custom_currency,
             ],
             'plan' => $plan ? [
                 'id' => $plan->id,

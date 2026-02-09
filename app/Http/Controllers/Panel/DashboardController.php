@@ -55,49 +55,16 @@ class DashboardController extends Controller
      */
     public function index(Request $request): Response
     {
-        // Tenant istatistikleri
         $totalTenants = $this->tenantService->getAll()->count();
         $activeTenants = $this->tenantService->getActive()->count();
-
-        // Payment istatistikleri
         $paymentStats = $this->paymentService->getStatistics();
-
-        // Subscription istatistikleri
         $subscriptionStats = $this->subscriptionService->getStatistics();
-
-        // Son ödemeler (5 adet)
         $recentPayments = $this->paymentService->getPaginated([], 5);
-
-        // Son hesaplar (5 adet)
         $recentTenants = $this->tenantService->getPaginated(['sort_field' => 'created_at', 'sort_direction' => 'desc'], 5);
-
-        // Son aktiviteler (15 adet) - Activity model varsa
-        $recentActivities = \App\Models\Activity::with('user')
-            ->orderBy('created_at', 'desc')
-            ->limit(15)
-            ->get();
-
-        // Plan dağılımı - DB seviyesinde aggregation
-        $planDistribution = \App\Models\Subscription::query()
-            ->join('plan_prices', 'subscriptions.plan_price_id', '=', 'plan_prices.id')
-            ->join('plans', 'plan_prices.plan_id', '=', 'plans.id')
-            ->selectRaw('plans.name, COUNT(*) as subscriber_count, SUM(plan_prices.price) as total_revenue')
-            ->groupBy('plans.name')
-            ->get();
-
-        // Uyarılar
-        $expiringSubscriptions = \App\Models\Subscription::whereNotNull('ends_at')
-            ->whereBetween('ends_at', [now(), now()->addDays(7)])
-            ->with('tenant')
-            ->limit(10)
-            ->get();
-
-        $failedPayments = \App\Models\Payment::withoutTenantScope()
-            ->where('status', \App\Enums\PaymentStatus::FAILED)
-            ->with('tenant')
-            ->orderBy('created_at', 'desc')
-            ->limit(10)
-            ->get();
+        $recentActivities = $this->tenantService->getRecentActivities();
+        $planDistribution = $this->subscriptionService->getPlanDistribution();
+        $expiringSubscriptions = $this->subscriptionService->getExpiringSubscriptions();
+        $failedPayments = $this->paymentService->getFailedPayments();
 
         return Inertia::render('panel/Dashboard', [
             'totalTenants' => $totalTenants,

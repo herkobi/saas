@@ -7,7 +7,7 @@ import { Link } from '@inertiajs/vue3';
 import PanelLayout from '@/layouts/Panel.vue';
 import type { Notification, PaginatedData } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     notifications: PaginatedData<Notification>;
     unreadCount: number;
 }>();

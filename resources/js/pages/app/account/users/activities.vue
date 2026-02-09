@@ -5,7 +5,7 @@ import Card from 'primevue/card';
 import AppLayout from '@/layouts/App.vue';
 import type { Activity, PaginatedData, TenantUser } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     user: TenantUser;
     activities: PaginatedData<Activity>;
 }>();

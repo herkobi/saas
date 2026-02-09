@@ -20,9 +20,9 @@ namespace App\Http\Controllers\App\Profile;
 
 use App\Contracts\App\Profile\PasswordServiceInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\App\Profile\UpdatePasswordRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -56,19 +56,14 @@ class PasswordController extends Controller
     /**
      * Update the user's password.
      *
-     * @param Request $request The incoming request
+     * @param UpdatePasswordRequest $request The validated password update request
      * @return RedirectResponse
      */
-    public function update(Request $request): RedirectResponse
+    public function update(UpdatePasswordRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::defaults(), 'confirmed'],
-        ]);
-
         $this->passwordService->update(
             $request->user(),
-            $validated['password'],
+            $request->validated('password'),
             $request->ip() ?? '127.0.0.1',
             $request->userAgent() ?? 'unknown'
         );

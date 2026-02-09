@@ -6,9 +6,10 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
+import { ref } from 'vue';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import PanelLayout from '@/layouts/Panel.vue';
 import type { PaginatedData } from '@/types';
-import { ref } from 'vue';
 
 const props = defineProps<{
     payments: PaginatedData<any>;
@@ -23,13 +24,6 @@ const applySearch = () => {
     router.get('/panel/payments', { search: search.value || undefined }, { preserveState: true });
 };
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

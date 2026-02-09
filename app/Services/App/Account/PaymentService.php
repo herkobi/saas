@@ -68,4 +68,39 @@ class PaymentService implements PaymentServiceInterface
             ->pending()
             ->count();
     }
+
+    public function getRecentPayments(Tenant $tenant, int $limit = 5): array
+    {
+        return $tenant->payments()
+            ->with(['subscription.price.plan', 'addon'])
+            ->latest()
+            ->take($limit)
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'id' => $payment->id,
+                    'type' => $payment->subscription_id ? 'subscription' : 'addon',
+                    'type_label' => $payment->subscription_id ? 'Abonelik' : 'Eklenti',
+                    'description' => $payment->subscription_id
+                        ? $payment->subscription->price->plan->name
+                        : ($payment->addon->name ?? 'Ödeme'),
+                    'amount' => $payment->amount,
+                    'currency' => $payment->currency,
+                    'status' => $payment->status,
+                    'status_label' => $payment->status->label(),
+                    'status_badge' => $payment->status->badge(),
+                    'created_at' => $payment->created_at,
+                ];
+            })
+            ->toArray();
+    }
+
+    public function getDashboardStatistics(Tenant $tenant): array
+    {
+        return [
+            'total_payments' => $tenant->payments()->completed()->count(),
+            'total_amount' => $tenant->payments()->completed()->sum('amount'),
+            'team_members' => $tenant->users()->count(),
+        ];
+    }
 }

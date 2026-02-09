@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import AppLayout from '@/layouts/App.vue';
 
 interface AvailableAddon {
@@ -26,18 +27,10 @@ interface CurrentAddon {
     expires_at: string | null;
 }
 
-const props = defineProps<{
+defineProps<{
     availableAddons: AvailableAddon[];
     currentAddons: CurrentAddon[];
 }>();
-
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 
 const purchaseAddon = (addonId: string) => {
     useForm({ addon_id: addonId }).post('/app/account/addons/purchase');

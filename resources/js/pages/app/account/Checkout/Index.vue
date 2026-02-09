@@ -3,6 +3,7 @@ import { useForm } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
 import AppLayout from '@/layouts/App.vue';
+import { formatCurrency } from '@/composables/useFormatting';
 
 interface CheckoutPlanPrice {
     id: string;
@@ -13,7 +14,7 @@ interface CheckoutPlanPrice {
     plan: { id: string; name: string; description?: string };
 }
 
-const props = defineProps<{
+defineProps<{
     planPrice: CheckoutPlanPrice;
     type: string;
     amounts: {
@@ -21,6 +22,8 @@ const props = defineProps<{
         tax_amount: number;
         total_amount: number;
         credit_amount?: number;
+        tax_rate: number;
+        tax_name: string;
     };
     billingInfo: Record<string, any>;
 }>();
@@ -31,9 +34,6 @@ const submit = () => {
     form.post('/app/account/checkout');
 };
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
 </script>
 
 <template>
@@ -61,7 +61,7 @@ const formatCurrency = (amount: number, currency: string = 'TRY') => {
                             <span class="text-sm text-green-600">-{{ formatCurrency(amounts.credit_amount, planPrice.currency) }}</span>
                         </div>
                         <div class="flex items-center justify-between">
-                            <span class="text-sm text-surface-500">KDV (%20)</span>
+                            <span class="text-sm text-surface-500">{{ amounts.tax_name }} (%{{ amounts.tax_rate }})</span>
                             <span class="text-sm text-surface-700 dark:text-surface-300">{{ formatCurrency(amounts.tax_amount, planPrice.currency) }}</span>
                         </div>
 

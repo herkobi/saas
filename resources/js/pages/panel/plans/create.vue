@@ -8,7 +8,7 @@ import InputNumber from 'primevue/inputnumber';
 import PanelLayout from '@/layouts/Panel.vue';
 import { store } from '@/routes/panel/plans';
 
-const props = defineProps<{
+defineProps<{
     tenants: any[];
 }>();
 

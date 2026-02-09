@@ -28,4 +28,6 @@ interface FeatureUsageServiceInterface
     public function decrementUsage(Tenant $tenant, string $featureSlug, int $amount = 1): bool;
 
     public function resetUsage(Tenant $tenant, string $featureSlug): bool;
+
+    public function resolveWithReason(Tenant $tenant, string $featureSlug): array;
 }

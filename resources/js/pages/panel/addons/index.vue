@@ -6,9 +6,10 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
+import { ref } from 'vue';
+import { formatCurrency } from '@/composables/useFormatting';
 import PanelLayout from '@/layouts/Panel.vue';
 import type { PaginatedData } from '@/types';
-import { ref } from 'vue';
 
 interface AddonItem {
     id: string;
@@ -37,9 +38,6 @@ const applySearch = () => {
     router.get('/panel/plans/addons', { search: search.value || undefined }, { preserveState: true });
 };
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
 </script>
 
 <template>

@@ -6,7 +6,6 @@ import { computed } from 'vue';
 import ToastListener from '@/components/ToastListener.vue';
 import type { AppPageProps } from '@/types';
 
-// Props tanımları
 const props = withDefaults(
     defineProps<{
         title?: string;

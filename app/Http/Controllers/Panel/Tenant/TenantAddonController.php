@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Panel\Tenant;
 
 use App\Contracts\Panel\Addon\TenantAddonServiceInterface;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Panel\Tenant\ExtendAddonRequest;
 use App\Models\Addon;
 use App\Models\Tenant;
 use App\Models\TenantAddon;
@@ -38,19 +39,15 @@ class TenantAddonController extends Controller
     /**
      * Extend a tenant's addon expiry.
      */
-    public function extend(Request $request, Tenant $tenant, string $addonId): RedirectResponse
+    public function extend(ExtendAddonRequest $request, Tenant $tenant, string $addonId): RedirectResponse
     {
-        $request->validate([
-            'days' => ['required', 'integer', 'min:1', 'max:365'],
-        ]);
-
         $tenantAddon = TenantAddon::where('tenant_id', $tenant->id)
             ->where('addon_id', $addonId)
             ->firstOrFail();
 
         $this->tenantAddonService->extendAddon(
             $tenantAddon,
-            (int) $request->input('days'),
+            (int) $request->validated('days'),
             $request->user(),
             $request->ip(),
             $request->userAgent()

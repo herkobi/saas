@@ -19,4 +19,8 @@ interface PaymentServiceInterface
     public function getLastPayment(Tenant $tenant): ?Payment;
 
     public function getPendingPayments(Tenant $tenant): int;
+
+    public function getRecentPayments(Tenant $tenant, int $limit = 5): array;
+
+    public function getDashboardStatistics(Tenant $tenant): array;
 }

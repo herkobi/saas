@@ -5,7 +5,7 @@ import Card from 'primevue/card';
 import PanelLayout from '@/layouts/Panel.vue';
 import type { Notification, PaginatedData } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     archivedNotifications: PaginatedData<Notification>;
 }>();
 

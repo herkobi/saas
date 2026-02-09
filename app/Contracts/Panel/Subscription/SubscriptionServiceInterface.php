@@ -19,4 +19,8 @@ interface SubscriptionServiceInterface
     public function getStatistics(array $filters = []): array; // Sadece bu isim kaldı.
 
     public function getRevenueByPlan(?string $startDate = null, ?string $endDate = null): Collection;
+
+    public function getPlanDistribution(): Collection;
+
+    public function getExpiringSubscriptions(int $days = 7, int $limit = 10): Collection;
 }

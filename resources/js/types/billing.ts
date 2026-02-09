@@ -53,3 +53,17 @@ export interface Addon {
     currency: string;
     is_active: boolean;
 }
+
+export interface FeatureUsage {
+    name: string;
+    unit: string | null;
+    usage: {
+        type: 'boolean' | 'numeric';
+        enabled: boolean;
+        is_unlimited: boolean;
+        limit: number;
+        used: number;
+        remaining: number;
+        percentage: number;
+    };
+}

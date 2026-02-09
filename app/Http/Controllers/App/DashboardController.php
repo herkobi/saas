@@ -18,6 +18,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App;
 
+use App\Contracts\App\Account\FeatureUsageServiceInterface;
+use App\Contracts\App\Account\PaymentServiceInterface;
+use App\Contracts\App\Account\SubscriptionServiceInterface;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
@@ -33,6 +36,19 @@ use Inertia\Response;
 class DashboardController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @param SubscriptionServiceInterface $subscriptionService
+     * @param PaymentServiceInterface $paymentService
+     * @param FeatureUsageServiceInterface $featureUsageService
+     */
+    public function __construct(
+        private readonly SubscriptionServiceInterface $subscriptionService,
+        private readonly PaymentServiceInterface $paymentService,
+        private readonly FeatureUsageServiceInterface $featureUsageService,
+    ) {}
+
+    /**
      * Display the tenant dashboard.
      *
      * @param Request $request
@@ -41,113 +57,56 @@ class DashboardController extends Controller
     public function index(Request $request): Response
     {
         $tenant = app(Tenant::class);
-        $user = $request->user();
 
-        // Subscription bilgileri
-        $subscription = $tenant->subscription;
-        $hasActiveSubscription = $tenant->hasActiveSubscription();
+        $subscriptionDetails = $this->subscriptionService->getSubscriptionDetails($tenant);
+        $hasSubscription = $subscriptionDetails['has_subscription'];
 
-        // Subscription data hazırla
-        $subscriptionData = null;
-        $features = collect();
-        $canUpgrade = false;
+        $features = $hasSubscription
+            ? $this->featureUsageService->getAllFeatures($tenant)
+            : collect();
 
-        if ($subscription) {
-            $subscriptionData = [
-                'status' => [
-                    'label' => $subscription->status->label(),
-                    'badge' => $subscription->status->badge(),
-                ],
-                'plan' => [
-                    'name' => $subscription->price->plan->name,
-                ],
-                'price' => [
-                    'amount' => $subscription->custom_price ?? $subscription->price->price,
-                    'currency' => $subscription->custom_currency ?? $subscription->price->currency,
-                    'interval_label' => $subscription->price->interval->label(),
-                ],
-                'ends_at' => $subscription->ends_at?->toISOString(),
-            ];
-
-            // Features
-            $planFeatures = $subscription->price->plan->features;
-            foreach ($planFeatures as $feature) {
-                $limit = $tenant->getFeatureLimit($feature);
-                $used = 0;
-
-                if ($feature->isMetered() || $feature->isLimit()) {
-                    $usage = $tenant->usages()
-                        ->where('feature_id', $feature->id)
-                        ->first();
-                    $used = $usage?->used ?? 0;
-                }
-
-                $isUnlimited = $limit === PHP_INT_MAX;
-                $percentage = 0;
-                $remaining = 0;
-
-                if (!$isUnlimited && $limit > 0) {
-                    $percentage = min(100, round(($used / $limit) * 100));
-                    $remaining = max(0, $limit - $used);
-                }
-
-                $features->push([
-                    'name' => $feature->name,
-                    'unit' => $feature->unit,
-                    'usage' => [
-                        'type' => $feature->isFeature() ? 'boolean' : 'numeric',
-                        'enabled' => $limit > 0 || $isUnlimited,
-                        'is_unlimited' => $isUnlimited,
-                        'limit' => $limit,
-                        'used' => $used,
-                        'remaining' => $remaining,
-                        'percentage' => $percentage,
-                    ],
-                ]);
-            }
-
-            // Check if upgrade available
-            $canUpgrade = $subscription->status->isValid();
-        }
-
-        // Statistics
-        $statistics = [
-            'total_payments' => $tenant->payments()->completed()->count(),
-            'total_amount' => $tenant->payments()->completed()->sum('amount'),
-            'team_members' => $tenant->users()->count(),
-        ];
-
-        // Recent payments
-        $recentPayments = $tenant->payments()
-            ->with(['subscription.price.plan', 'addon'])
-            ->latest()
-            ->take(5)
-            ->get()
-            ->map(function ($payment) {
-                return [
-                    'id' => $payment->id,
-                    'type' => $payment->subscription_id ? 'subscription' : 'addon',
-                    'type_label' => $payment->subscription_id ? 'Abonelik' : 'Eklenti',
-                    'description' => $payment->subscription_id
-                        ? $payment->subscription->price->plan->name
-                        : ($payment->addon->name ?? 'Ödeme'),
-                    'amount' => $payment->amount,
-                    'currency' => $payment->currency,
-                    'status' => $payment->status,
-                    'status_label' => $payment->status->label(),
-                    'status_badge' => $payment->status->badge(),
-                    'created_at' => $payment->created_at,
-                ];
-            });
+        $canUpgrade = $this->subscriptionService->canUpgrade($tenant);
+        $statistics = $this->paymentService->getDashboardStatistics($tenant);
+        $recentPayments = $this->paymentService->getRecentPayments($tenant);
 
         return Inertia::render('app/Dashboard', [
             'tenant' => $tenant,
-            'hasActiveSubscription' => $hasActiveSubscription,
-            'subscription' => $subscriptionData,
+            'hasActiveSubscription' => $tenant->hasActiveSubscription(),
+            'subscription' => $hasSubscription
+                ? $this->formatSubscriptionForDashboard($subscriptionDetails)
+                : null,
             'features' => $features,
             'statistics' => $statistics,
             'recentPayments' => $recentPayments,
             'canUpgrade' => $canUpgrade,
         ]);
+    }
+
+    /**
+     * Format subscription details for dashboard display.
+     *
+     * @param array<string, mixed> $details
+     * @return array<string, mixed>
+     */
+    private function formatSubscriptionForDashboard(array $details): array
+    {
+        $subscription = $details['subscription'];
+        $price = $details['price'];
+
+        return [
+            'status' => [
+                'label' => $subscription['status']['label'],
+                'badge' => $subscription['status']['badge'],
+            ],
+            'plan' => [
+                'name' => $details['plan']['name'] ?? '',
+            ],
+            'price' => [
+                'amount' => $subscription['custom_price'] ?? $price['amount'] ?? 0,
+                'currency' => $subscription['custom_currency'] ?? $price['currency'] ?? 'TRY',
+                'interval_label' => $price['interval_label'] ?? '',
+            ],
+            'ends_at' => $subscription['ends_at'],
+        ];
     }
 }

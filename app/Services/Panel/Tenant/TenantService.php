@@ -260,6 +260,14 @@ class TenantService implements TenantServiceInterface
         ];
     }
 
+    public function getRecentActivities(int $limit = 15): Collection
+    {
+        return Activity::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
     /**
      * Apply subscription status filter to query.
      *

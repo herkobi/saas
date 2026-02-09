@@ -4,21 +4,15 @@ import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
 import PanelLayout from '@/layouts/Panel.vue';
+import { formatDate, formatDateTime } from '@/composables/useFormatting';
 import type { Activity, PaginatedData } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     tenant: any;
     statistics: Record<string, any>;
     activities: PaginatedData<Activity>;
 }>();
 
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
-
-const formatDateTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-};
 </script>
 
 <template>

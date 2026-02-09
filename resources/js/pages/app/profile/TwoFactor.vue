@@ -11,7 +11,7 @@ import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import { enable, confirm, disable, regenerateRecoveryCodes } from '@/routes/two-factor';
 import type { User } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     user: User;
     twoFactorEnabled: boolean;
     requiresConfirmation: boolean;

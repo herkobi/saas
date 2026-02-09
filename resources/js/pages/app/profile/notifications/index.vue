@@ -8,7 +8,7 @@ import AppLayout from '@/layouts/App.vue';
 import { markAsRead, markAllAsRead } from '@/routes/app/profile/notifications';
 import type { Notification, PaginatedData } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     notifications: PaginatedData<Notification>;
     unreadCount: number;
 }>();

@@ -11,6 +11,7 @@ import Textarea from 'primevue/textarea';
 import ToggleSwitch from 'primevue/toggleswitch';
 import PanelLayout from '@/layouts/Panel.vue';
 import { update, publish, unpublish } from '@/routes/panel/plans';
+import { formatCurrency } from '@/composables/useFormatting';
 
 interface PlanPrice {
     id: string;
@@ -59,9 +60,6 @@ const togglePublish = () => {
     }
 };
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
 </script>
 
 <template>

@@ -5,6 +5,7 @@ import Card from 'primevue/card';
 import Message from 'primevue/message';
 import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
+import { formatCurrency } from '@/composables/useFormatting';
 
 interface PlanOption {
     id: string;
@@ -15,7 +16,7 @@ interface PlanOption {
     plan: { id: string; name: string; description?: string };
 }
 
-const props = defineProps<{
+defineProps<{
     currentSubscription: {
         id: string;
         ends_at: string | null;
@@ -35,10 +36,6 @@ const props = defineProps<{
     upgradeOptions: PlanOption[];
     downgradeOptions: PlanOption[];
 }>();
-
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
 
 const cancelDowngradeForm = useForm({});
 const cancelDowngrade = () => {

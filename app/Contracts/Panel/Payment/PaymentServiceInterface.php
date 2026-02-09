@@ -121,4 +121,12 @@ interface PaymentServiceInterface
         ?string $startDate = null,
         ?string $endDate = null
     ): Collection;
+
+    /**
+     * Get recent failed payments.
+     *
+     * @param int $limit Maximum number of results
+     * @return Collection Collection of failed payments with tenant relation
+     */
+    public function getFailedPayments(int $limit = 10): Collection;
 }

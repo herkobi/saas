@@ -4,6 +4,7 @@ import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
+import { formatCurrency, formatDateTime } from '@/composables/useFormatting';
 
 interface PaymentDetail {
     id: string;
@@ -19,17 +20,10 @@ interface PaymentDetail {
     created_at: string;
 }
 
-const props = defineProps<{
+defineProps<{
     payment: PaymentDetail;
 }>();
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-};
 </script>
 
 <template>
@@ -67,11 +61,11 @@ const formatDate = (dateStr: string) => {
                         </div>
                         <div v-if="payment.paid_at" class="flex items-center justify-between">
                             <span class="text-sm text-surface-500">Ödeme Tarihi</span>
-                            <span class="text-sm text-surface-700 dark:text-surface-300">{{ formatDate(payment.paid_at) }}</span>
+                            <span class="text-sm text-surface-700 dark:text-surface-300">{{ formatDateTime(payment.paid_at) }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-surface-500">Oluşturulma</span>
-                            <span class="text-sm text-surface-700 dark:text-surface-300">{{ formatDate(payment.created_at) }}</span>
+                            <span class="text-sm text-surface-700 dark:text-surface-300">{{ formatDateTime(payment.created_at) }}</span>
                         </div>
                     </div>
                 </template>

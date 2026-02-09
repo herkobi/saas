@@ -69,7 +69,8 @@ class InvitationService implements InvitationServiceInterface
     {
         $hashedToken = hash('sha256', $rawToken);
 
-        $invitation = TenantInvitation::withoutTenantScope()
+        /** @var TenantInvitation|null $invitation */
+        $invitation = TenantInvitation::query()
             ->where('token', $hashedToken)
             ->where('status', InvitationStatus::PENDING)
             ->first();
@@ -213,7 +214,7 @@ class InvitationService implements InvitationServiceInterface
     {
         $hashedToken = hash('sha256', $rawToken);
 
-        return TenantInvitation::withoutTenantScope()
+        return TenantInvitation::query()
             ->where('token', $hashedToken)
             ->where('status', InvitationStatus::PENDING)
             ->first();
@@ -221,7 +222,7 @@ class InvitationService implements InvitationServiceInterface
 
     public function expireOldInvitations(): int
     {
-        return TenantInvitation::withoutTenantScope()
+        return TenantInvitation::query()
             ->where('status', InvitationStatus::PENDING)
             ->where('expires_at', '<=', now())
             ->update(['status' => InvitationStatus::EXPIRED]);

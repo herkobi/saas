@@ -6,6 +6,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputNumber from 'primevue/inputnumber';
 import Tag from 'primevue/tag';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import PanelLayout from '@/layouts/Panel.vue';
 
 const props = defineProps<{
@@ -39,13 +40,6 @@ const extendGracePeriod = () => {
     extendGraceForm.post(`/panel/tenants/${props.tenant.id}/subscription/extend-grace-period`);
 };
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

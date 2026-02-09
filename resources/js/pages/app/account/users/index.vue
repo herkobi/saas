@@ -8,7 +8,7 @@ import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
 import type { PaginatedData, TenantUser } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     users: PaginatedData<TenantUser>;
 }>();
 

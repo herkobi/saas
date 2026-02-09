@@ -9,21 +9,8 @@ import Message from 'primevue/message';
 import ProgressBar from 'primevue/progressbar';
 import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
-import type { AppPageProps } from '@/types';
-
-interface FeatureUsage {
-    name: string;
-    unit: string | null;
-    usage: {
-        type: 'boolean' | 'numeric';
-        enabled: boolean;
-        is_unlimited: boolean;
-        limit: number;
-        used: number;
-        remaining: number;
-        percentage: number;
-    };
-}
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
+import type { AppPageProps, FeatureUsage } from '@/types';
 
 interface RecentPayment {
     id: string;
@@ -45,7 +32,7 @@ interface SubscriptionData {
     ends_at: string | null;
 }
 
-const props = defineProps<{
+defineProps<{
     hasActiveSubscription: boolean;
     subscription: SubscriptionData | null;
     features: FeatureUsage[];
@@ -59,18 +46,6 @@ const props = defineProps<{
 }>();
 
 const page = usePage<AppPageProps>();
-
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-    });
-};
 </script>
 
 <template>

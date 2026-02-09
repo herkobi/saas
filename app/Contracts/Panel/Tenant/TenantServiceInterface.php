@@ -118,4 +118,12 @@ interface TenantServiceInterface
      * @return array<string, mixed> Array of statistics data
      */
     public function getStatistics(Tenant $tenant): array;
+
+    /**
+     * Get recent activities across all tenants.
+     *
+     * @param int $limit Maximum number of results
+     * @return Collection Collection of recent activities with user relation
+     */
+    public function getRecentActivities(int $limit = 15): Collection;
 }

@@ -3,7 +3,7 @@ import { Link } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import AppLayout from '@/layouts/App.vue';
 
-const props = defineProps<{
+defineProps<{
     error?: string;
 }>();
 </script>

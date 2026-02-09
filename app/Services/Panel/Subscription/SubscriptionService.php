@@ -79,6 +79,25 @@ class SubscriptionService implements SubscriptionServiceInterface
             ->get();
     }
 
+    public function getPlanDistribution(): Collection
+    {
+        return Subscription::query()
+            ->join('plan_prices', 'subscriptions.plan_price_id', '=', 'plan_prices.id')
+            ->join('plans', 'plan_prices.plan_id', '=', 'plans.id')
+            ->selectRaw('plans.name, COUNT(*) as subscriber_count, SUM(plan_prices.price) as total_revenue')
+            ->groupBy('plans.name')
+            ->get();
+    }
+
+    public function getExpiringSubscriptions(int $days = 7, int $limit = 10): Collection
+    {
+        return Subscription::whereNotNull('ends_at')
+            ->whereBetween('ends_at', [now(), now()->addDays($days)])
+            ->with('tenant')
+            ->limit($limit)
+            ->get();
+    }
+
     protected function applyStatusFilter($query, SubscriptionStatus $status): void
     {
         $now = now();

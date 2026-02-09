@@ -9,7 +9,7 @@ import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
 import type { Invitation } from '@/types';
 
-const props = defineProps<{
+defineProps<{
     invitations: Invitation[];
 }>();
 

@@ -8,6 +8,7 @@ import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 import PanelLayout from '@/layouts/Panel.vue';
+import { formatDate } from '@/composables/useFormatting';
 import type { PaginatedData } from '@/types';
 import { ref } from 'vue';
 
@@ -45,9 +46,6 @@ const applyFilters = () => {
     }, { preserveState: true });
 };
 
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

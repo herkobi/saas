@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import Card from 'primevue/card';
 import AppLayout from '@/layouts/App.vue';
+import { formatCurrency } from '@/composables/useFormatting';
 
-const props = defineProps<{
+defineProps<{
     checkout: {
         id: string;
         merchant_oid: string;
@@ -14,10 +15,6 @@ const props = defineProps<{
     };
     iframeUrl: string;
 }>();
-
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
 </script>
 
 <template>

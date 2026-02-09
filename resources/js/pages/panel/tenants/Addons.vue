@@ -6,21 +6,14 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import PanelLayout from '@/layouts/Panel.vue';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 
-const props = defineProps<{
+defineProps<{
     tenant: any;
     addons: any[];
     activeAddons: any[];
 }>();
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

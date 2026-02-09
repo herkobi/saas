@@ -6,6 +6,7 @@ import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import type { PaginatedData } from '@/types';
 
 interface PaymentItem {
@@ -22,7 +23,7 @@ interface PaymentItem {
     created_at: string;
 }
 
-const props = defineProps<{
+defineProps<{
     payments: PaginatedData<PaymentItem>;
     statistics: {
         total_payments: number;
@@ -32,13 +33,6 @@ const props = defineProps<{
     filters: Record<string, any>;
 }>();
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

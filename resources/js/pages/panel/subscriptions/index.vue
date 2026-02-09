@@ -7,6 +7,7 @@ import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
 import { ref } from 'vue';
+import { formatDate } from '@/composables/useFormatting';
 import PanelLayout from '@/layouts/Panel.vue';
 import type { PaginatedData } from '@/types';
 
@@ -24,9 +25,6 @@ const applySearch = () => {
     router.get('/panel/subscriptions', { search: search.value || undefined }, { preserveState: true });
 };
 
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

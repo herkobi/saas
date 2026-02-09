@@ -7,7 +7,7 @@ import DataTable from 'primevue/datatable';
 import Tag from 'primevue/tag';
 import PanelLayout from '@/layouts/Panel.vue';
 
-const props = defineProps<{
+defineProps<{
     tenant: any;
     users: any[];
     statistics: Record<string, any>;

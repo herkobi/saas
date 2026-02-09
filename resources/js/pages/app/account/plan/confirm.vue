@@ -3,6 +3,7 @@ import { useForm, Link } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
 import Tag from 'primevue/tag';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import AppLayout from '@/layouts/App.vue';
 
 const props = defineProps<{
@@ -26,13 +27,6 @@ const submit = () => {
     form.post('/app/account/plan-change');
 };
 
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
-};
-
-const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
 </script>
 
 <template>

@@ -25,13 +25,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Tenant\CancelSubscriptionRequest;
 use App\Http\Requests\Panel\Tenant\ChangeSubscriptionPlanRequest;
 use App\Http\Requests\Panel\Tenant\CreateSubscriptionRequest;
+use App\Http\Requests\Panel\Tenant\ExtendGracePeriodRequest;
+use App\Http\Requests\Panel\Tenant\ExtendTrialRequest;
 use App\Http\Requests\Panel\Tenant\RenewSubscriptionRequest;
 use App\Http\Requests\Panel\Tenant\UpdateSubscriptionStatusRequest;
 use App\Models\PlanPrice;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -58,7 +58,7 @@ class TenantSubscriptionController extends Controller
      * Display the current subscription for a tenant.
      *
      * @param Tenant $tenant
-     * @return View
+     * @return Response
      */
     public function show(Tenant $tenant): Response
     {
@@ -210,16 +210,12 @@ class TenantSubscriptionController extends Controller
     /**
      * Extend the trial period for a tenant's subscription.
      *
-     * @param Request $request
+     * @param ExtendTrialRequest $request
      * @param Tenant $tenant
      * @return RedirectResponse
      */
-    public function extendTrial(Request $request, Tenant $tenant): RedirectResponse
+    public function extendTrial(ExtendTrialRequest $request, Tenant $tenant): RedirectResponse
     {
-        $request->validate([
-            'days' => ['required', 'integer', 'min:1', 'max:365'],
-        ]);
-
         $subscription = $tenant->subscription;
 
         if (!$subscription) {
@@ -230,7 +226,7 @@ class TenantSubscriptionController extends Controller
 
         $this->subscriptionService->extendTrial(
             $subscription,
-            (int) $request->input('days'),
+            (int) $request->validated('days'),
             $request->user(),
             $request->ip(),
             $request->userAgent()
@@ -244,16 +240,12 @@ class TenantSubscriptionController extends Controller
     /**
      * Extend the grace period for a tenant's subscription.
      *
-     * @param Request $request
+     * @param ExtendGracePeriodRequest $request
      * @param Tenant $tenant
      * @return RedirectResponse
      */
-    public function extendGracePeriod(Request $request, Tenant $tenant): RedirectResponse
+    public function extendGracePeriod(ExtendGracePeriodRequest $request, Tenant $tenant): RedirectResponse
     {
-        $request->validate([
-            'days' => ['required', 'integer', 'min:1', 'max:90'],
-        ]);
-
         $subscription = $tenant->subscription;
 
         if (!$subscription) {
@@ -264,7 +256,7 @@ class TenantSubscriptionController extends Controller
 
         $this->subscriptionService->extendGracePeriod(
             $subscription,
-            (int) $request->input('days'),
+            (int) $request->validated('days'),
             $request->user(),
             $request->ip(),
             $request->userAgent()

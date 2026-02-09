@@ -20,6 +20,7 @@ namespace App\Contracts\App\Account;
 
 use App\Models\Checkout;
 use App\Models\Payment;
+use App\Models\PlanPrice;
 use App\Models\Subscription;
 
 /**
@@ -61,8 +62,8 @@ interface SubscriptionPurchaseServiceInterface
      * Calculate the subscription end date based on plan price interval.
      *
      * @param \Carbon\Carbon $startDate The start date
-     * @param \App\Models\PlanPrice $planPrice The plan price
+     * @param PlanPrice $planPrice The plan price
      * @return \Carbon\Carbon
      */
-    public function calculateEndDate(\Carbon\Carbon $startDate, \App\Models\PlanPrice $planPrice): \Carbon\Carbon;
+    public function calculateEndDate(\Carbon\Carbon $startDate, PlanPrice $planPrice): \Carbon\Carbon;
 }
