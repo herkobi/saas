@@ -20,6 +20,8 @@ class Tenant extends Model
 {
     use HasFactory, HasUlids, SoftDeletes;
 
+    protected $appends = ['name'];
+
     protected $fillable = [
         'code',
         'slug',
@@ -56,6 +58,11 @@ class Tenant extends Model
                 'metadata',
             ])
             ->withTimestamps();
+    }
+
+    public function getNameAttribute(): string
+    {
+        return $this->account['title'] ?? $this->code;
     }
 
     public function owner(): ?User

@@ -21,6 +21,7 @@ namespace App\Services\Panel\Tenant;
 use App\Contracts\Panel\Tenant\TenantServiceInterface;
 use App\Enums\PaymentStatus;
 use App\Enums\SubscriptionStatus;
+use App\Enums\TenantUserRole;
 use App\Events\PanelTenantUpdated;
 use App\Models\Activity;
 use App\Models\Payment;
@@ -88,7 +89,21 @@ class TenantService implements TenantServiceInterface
         $sortDirection = $filters['sort_direction'] ?? 'desc';
         $query->orderBy($sortField, $sortDirection);
 
-        return $query->paginate($perPage)->withQueryString();
+        return $query->paginate($perPage)
+            ->through(function ($tenant) {
+                $owner = $tenant->users->first(fn ($u) => (int) $u->pivot->role === TenantUserRole::OWNER->value);
+                $subscription = $tenant->subscription;
+
+                return array_merge($tenant->toArray(), [
+                    'owner_name' => $owner?->name,
+                    'owner_email' => $owner?->email,
+                    'plan_name' => $subscription?->price?->plan?->name,
+                    'subscription_status' => $subscription?->status?->value,
+                    'subscription_status_label' => $subscription?->status?->label(),
+                    'subscription_status_badge' => $subscription?->status?->badge(),
+                ]);
+            })
+            ->withQueryString();
     }
 
     /**
@@ -220,6 +235,10 @@ class TenantService implements TenantServiceInterface
             ->with('subscription.price.plan')
             ->orderBy('created_at', 'desc')
             ->paginate($perPage)
+            ->through(fn ($payment) => array_merge($payment->toArray(), [
+                'status_label' => $payment->status->label(),
+                'status_badge' => $payment->status->badge(),
+            ]))
             ->withQueryString();
     }
 

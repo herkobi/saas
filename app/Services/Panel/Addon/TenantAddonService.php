@@ -10,13 +10,16 @@ use App\Models\Addon;
 use App\Models\Tenant;
 use App\Models\TenantAddon;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class TenantAddonService implements TenantAddonServiceInterface
 {
     public function getByTenant(Tenant $tenant): Collection
     {
-        return $tenant->addons()->with('feature')->get();
+        return $tenant->addons()->with('feature')->get()
+            ->map(fn ($addon) => array_merge($addon->toArray(), [
+                'addon_type_label' => $addon->addon_type->label(),
+            ]));
     }
 
     public function getActiveTenantAddons(Tenant $tenant): Collection

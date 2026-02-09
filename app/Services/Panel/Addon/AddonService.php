@@ -51,7 +51,10 @@ class AddonService implements AddonServiceInterface
         $direction = $filters['direction'] ?? 'desc';
         $query->orderBy($sort, $direction);
 
-        return $query->paginate($perPage);
+        return $query->paginate($perPage)
+            ->through(fn ($addon) => array_merge($addon->toArray(), [
+                'addon_type_label' => $addon->addon_type->label(),
+            ]));
     }
 
     public function getAll(): Collection

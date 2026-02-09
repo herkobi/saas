@@ -90,7 +90,11 @@ class PaymentService implements PaymentServiceInterface
         $sortField = $filters['sort'] ?? 'created_at';
         $sortDirection = $filters['direction'] ?? 'desc';
 
-        return $query->orderBy($sortField, $sortDirection)->paginate($perPage);
+        return $query->orderBy($sortField, $sortDirection)->paginate($perPage)
+            ->through(fn ($payment) => array_merge($payment->toArray(), [
+                'status_label' => $payment->status->label(),
+                'status_badge' => $payment->status->badge(),
+            ]));
     }
 
     /**

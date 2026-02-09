@@ -29,7 +29,12 @@ class SubscriptionService implements SubscriptionServiceInterface
                 $this->applyStatusFilter($query, SubscriptionStatus::from($filters['status']));
             })
             ->latest()
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->through(fn ($subscription) => array_merge($subscription->toArray(), [
+                'plan_name' => $subscription->price?->plan?->name,
+                'status_label' => $subscription->status->label(),
+                'status_badge' => $subscription->status->badge(),
+            ]));
     }
 
     public function findById(string $id): ?Subscription

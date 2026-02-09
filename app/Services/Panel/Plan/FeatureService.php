@@ -53,7 +53,10 @@ class FeatureService implements FeatureServiceInterface
         // PerPage sınırı
         $perPage = max(1, min(100, (int) $perPage));
 
-        return $query->orderBy($sortField, $sortDirection)->paginate($perPage);
+        return $query->orderBy($sortField, $sortDirection)->paginate($perPage)
+            ->through(fn ($feature) => array_merge($feature->toArray(), [
+                'type_label' => $feature->type->label(),
+            ]));
     }
 
     public function getAll(): Collection
