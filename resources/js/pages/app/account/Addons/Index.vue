@@ -60,7 +60,7 @@ const cancelAddon = (addonId: string) => {
                                         <span v-if="addon.expires_at" class="text-xs text-surface-400">Bitiş: {{ formatDate(addon.expires_at) }}</span>
                                     </div>
                                 </div>
-                                <Button v-if="addon.is_active" label="İptal Et" icon="pi pi-times" severity="danger" outlined size="small" @click="cancelAddon(addon.addon_id)" />
+                                <Button v-if="addon.is_active" label="İptal Et" icon="pi pi-times" severity="danger" outlined size="small" @click="cancelAddon(addon.id)" />
                             </div>
                         </template>
                     </Card>

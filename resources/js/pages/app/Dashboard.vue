@@ -75,7 +75,7 @@ const page = usePage<AppPageProps>();
                             </span>
                         </div>
                         <div v-if="canUpgrade" class="flex gap-2">
-                            <Link href="/account/plan-change">
+                            <Link href="/app/account/plan-change">
                                 <Button label="Plan Değiştir" icon="pi pi-arrow-right-arrow-left" outlined size="small" />
                             </Link>
                         </div>
@@ -162,7 +162,7 @@ const page = usePage<AppPageProps>();
                 <template #title>
                     <div class="flex items-center justify-between">
                         <span class="text-base font-semibold">Son Ödemeler</span>
-                        <Link href="/account/payments">
+                        <Link href="/app/account/payments">
                             <Button label="Tümünü Gör" text size="small" />
                         </Link>
                     </div>

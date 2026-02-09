@@ -66,6 +66,7 @@ class HandleInertiaRequests extends Middleware
                 'name' => settings('site_name', config('app.name')),
                 'logo' => logo(),
                 'favicon' => favicon(),
+                'allow_team_members' => config('herkobi.tenant.allow_team_members', false),
             ],
 
             'auth' => [

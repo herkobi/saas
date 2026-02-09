@@ -70,14 +70,19 @@ const profileNav: NavItem[] = [
     { title: 'Bildirimler', href: '/app/profile/notifications', icon: 'pi pi-bell' },
 ];
 
-const accountNav: NavItem[] = [
-    { title: 'Abonelik', href: '/app/account/subscription', icon: 'pi pi-credit-card' },
-    { title: 'Fatura Bilgileri', href: '/app/account/billing', icon: 'pi pi-file-edit' },
-    { title: 'Ödemeler', href: '/app/account/payments', icon: 'pi pi-wallet' },
-    { title: 'Plan Değiştir', href: '/app/account/plan-change', icon: 'pi pi-arrow-right-arrow-left' },
-    { title: 'Eklentiler', href: '/app/account/addons', icon: 'pi pi-box' },
-    { title: 'Kullanıcılar', href: '/app/account/users', icon: 'pi pi-users' },
-];
+const accountNav = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        { title: 'Abonelik', href: '/app/account/subscription', icon: 'pi pi-credit-card' },
+        { title: 'Fatura Bilgileri', href: '/app/account/billing', icon: 'pi pi-file-edit' },
+        { title: 'Ödemeler', href: '/app/account/payments', icon: 'pi pi-wallet' },
+        { title: 'Plan Değiştir', href: '/app/account/plan-change', icon: 'pi pi-arrow-right-arrow-left' },
+        { title: 'Eklentiler', href: '/app/account/addons', icon: 'pi pi-box' },
+    ];
+    if (page.props.site?.allow_team_members) {
+        items.push({ title: 'Kullanıcılar', href: '/app/account/users', icon: 'pi pi-users' });
+    }
+    return items;
+});
 
 const isActive = (href: string) => {
     if (href === '/app/dashboard') return isCurrentUrl(href);

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->boolean('is_public')->default(false);
             $table->boolean('is_free')->default(false);
+            $table->unsignedInteger('sort_order')->default(0);
             $table->timestamp('archived_at')->nullable();
             $table->integer('grace_period_days')->default(0);
             $table->string('grace_period_policy')->default(GracePeriod::NONE->value);
