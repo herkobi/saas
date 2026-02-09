@@ -60,7 +60,7 @@ class FeatureController extends Controller
             $perPage = 15;
         }
 
-        return Inertia::render('panel/plans.features.index', [
+        return Inertia::render('panel/Plans/Features/Index', [
             'features' => $this->featureService->getPaginated($filters, $perPage),
             'filters' => $filters,
         ]);
@@ -73,7 +73,7 @@ class FeatureController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('panel/plans.features.create');
+        return Inertia::render('panel/Plans/Features/Create');
     }
 
     /**
@@ -107,7 +107,7 @@ class FeatureController extends Controller
         // View tarafında $feature->plans kullanımı varsa tek seferde yükle
         $feature->load('plans');
 
-        return Inertia::render('panel/plans.features.edit', [
+        return Inertia::render('panel/Plans/Features/Edit', [
             'feature' => $feature,
         ]);
     }

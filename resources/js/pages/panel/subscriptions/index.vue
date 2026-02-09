@@ -5,11 +5,10 @@ import Card from 'primevue/card';
 import Column from 'primevue/column';
 import DataTable from 'primevue/datatable';
 import InputText from 'primevue/inputtext';
-import Select from 'primevue/select';
 import Tag from 'primevue/tag';
+import { ref } from 'vue';
 import PanelLayout from '@/layouts/Panel.vue';
 import type { PaginatedData } from '@/types';
-import { ref } from 'vue';
 
 const props = defineProps<{
     subscriptions: PaginatedData<any>;
@@ -23,10 +22,6 @@ const search = ref(props.filters?.search ?? '');
 
 const applySearch = () => {
     router.get('/panel/subscriptions', { search: search.value || undefined }, { preserveState: true });
-};
-
-const formatCurrency = (amount: number, currency: string = 'TRY') => {
-    return new Intl.NumberFormat('tr-TR', { style: 'currency', currency }).format(amount / 100);
 };
 
 const formatDate = (dateStr: string) => {

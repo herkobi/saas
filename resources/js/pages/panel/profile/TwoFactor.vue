@@ -5,8 +5,8 @@ import Card from 'primevue/card';
 import InputText from 'primevue/inputtext';
 import Message from 'primevue/message';
 import { ref } from 'vue';
-import PanelLayout from '@/layouts/Panel.vue';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
+import PanelLayout from '@/layouts/Panel.vue';
 import type { User } from '@/types';
 
 const props = defineProps<{

@@ -58,7 +58,7 @@ class TenantUserController extends Controller
         $users = $this->tenantService->getUsers($tenant);
         $statistics = $this->tenantService->getStatistics($tenant);
 
-        return Inertia::render('panel/tenants.users', [
+        return Inertia::render('panel/Tenants/Users', [
             'tenant' => $tenant,
             'users' => $users,
             'statistics' => $statistics,

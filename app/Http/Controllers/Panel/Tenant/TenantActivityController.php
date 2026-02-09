@@ -57,7 +57,7 @@ class TenantActivityController extends Controller
         $activities = $this->tenantService->getActivities($tenant, $perPage);
         $statistics = $this->tenantService->getStatistics($tenant);
 
-        return Inertia::render('panel/tenants.activities', [
+        return Inertia::render('panel/Tenants/Activities', [
             'tenant' => $tenant,
             'activities' => $activities,
             'statistics' => $statistics,

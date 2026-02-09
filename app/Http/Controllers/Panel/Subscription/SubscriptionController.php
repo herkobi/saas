@@ -63,7 +63,7 @@ class SubscriptionController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'slug']);
 
-        return Inertia::render('panel/subscriptions.index', [
+        return Inertia::render('panel/Subscriptions/Index', [
             'subscriptions' => $subscriptions,
             'statistics' => $statistics,
             'filters' => $request->validated(),
@@ -86,7 +86,7 @@ class SubscriptionController extends Controller
         $subscription = $this->subscriptionService->findById($subscription->id);
         $payments = $this->subscriptionService->getPayments($subscription);
 
-        return Inertia::render('panel/subscriptions.show', [
+        return Inertia::render('panel/Subscriptions/Show', [
             'subscription' => $subscription,
             'payments' => $payments,
         ]);

@@ -56,9 +56,6 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
     public function show(TwoFactorAuthenticationRequest $request): Response
     {
         $request->ensureStateIsValid();
-
-        // Auth::user() da $request->user() da aynı şey, ikisi de cache'lenir
-        // O yüzden fresh() ile DB'den yeniden çekiyoruz
         $user = Auth::user()->fresh();
 
         return Inertia::render('panel/Profile/TwoFactor', [

@@ -66,7 +66,7 @@ class TenantSubscriptionController extends Controller
         $history = $this->subscriptionService->getSubscriptionHistory($tenant);
         $statistics = $this->tenantService->getStatistics($tenant);
 
-        return Inertia::render('panel/tenants.subscription', [
+        return Inertia::render('panel/Tenants/Subscription', [
             'tenant' => $tenant,
             'subscription' => $subscription,
             'history' => $history,

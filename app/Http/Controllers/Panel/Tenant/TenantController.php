@@ -74,7 +74,7 @@ class TenantController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'slug']);
 
-        return Inertia::render('panel/tenants.index', [
+        return Inertia::render('panel/Tenants/Index', [
             'tenants' => $tenants,
             'plans' => $plans,
             'filters' => $filters,
@@ -96,7 +96,7 @@ class TenantController extends Controller
         $perPage = min(max((int) $request->input('per_page', 15), 5), 100);
         $activities = $this->tenantService->getActivities($tenant, $perPage);
 
-        return Inertia::render('panel/tenants.show', [
+        return Inertia::render('panel/Tenants/Show', [
             'tenant' => $tenant,
             'statistics' => $statistics,
             'activities' => $activities,

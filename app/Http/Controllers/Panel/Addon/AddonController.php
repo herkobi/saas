@@ -43,7 +43,7 @@ class AddonController extends Controller
         $addons = $this->addonService->getPaginated($filters, $perPage);
         $features = Feature::active()->orderBy('name')->get();
 
-        return Inertia::render('panel/addons.index', compact('addons', 'features', 'filters'));
+        return Inertia::render('panel/Addons/Index', compact('addons', 'features', 'filters'));
     }
 
     /**
@@ -65,7 +65,7 @@ class AddonController extends Controller
 
         $systemCurrency = CurrencyHelper::defaultCode();
 
-        return Inertia::render('panel/addons.create', compact('features', 'allowedAddonTypesByFeatureType', 'systemCurrency'));
+        return Inertia::render('panel/Addons/Create', compact('features', 'allowedAddonTypesByFeatureType', 'systemCurrency'));
     }
 
 
@@ -105,7 +105,7 @@ class AddonController extends Controller
 
         $systemCurrency = CurrencyHelper::defaultCode();
 
-        return Inertia::render('panel/addons.edit', compact('addon', 'features', 'allowedAddonTypesByFeatureType', 'systemCurrency'));
+        return Inertia::render('panel/Addons/Edit', compact('addon', 'features', 'allowedAddonTypesByFeatureType', 'systemCurrency'));
     }
 
 

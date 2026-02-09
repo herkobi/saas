@@ -168,7 +168,7 @@ class CheckoutController extends Controller
      */
     public function failed(): Response
     {
-        return Inertia::render('app/AAccount/Checkout/Failed', [
+        return Inertia::render('app/Account/Checkout/Failed', [
             'error' => session('error'),
         ]);
     }

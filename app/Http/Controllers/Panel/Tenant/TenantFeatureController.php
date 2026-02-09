@@ -63,7 +63,7 @@ class TenantFeatureController extends Controller
         $allFeatures = Feature::orderBy('name')->get(['id', 'name', 'slug', 'type']);
         $statistics = $this->tenantService->getStatistics($tenant);
 
-        return Inertia::render('panel/tenants.features', [
+        return Inertia::render('panel/Tenants/Features', [
             'tenant' => $tenant,
             'effectiveFeatures' => $effectiveFeatures,
             'planFeatures' => $planFeatures,

@@ -28,7 +28,7 @@ class TenantAddonController extends Controller
         $addons = $this->tenantAddonService->getByTenant($tenant);
         $activeAddons = $this->tenantAddonService->getActiveTenantAddons($tenant);
 
-        return Inertia::render('panel/tenants.addons.index', [
+        return Inertia::render('panel/Tenants/Addons', [
             'tenant' => $tenant,
             'addons' => $addons,
             'activeAddons' => $activeAddons,

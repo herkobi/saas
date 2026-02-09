@@ -57,7 +57,7 @@ class TenantPaymentController extends Controller
         $payments = $this->tenantService->getPayments($tenant, $perPage);
         $statistics = $this->tenantService->getStatistics($tenant);
 
-        return Inertia::render('panel/tenants.payments', [
+        return Inertia::render('panel/Tenants/Payments', [
             'tenant' => $tenant,
             'payments' => $payments,
             'statistics' => $statistics,

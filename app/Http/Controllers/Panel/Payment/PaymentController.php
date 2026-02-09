@@ -62,7 +62,7 @@ class PaymentController extends Controller
 
         $statistics = $this->paymentService->getStatistics($request->validated());
 
-        return Inertia::render('panel/payments.index', [
+        return Inertia::render('panel/Payments/Index', [
             'payments' => $payments,
             'statistics' => $statistics,
             'filters' => $request->validated(),
@@ -83,7 +83,7 @@ class PaymentController extends Controller
     {
         $payment = $this->paymentService->findById($payment->id);
 
-        return Inertia::render('panel/payments.show', [
+        return Inertia::render('panel/Payments/Show', [
             'payment' => $payment,
             'statuses' => collect(PaymentStatus::cases())->map(fn($s) => [
                 'value' => $s->value,
