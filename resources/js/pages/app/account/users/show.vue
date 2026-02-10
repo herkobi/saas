@@ -2,15 +2,26 @@
 import { useForm, Link } from '@inertiajs/vue3';
 import Button from 'primevue/button';
 import Card from 'primevue/card';
+import Select from 'primevue/select';
 import Tag from 'primevue/tag';
 import AppLayout from '@/layouts/App.vue';
 import type { TenantUser } from '@/types';
 
 const props = defineProps<{
     user: TenantUser;
+    pivotStatus: number;
+    pivotStatusLabel: string;
+    pivotStatusBadge: string;
+    canChangeStatus: boolean;
+    statusOptions: { value: number; label: string }[];
 }>();
 
 const removeForm = useForm({});
+
+const statusForm = useForm({
+    status: props.pivotStatus,
+    reason: '',
+});
 
 const removeUser = () => {
     if (confirm('Bu kullanıcıyı kaldırmak istediğinize emin misiniz?')) {
@@ -18,8 +29,20 @@ const removeUser = () => {
     }
 };
 
+const updateStatus = () => {
+    statusForm.put(`/app/account/users/${props.user.id}/status`, {
+        preserveScroll: true,
+    });
+};
+
 const roleLabel = (role: string) => {
     return role === 'owner' ? 'Sahip' : 'Üye';
+};
+
+const statusBadge = (status: number): string => {
+    if (status === 0) return 'secondary';
+    if (status === 2) return 'warn';
+    return 'success';
 };
 
 const formatDate = (dateStr: string) => {
@@ -53,8 +76,51 @@ const formatDate = (dateStr: string) => {
                             <Tag :value="roleLabel(user.role)" :severity="user.role === 'owner' ? 'warn' : 'info'" />
                         </div>
                         <div class="flex items-center justify-between">
+                            <span class="text-sm text-surface-500">Durum</span>
+                            <Tag :value="pivotStatusLabel" :severity="pivotStatusBadge" />
+                        </div>
+                        <div class="flex items-center justify-between">
                             <span class="text-sm text-surface-500">Katılım Tarihi</span>
                             <span class="text-sm text-surface-700 dark:text-surface-300">{{ formatDate(user.created_at) }}</span>
+                        </div>
+                    </div>
+                </template>
+            </Card>
+
+            <Card v-if="canChangeStatus">
+                <template #title>
+                    <span class="text-base font-semibold">Durum Değiştir</span>
+                </template>
+                <template #content>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-2">
+                            <label class="text-sm text-surface-500">Yeni Durum</label>
+                            <Select
+                                v-model="statusForm.status"
+                                :options="statusOptions"
+                                optionLabel="label"
+                                optionValue="value"
+                                class="w-full"
+                            />
+                        </div>
+                        <div v-if="statusForm.status !== pivotStatus" class="flex flex-col gap-2">
+                            <label class="text-sm text-surface-500">Sebep (isteğe bağlı)</label>
+                            <textarea
+                                v-model="statusForm.reason"
+                                rows="2"
+                                class="w-full rounded-md border border-surface-300 dark:border-surface-600 bg-surface-0 dark:bg-surface-900 px-3 py-2 text-sm"
+                                placeholder="Durum değişikliği sebebi..."
+                            />
+                        </div>
+                        <div>
+                            <Button
+                                label="Durumu Güncelle"
+                                icon="pi pi-check"
+                                size="small"
+                                :loading="statusForm.processing"
+                                :disabled="statusForm.status === pivotStatus"
+                                @click="updateStatus"
+                            />
                         </div>
                     </div>
                 </template>

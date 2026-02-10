@@ -18,6 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
+use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Enums\UserStatus;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -48,17 +50,38 @@ class EnsureWriteAccess
     {
         $user = $request->user();
 
-        if ($user && $user->status->isReadOnly() && $this->isWriteRequest($request)) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'Hesabınız kısıtlı modda. Yazma işlemi yapamazsınız.',
-                ], Response::HTTP_FORBIDDEN);
-            }
+        if (! $user || ! $this->isWriteRequest($request)) {
+            return $next($request);
+        }
 
-            return back()->with('error', 'Hesabınız kısıtlı modda. Yazma işlemi yapamazsınız.');
+        if ($user->status->isReadOnly()) {
+            return $this->denyWriteAccess($request, 'Hesabınız kısıtlı modda. Yazma işlemi yapamazsınız.');
+        }
+
+        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+
+        if ($tenant) {
+            $pivotStatus = $tenant->users()
+                ->where('users.id', $user->id)
+                ->first()
+                ?->pivot
+                ?->status;
+
+            if ($pivotStatus !== null && UserStatus::from((int) $pivotStatus)->isReadOnly()) {
+                return $this->denyWriteAccess($request, 'Bu hesaptaki erişiminiz kısıtlı modda. Yazma işlemi yapamazsınız.');
+            }
         }
 
         return $next($request);
+    }
+
+    private function denyWriteAccess(Request $request, string $message): Response
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message], 422);
+        }
+
+        return back()->with('error', $message);
     }
 
     /**

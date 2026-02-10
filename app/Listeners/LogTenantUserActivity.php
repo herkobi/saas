@@ -22,6 +22,7 @@ use App\Contracts\Shared\ActivityServiceInterface;
 use App\Enums\TenantUserRole;
 use App\Events\TenantUserRemoved;
 use App\Events\TenantUserRoleChanged;
+use App\Events\TenantUserStatusChanged;
 use App\Notifications\App\Account\UserRemovedFromTenantNotification;
 use App\Notifications\App\Account\UserRoleChangedNotification;
 use Illuminate\Events\Dispatcher;
@@ -112,6 +113,35 @@ class LogTenantUserActivity
     }
 
     /**
+     * Handle user status changed event.
+     *
+     * @param TenantUserStatusChanged $event The event
+     * @return void
+     */
+    public function handleStatusChanged(TenantUserStatusChanged $event): void
+    {
+        $this->activityService->log(
+            user: $event->changedBy,
+            type: 'tenant.user_status_changed',
+            description: 'Kullanıcı durumu değiştirildi',
+            log: [
+                'tenant_id' => $event->tenant->id,
+                'target_user_id' => $event->user->id,
+                'target_user_email' => $event->user->email,
+                'old_status' => $event->oldStatus->value,
+                'old_status_label' => $event->oldStatus->label(),
+                'new_status' => $event->newStatus->value,
+                'new_status_label' => $event->newStatus->label(),
+                'reason' => $event->reason,
+                'changed_by_name' => $event->changedBy->name,
+                'ip_address' => $event->ipAddress,
+                'user_agent' => $event->userAgent,
+            ],
+            tenantId: $event->tenant->id
+        );
+    }
+
+    /**
      * Register the listeners for the subscriber.
      *
      * @param Dispatcher $events The event dispatcher
@@ -122,6 +152,7 @@ class LogTenantUserActivity
         return [
             TenantUserRoleChanged::class => 'handleRoleChanged',
             TenantUserRemoved::class => 'handleUserRemoved',
+            TenantUserStatusChanged::class => 'handleStatusChanged',
         ];
     }
 }

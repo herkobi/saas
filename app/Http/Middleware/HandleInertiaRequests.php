@@ -81,10 +81,11 @@ class HandleInertiaRequests extends Middleware
                     'two_factor_enabled' => !is_null($user->two_factor_confirmed_at),
                 ] : null,
                 'tenants' => $user && $tenantContextService->multipleTenantsAllowed()
-                    ? $user->tenants()->withPivot(['role', 'joined_at'])->orderByPivot('joined_at')->get()->map(fn ($t) => [
+                    ? $user->tenants()->withPivot(['role', 'status', 'joined_at'])->orderByPivot('joined_at')->get()->map(fn ($t) => [
                         'id' => $t->id,
                         'name' => $t->account['title'] ?? $t->name,
                         'role' => $t->pivot->role,
+                        'status' => $t->pivot->status,
                     ])->toArray()
                     : [],
                 'can_create_tenant' => $user

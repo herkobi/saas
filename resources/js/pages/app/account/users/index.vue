@@ -19,6 +19,20 @@ const formatDate = (dateStr: string) => {
 const roleLabel = (role: string) => {
     return role === 'owner' ? 'Sahip' : 'Üye';
 };
+
+const statusLabel = (status: number | undefined) => {
+    const s = status ?? 1;
+    if (s === 0) return 'Pasif';
+    if (s === 2) return 'Taslak';
+    return 'Aktif';
+};
+
+const statusBadge = (status: number | undefined): string => {
+    const s = status ?? 1;
+    if (s === 0) return 'secondary';
+    if (s === 2) return 'warn';
+    return 'success';
+};
 </script>
 
 <template>
@@ -45,6 +59,11 @@ const roleLabel = (role: string) => {
                         <Column field="role" header="Rol">
                             <template #body="{ data }">
                                 <Tag :value="roleLabel(data.role)" :severity="data.role === 'owner' ? 'warn' : 'info'" />
+                            </template>
+                        </Column>
+                        <Column header="Durum">
+                            <template #body="{ data }">
+                                <Tag :value="statusLabel(data.pivot?.status)" :severity="statusBadge(data.pivot?.status)" />
                             </template>
                         </Column>
                         <Column field="created_at" header="Katılım">

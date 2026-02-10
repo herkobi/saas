@@ -7,7 +7,9 @@ namespace App\Http\Controllers\App\Account;
 use App\Contracts\App\Account\FeatureUsageServiceInterface;
 use App\Contracts\App\Account\UserServiceInterface;
 use App\Http\Controllers\Controller;
+use App\Enums\UserStatus;
 use App\Http\Requests\App\Account\UpdateUserRoleRequest;
+use App\Http\Requests\App\Account\UpdateUserStatusRequest;
 use App\Traits\HasTenantContext;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,7 +46,7 @@ class UserController extends Controller
         return Inertia::render('app/Account/Users/Index', compact('users'));
     }
 
-    public function show(string $userId): Response|RedirectResponse
+    public function show(Request $request, string $userId): Response|RedirectResponse
     {
         $tenant = $this->currentTenant();
 
@@ -68,7 +70,25 @@ class UserController extends Controller
                 ]);
         }
 
-        return Inertia::render('app/Account/Users/Show', compact('user'));
+        $pivotStatus = UserStatus::from((int) ($user->pivot->status ?? UserStatus::ACTIVE->value));
+
+        $canChangeStatus = $this->userService->canChangeStatus(
+            $request->user(),
+            $user,
+            $tenant
+        );
+
+        return Inertia::render('app/Account/Users/Show', [
+            'user' => $user,
+            'pivotStatus' => $pivotStatus->value,
+            'pivotStatusLabel' => $pivotStatus->label(),
+            'pivotStatusBadge' => $pivotStatus->badge(),
+            'canChangeStatus' => $canChangeStatus,
+            'statusOptions' => collect(UserStatus::cases())->map(fn ($s) => [
+                'value' => $s->value,
+                'label' => $s->label(),
+            ])->toArray(),
+        ]);
     }
 
     public function updateRole(UpdateUserRoleRequest $request, string $userId): RedirectResponse
@@ -182,6 +202,60 @@ class UserController extends Controller
             ->with('toast', [
                 'type' => 'success',
                 'message' => 'Kullanıcı tenant\'tan çıkarıldı.',
+            ]);
+    }
+
+    public function updateStatus(UpdateUserStatusRequest $request, string $userId): RedirectResponse
+    {
+        $tenant = $this->currentTenant();
+
+        if (! $tenant) {
+            return redirect()
+                ->route('app.dashboard')
+                ->with('toast', [
+                    'type' => 'error',
+                    'message' => 'Tenant bulunamadı.',
+                ]);
+        }
+
+        $currentUser = $request->user();
+        $targetUser = $this->userService->findById($tenant, $userId);
+
+        if (! $targetUser) {
+            return redirect()
+                ->route('account.users.index')
+                ->with('toast', [
+                    'type' => 'error',
+                    'message' => 'Kullanıcı bulunamadı.',
+                ]);
+        }
+
+        if (! $this->userService->canChangeStatus($currentUser, $targetUser, $tenant)) {
+            return redirect()
+                ->back()
+                ->with('toast', [
+                    'type' => 'error',
+                    'message' => 'Bu işlem için yetkiniz yok.',
+                ]);
+        }
+
+        $newStatus = UserStatus::from($request->validated('status'));
+
+        $this->userService->changeStatus(
+            $tenant,
+            $targetUser,
+            $newStatus,
+            $request->validated('reason'),
+            $currentUser,
+            $request->ip() ?? '127.0.0.1',
+            $request->userAgent() ?? 'unknown'
+        );
+
+        return redirect()
+            ->back()
+            ->with('toast', [
+                'type' => 'success',
+                'message' => 'Kullanıcı durumu güncellendi.',
             ]);
     }
 }

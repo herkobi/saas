@@ -18,6 +18,7 @@ declare(strict_types=1);
 
 namespace App\Contracts\App\Account;
 
+use App\Enums\UserStatus;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -147,4 +148,22 @@ interface UserServiceInterface
      * @return bool
      */
     public function canInviteTeamMember(Tenant $tenant): bool;
+
+    /**
+     * Change a user's status within a tenant (pivot-based).
+     */
+    public function changeStatus(
+        Tenant $tenant,
+        User $targetUser,
+        UserStatus $newStatus,
+        ?string $reason,
+        User $changedBy,
+        string $ipAddress,
+        string $userAgent
+    ): void;
+
+    /**
+     * Check if a user can change another user's status within a tenant.
+     */
+    public function canChangeStatus(User $manager, User $targetUser, Tenant $tenant): bool;
 }

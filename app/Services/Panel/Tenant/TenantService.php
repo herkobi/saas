@@ -219,7 +219,7 @@ class TenantService implements TenantServiceInterface
      */
     public function getUsers(Tenant $tenant): Collection
     {
-        return $tenant->users()->withPivot(['role', 'joined_at'])->get();
+        return $tenant->users()->withPivot(['role', 'status', 'joined_at'])->get();
     }
 
     /**

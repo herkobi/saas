@@ -45,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tenant.allow_team_members' => \App\Http\Middleware\EnsureTenantAllowsTeamMembers::class,
             'feature.access' => \App\Http\Middleware\EnsureFeatureAccess::class,
             'tenant.owner' => \App\Http\Middleware\EnsureTenantOwner::class,
+            'tenant.member_active' => \App\Http\Middleware\EnsureTenantMemberActive::class,
         ]);
 
     })

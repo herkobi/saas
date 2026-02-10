@@ -57,7 +57,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function tenants(): BelongsToMany
     {
         return $this->belongsToMany(Tenant::class, 'tenant_user')
-            ->withPivot(['role', 'joined_at'])
+            ->withPivot(['role', 'status', 'joined_at'])
             ->withTimestamps();
     }
 

@@ -78,7 +78,7 @@ Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
     /**
      * Dashboard Routes
      */
-    Route::controller(DashboardController::class)->group(function () {
+    Route::controller(DashboardController::class)->middleware(['tenant.member_active'])->group(function () {
         Route::get('dashboard', 'index')->name('dashboard');
     });
 
@@ -155,7 +155,7 @@ Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
     |
     */
 
-    Route::prefix('account')->name('account.')->middleware(['tenant.owner'])->group(function () {
+    Route::prefix('account')->name('account.')->middleware(['tenant.owner', 'tenant.member_active'])->group(function () {
 
         /**
          * Subscription Routes
@@ -219,6 +219,7 @@ Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
                 Route::get('/', 'index')->middleware(['subscription.active'])->name('index');
                 Route::get('{userId}', 'show')->middleware(['subscription.active'])->name('show');
                 Route::put('{userId}/role', 'updateRole')->middleware(['subscription.active', 'write.access'])->name('role.update');
+                Route::put('{userId}/status', 'updateStatus')->middleware(['subscription.active', 'write.access'])->name('status.update');
                 Route::delete('{userId}', 'remove')->middleware(['subscription.active', 'write.access'])->name('remove');
             });
 

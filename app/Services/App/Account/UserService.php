@@ -21,8 +21,10 @@ namespace App\Services\App\Account;
 use App\Contracts\App\Account\UserServiceInterface;
 use App\Contracts\Shared\TenantContextServiceInterface;
 use App\Enums\TenantUserRole;
+use App\Enums\UserStatus;
 use App\Events\TenantUserRemoved;
 use App\Events\TenantUserRoleChanged;
+use App\Events\TenantUserStatusChanged;
 use App\Models\Activity;
 use App\Models\Tenant;
 use App\Models\User;
@@ -45,14 +47,14 @@ class UserService implements UserServiceInterface
     {
         if (!$this->tenantContextService->teamMembersAllowed()) {
             return $tenant->users()
-                ->withPivot(['role', 'joined_at'])
+                ->withPivot(['role', 'status', 'joined_at'])
                 ->wherePivot('role', TenantUserRole::OWNER->value)
                 ->orderBy('tenant_user.joined_at', 'desc')
                 ->paginate($perPage);
         }
 
         $query = $tenant->users()
-            ->withPivot(['role', 'joined_at']);
+            ->withPivot(['role', 'status', 'joined_at']);
 
         if (!empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
@@ -82,14 +84,14 @@ class UserService implements UserServiceInterface
     {
         if (!$this->tenantContextService->teamMembersAllowed()) {
             return $tenant->users()
-                ->withPivot(['role', 'joined_at'])
+                ->withPivot(['role', 'status', 'joined_at'])
                 ->wherePivot('role', TenantUserRole::OWNER->value)
                 ->orderBy('tenant_user.joined_at', 'desc')
                 ->get();
         }
 
         return $tenant->users()
-            ->withPivot(['role', 'joined_at'])
+            ->withPivot(['role', 'status', 'joined_at'])
             ->orderBy('tenant_user.joined_at', 'desc')
             ->get();
     }
@@ -101,14 +103,14 @@ class UserService implements UserServiceInterface
     {
         if (!$this->tenantContextService->teamMembersAllowed()) {
             return $tenant->users()
-                ->withPivot(['role', 'joined_at'])
+                ->withPivot(['role', 'status', 'joined_at'])
                 ->wherePivot('role', TenantUserRole::OWNER->value)
                 ->where('users.id', $userId)
                 ->first();
         }
 
         return $tenant->users()
-            ->withPivot(['role', 'joined_at'])
+            ->withPivot(['role', 'status', 'joined_at'])
             ->where('users.id', $userId)
             ->first();
     }
@@ -264,5 +266,59 @@ class UserService implements UserServiceInterface
     public function canInviteTeamMember(Tenant $tenant): bool
     {
         return $this->tenantContextService->canInviteTeamMember($tenant);
+    }
+
+    /**
+     * Change a user's status within a tenant (pivot-based).
+     */
+    public function changeStatus(
+        Tenant $tenant,
+        User $targetUser,
+        UserStatus $newStatus,
+        ?string $reason,
+        User $changedBy,
+        string $ipAddress,
+        string $userAgent
+    ): void {
+        if (! $this->tenantContextService->teamMembersAllowed()) {
+            return;
+        }
+
+        $pivotStatus = $tenant->users()
+            ->where('users.id', $targetUser->id)
+            ->first()
+            ?->pivot
+            ?->status;
+
+        $oldStatus = $pivotStatus !== null
+            ? UserStatus::from((int) $pivotStatus)
+            : UserStatus::ACTIVE;
+
+        $tenant->users()->updateExistingPivot($targetUser->id, [
+            'status' => $newStatus->value,
+        ]);
+
+        TenantUserStatusChanged::dispatch(
+            $tenant,
+            $targetUser,
+            $oldStatus,
+            $newStatus,
+            $reason,
+            $changedBy,
+            $ipAddress,
+            $userAgent
+        );
+    }
+
+    /**
+     * Check if a user can change another user's status within a tenant.
+     */
+    public function canChangeStatus(User $manager, User $targetUser, Tenant $tenant): bool
+    {
+        if ($manager->id === $targetUser->id) {
+            return false;
+        }
+
+        return $this->canManageUser($manager, $targetUser, $tenant);
     }
 }

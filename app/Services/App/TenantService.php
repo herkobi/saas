@@ -32,7 +32,7 @@ class TenantService implements TenantServiceInterface
     public function getAllTenants(User $user): Collection
     {
         return $user->tenants()
-            ->withPivot(['role', 'joined_at'])
+            ->withPivot(['role', 'status', 'joined_at'])
             ->orderByPivot('joined_at')
             ->get();
     }

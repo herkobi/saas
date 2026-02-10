@@ -12,6 +12,7 @@ export interface AuthTenant {
     id: string;
     name: string;
     role: string;
+    status: number;
 }
 
 export interface Auth {

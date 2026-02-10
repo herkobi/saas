@@ -20,6 +20,9 @@ export interface TenantUser {
     name: string;
     email: string;
     role: 'owner' | 'staff';
+    pivot?: {
+        status?: number;
+    };
     created_at: string;
 }
 

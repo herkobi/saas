@@ -40,7 +40,7 @@ class Tenant extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'tenant_user')
-            ->withPivot(['role', 'joined_at'])
+            ->withPivot(['role', 'status', 'joined_at'])
             ->withTimestamps();
     }
 

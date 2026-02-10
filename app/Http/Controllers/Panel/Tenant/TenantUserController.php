@@ -62,6 +62,10 @@ class TenantUserController extends Controller
             'tenant' => $tenant,
             'users' => $users,
             'statistics' => $statistics,
+            'statusOptions' => collect(UserStatus::cases())->map(fn ($s) => [
+                'value' => $s->value,
+                'label' => $s->label(),
+            ])->toArray(),
         ]);
     }
 
