@@ -30,6 +30,7 @@ use App\Http\Controllers\App\Account\UserActivityController;
 use App\Http\Controllers\App\Account\UserController;
 use App\Http\Controllers\App\DashboardController;
 use App\Http\Controllers\App\InvitationAcceptController;
+use App\Http\Controllers\App\TenantController;
 use App\Http\Controllers\App\Profile\NotificationController;
 use App\Http\Controllers\App\Profile\PasswordController;
 use App\Http\Controllers\App\Profile\ProfileController;
@@ -79,6 +80,15 @@ Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
      */
     Route::controller(DashboardController::class)->group(function () {
         Route::get('dashboard', 'index')->name('dashboard');
+    });
+
+    /**
+     * Tenant Management Routes
+     */
+    Route::controller(TenantController::class)->prefix('tenant')->name('tenant.')->group(function () {
+        Route::get('create', 'create')->middleware(['write.access'])->name('create');
+        Route::post('/', 'store')->middleware(['write.access'])->name('store');
+        Route::post('switch', 'switch')->name('switch');
     });
 
     /*

@@ -96,6 +96,7 @@ final class PlanSeeder extends Seeder
             $features = Feature::query()->pluck('id', 'code');
 
             $this->syncFeatures($free, [
+                ($features['tenants'] ?? null) => '1',
                 ($features['users'] ?? null) => '1',
                 ($features['storage_gb'] ?? null) => '1',
                 ($features['api_access'] ?? null) => '0',
@@ -105,6 +106,7 @@ final class PlanSeeder extends Seeder
             ]);
 
             $this->syncFeatures($standard, [
+                ($features['tenants'] ?? null) => '1',
                 ($features['users'] ?? null) => '5',
                 ($features['storage_gb'] ?? null) => '20',
                 ($features['api_access'] ?? null) => '1',
@@ -114,6 +116,7 @@ final class PlanSeeder extends Seeder
             ]);
 
             $this->syncFeatures($pro, [
+                ($features['tenants'] ?? null) => '3',
                 ($features['users'] ?? null) => '-1',
                 ($features['storage_gb'] ?? null) => '200',
                 ($features['api_access'] ?? null) => '1',
@@ -123,6 +126,7 @@ final class PlanSeeder extends Seeder
             ]);
 
             $this->syncFeatures($business, [
+                ($features['tenants'] ?? null) => '5',
                 ($features['users'] ?? null) => '25',
                 ($features['storage_gb'] ?? null) => '500',
                 ($features['api_access'] ?? null) => '1',
@@ -132,6 +136,7 @@ final class PlanSeeder extends Seeder
             ]);
 
             $this->syncFeatures($enterprise, [
+                ($features['tenants'] ?? null) => '-1',
                 ($features['users'] ?? null) => '-1',
                 ($features['storage_gb'] ?? null) => '-1',
                 ($features['api_access'] ?? null) => '1',

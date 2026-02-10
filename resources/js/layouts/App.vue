@@ -27,9 +27,49 @@ const { getInitials } = useInitials();
 const user = computed(() => page.props.auth.user);
 const tenant = computed(() => page.props.tenant);
 const appName = computed(() => page.props.site?.name ?? 'Herkobi');
+const allowMultipleTenants = computed(() => page.props.site?.allow_multiple_tenants ?? false);
+const authTenants = computed(() => page.props.auth.tenants ?? []);
+const canCreateTenant = computed(() => page.props.auth.can_create_tenant ?? false);
+const showTenantSwitcher = computed(() => allowMultipleTenants.value && authTenants.value.length > 1);
 
 // Sidebar toggle (mobile)
 const sidebarOpen = ref(false);
+
+// Tenant menu
+const tenantMenu = ref();
+const tenantMenuItems = computed(() => {
+    const items: any[] = [];
+
+    if (authTenants.value.length > 0) {
+        items.push({
+            label: 'Tenant Seçin',
+            items: authTenants.value.map((t) => ({
+                label: t.name,
+                icon: t.id === tenant.value?.id ? 'pi pi-check' : 'pi pi-building',
+                command: () => {
+                    if (t.id !== tenant.value?.id) {
+                        useForm({ tenant_id: t.id }).post('/app/tenant/switch');
+                    }
+                },
+            })),
+        });
+    }
+
+    if (canCreateTenant.value) {
+        items.push({ separator: true });
+        items.push({
+            label: 'Yeni Tenant Oluştur',
+            icon: 'pi pi-plus',
+            url: '/app/tenant/create',
+        });
+    }
+
+    return items;
+});
+
+const toggleTenantMenu = (event: Event) => {
+    tenantMenu.value.toggle(event);
+};
 
 // User menu
 const userMenu = ref();
@@ -113,10 +153,21 @@ const isActive = (href: string) => {
         >
             <!-- Logo / Tenant -->
             <div class="flex h-16 items-center gap-3 border-b border-surface-200 px-5 dark:border-surface-800">
-                <div class="flex flex-col truncate">
+                <div class="flex min-w-0 flex-1 flex-col truncate">
                     <span class="truncate text-sm font-bold text-surface-900 dark:text-surface-0">{{ appName }}</span>
-                    <span v-if="tenant" class="truncate text-xs text-surface-500 dark:text-surface-400">{{ tenant.name }}</span>
+                    <button
+                        v-if="tenant && showTenantSwitcher"
+                        class="flex items-center gap-1 truncate text-left text-xs text-surface-500 transition-colors hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200"
+                        @click="toggleTenantMenu"
+                    >
+                        <span class="truncate">{{ tenant.account?.title ?? tenant.name }}</span>
+                        <i class="pi pi-chevron-down text-[10px]" />
+                    </button>
+                    <span v-else-if="tenant" class="truncate text-xs text-surface-500 dark:text-surface-400">
+                        {{ tenant.account?.title ?? tenant.name }}
+                    </span>
                 </div>
+                <Menu ref="tenantMenu" :model="tenantMenuItems" :popup="true" />
             </div>
 
             <!-- Navigation -->

@@ -8,8 +8,16 @@ export interface User {
     updated_at: string;
 }
 
+export interface AuthTenant {
+    id: string;
+    name: string;
+    role: string;
+}
+
 export interface Auth {
     user: User | null;
+    tenants: AuthTenant[];
+    can_create_tenant: boolean;
 }
 
 export type TwoFactorConfigContent = {

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Shared;
 
 use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Enums\TenantUserRole;
+use App\Models\Feature;
 use App\Models\Tenant;
 use App\Models\User;
 
@@ -68,7 +70,38 @@ class TenantContextService implements TenantContextServiceInterface
             return ! $user->tenants()->exists();
         }
 
-        return true;
+        $ownedCount = $user->tenants()
+            ->wherePivot('role', TenantUserRole::OWNER->value)
+            ->count();
+
+        $primaryTenant = $user->tenants()
+            ->wherePivot('role', TenantUserRole::OWNER->value)
+            ->orderByPivot('joined_at')
+            ->first();
+
+        if (! $primaryTenant) {
+            return true;
+        }
+
+        $plan = $primaryTenant->currentPlan();
+
+        if (! $plan) {
+            return false;
+        }
+
+        $feature = Feature::where('code', 'tenants')->first();
+
+        if (! $feature) {
+            return true;
+        }
+
+        $limit = $primaryTenant->getFeatureLimit($feature);
+
+        if ($limit === null) {
+            return true;
+        }
+
+        return $ownedCount < (int) $limit;
     }
 
     public function canInviteTeamMember(Tenant $tenant): bool

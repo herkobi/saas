@@ -16,6 +16,16 @@ final class FeatureSeeder extends Seeder
         $items = [
             // LIMIT
             [
+                'code' => 'tenants',
+                'slug' => 'tenants',
+                'name' => 'Tenant Limiti',
+                'description' => 'Kullanıcının oluşturabileceği tenant sayısı',
+                'type' => FeatureType::LIMIT,
+                'unit' => 'adet',
+                'reset_period' => ResetPeriod::Monthly,
+                'is_active' => true,
+            ],
+            [
                 'code' => 'users',
                 'slug' => 'users',
                 'name' => 'Kullanıcı Limiti',

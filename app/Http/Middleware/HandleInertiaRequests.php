@@ -58,7 +58,8 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenantContextService = app(TenantContextServiceInterface::class);
+        $tenant = $tenantContextService->currentTenant();
 
         return array_merge(parent::share($request), [
 
@@ -67,6 +68,7 @@ class HandleInertiaRequests extends Middleware
                 'logo' => logo(),
                 'favicon' => favicon(),
                 'allow_team_members' => config('herkobi.tenant.allow_team_members', false),
+                'allow_multiple_tenants' => config('herkobi.tenant.allow_multiple_tenants', false),
             ],
 
             'auth' => [
@@ -78,6 +80,16 @@ class HandleInertiaRequests extends Middleware
                     'status' => $user->status->value,
                     'two_factor_enabled' => !is_null($user->two_factor_confirmed_at),
                 ] : null,
+                'tenants' => $user && $tenantContextService->multipleTenantsAllowed()
+                    ? $user->tenants()->withPivot(['role', 'joined_at'])->orderByPivot('joined_at')->get()->map(fn ($t) => [
+                        'id' => $t->id,
+                        'name' => $t->account['title'] ?? $t->name,
+                        'role' => $t->pivot->role,
+                    ])->toArray()
+                    : [],
+                'can_create_tenant' => $user
+                    ? $tenantContextService->canCreateNewTenant($user)
+                    : false,
             ],
 
             'tenant' => $tenant ? [

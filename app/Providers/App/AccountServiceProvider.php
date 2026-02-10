@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\App;
 
+use App\Contracts\App\TenantServiceInterface;
 use App\Contracts\App\Account\AddonPurchaseServiceInterface;
 use App\Contracts\App\Account\BillingServiceInterface;
 use App\Contracts\App\Account\CheckoutServiceInterface;
@@ -18,6 +19,7 @@ use App\Contracts\App\Account\SubscriptionPurchaseServiceInterface;
 use App\Contracts\App\Account\SubscriptionServiceInterface;
 use App\Contracts\App\Account\UsageResetServiceInterface;
 use App\Contracts\App\Account\UserServiceInterface;
+use App\Services\App\TenantService;
 use App\Services\App\Account\AddonPurchaseService;
 use App\Services\App\Account\BillingService;
 use App\Services\App\Account\CheckoutService;
@@ -55,6 +57,7 @@ class AccountServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(TenantServiceInterface::class, TenantService::class);
         $this->app->bind(AddonPurchaseServiceInterface::class, AddonPurchaseService::class);
         $this->app->bind(BillingServiceInterface::class, BillingService::class);
         $this->app->bind(CheckoutServiceInterface::class, CheckoutService::class);
