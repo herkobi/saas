@@ -1,5 +1,5 @@
 import { createInertiaApp } from '@inertiajs/vue3';
-import Aura from '@primeuix/themes/lara';
+import Aura from '@primeuix/themes/aura';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';

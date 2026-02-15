@@ -5,6 +5,7 @@ export * from './site';
 export * from './common';
 export * from './navigation';
 export * from './ui';
+export * from './panel';
 
 import type { Auth } from './auth';
 import type { FlashMessage } from './common';

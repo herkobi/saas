@@ -54,6 +54,21 @@ export interface Addon {
     is_active: boolean;
 }
 
+export interface Feature {
+    id: string;
+    name: string;
+    slug: string;
+    code: string;
+    description?: string;
+    type: string;
+    type_label?: string;
+    unit?: string;
+    is_active: boolean;
+    plans?: Plan[];
+    created_at: string;
+    updated_at: string;
+}
+
 export interface FeatureUsage {
     name: string;
     unit: string | null;

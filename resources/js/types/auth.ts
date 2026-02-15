@@ -2,10 +2,12 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    email_verified_at: string | null;
+    type: string;
+    status: string;
     two_factor_enabled: boolean;
-    created_at: string;
-    updated_at: string;
+    email_verified_at?: string | null;
+    created_at?: string;
+    updated_at?: string;
 }
 
 export interface AuthTenant {
