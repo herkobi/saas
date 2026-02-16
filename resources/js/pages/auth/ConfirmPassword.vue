@@ -1,44 +1,53 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import Password from 'primevue/password';
-import AuthLayout from '@/layouts/Auth.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import InputError from '@/components/common/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import AuthLayout from '@/layouts/AuthLayout.vue';
 import { store } from '@/routes/password/confirm';
-
-const form = useForm({
-    password: '',
-});
-
-const submit = () => {
-    form.post(store.url(), {
-        onFinish: () => form.reset('password'),
-    });
-};
 </script>
 
 <template>
-    <AuthLayout title="Şifre Onayı" subtitle="Devam etmeden önce şifrenizi onaylayın.">
-        <form @submit.prevent="submit" class="flex flex-col gap-4">
-            <p class="text-sm text-surface-600 dark:text-surface-400">
-                Bu güvenli bir alandır. Devam etmek için lütfen şifrenizi girin.
-            </p>
+    <AuthLayout
+        title="Confirm your password"
+        description="This is a secure area of the application. Please confirm your password before continuing."
+    >
+        <Head title="Confirm password" />
 
-            <div class="flex flex-col gap-2">
-                <label for="password" class="text-sm font-medium text-surface-700 dark:text-surface-300">Şifre</label>
-                <Password
-                    id="password"
-                    v-model="form.password"
-                    :feedback="false"
-                    toggleMask
-                    placeholder="••••••••"
-                    :invalid="!!form.errors.password"
-                    autofocus
-                    fluid
-                />
-                <small v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</small>
+        <Form
+            v-bind="store.form()"
+            reset-on-success
+            v-slot="{ errors, processing }"
+        >
+            <div class="space-y-6">
+                <div class="grid gap-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input
+                        id="password"
+                        type="password"
+                        name="password"
+                        class="mt-1 block w-full"
+                        required
+                        autocomplete="current-password"
+                        autofocus
+                    />
+
+                    <InputError :message="errors.password" />
+                </div>
+
+                <div class="flex items-center">
+                    <Button
+                        class="w-full"
+                        :disabled="processing"
+                        data-test="confirm-password-button"
+                    >
+                        <Spinner v-if="processing" />
+                        Confirm Password
+                    </Button>
+                </div>
             </div>
-
-            <Button type="submit" label="Onayla" icon="pi pi-check" :loading="form.processing" class="mt-2" fluid />
-        </form>
+        </Form>
     </AuthLayout>
 </template>

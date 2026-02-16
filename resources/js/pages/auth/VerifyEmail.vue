@@ -1,39 +1,49 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import Message from 'primevue/message';
-import AuthLayout from '@/layouts/Auth.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import TextLink from '@/components/common/TextLink.vue';
+import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import AuthLayout from '@/layouts/AuthLayout.vue';
+import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
-const props = defineProps<{
+defineProps<{
     status?: string;
 }>();
-
-const form = useForm({});
-
-const submit = () => {
-    form.post(send.url());
-};
 </script>
 
 <template>
-    <AuthLayout title="E-posta Doğrulama" subtitle="Devam etmeden önce e-posta adresinizi doğrulamanız gerekiyor.">
-        <div class="flex flex-col gap-4">
-            <p class="text-sm text-surface-600 dark:text-surface-400">
-                Kayıt olurken belirttiğiniz e-posta adresine bir doğrulama bağlantısı gönderdik. Eğer e-postayı almadıysanız, tekrar gönderebilirsiniz.
-            </p>
+    <AuthLayout
+        title="Verify email"
+        description="Please verify your email address by clicking on the link we just emailed to you."
+    >
+        <Head title="Email verification" />
 
-            <Message v-if="props.status === 'verification-link-sent'" severity="success" variant="simple" size="small">
-                Yeni bir doğrulama bağlantısı e-posta adresinize gönderildi.
-            </Message>
-
-            <form @submit.prevent="submit">
-                <Button type="submit" label="Doğrulama E-postasını Tekrar Gönder" icon="pi pi-refresh" :loading="form.processing" fluid />
-            </form>
-
-            <div class="mt-2 text-center text-sm">
-                <a href="/login" class="font-semibold text-primary-600 hover:text-primary-500">Çıkış Yap</a>
-            </div>
+        <div
+            v-if="status === 'verification-link-sent'"
+            class="mb-4 text-center text-sm font-medium text-green-600"
+        >
+            A new verification link has been sent to the email address you
+            provided during registration.
         </div>
+
+        <Form
+            v-bind="send.form()"
+            class="space-y-6 text-center"
+            v-slot="{ processing }"
+        >
+            <Button :disabled="processing" variant="secondary">
+                <Spinner v-if="processing" />
+                Resend verification email
+            </Button>
+
+            <TextLink
+                :href="logout()"
+                as="button"
+                class="mx-auto block text-sm"
+            >
+                Log out
+            </TextLink>
+        </Form>
     </AuthLayout>
 </template>

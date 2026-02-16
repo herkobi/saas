@@ -1,65 +1,133 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import AuthLayout from '@/layouts/Auth.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import { computed, ref } from 'vue';
+import InputError from '@/components/common/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+    InputOTP,
+    InputOTPGroup,
+    InputOTPSlot,
+} from '@/components/ui/input-otp';
+import AuthLayout from '@/layouts/AuthLayout.vue';
 import { store } from '@/routes/two-factor/login';
+import type { TwoFactorConfigContent } from '@/types';
 
-const recovery = ref(false);
+const authConfigContent = computed<TwoFactorConfigContent>(() => {
+    if (showRecoveryInput.value) {
+        return {
+            title: 'Recovery Code',
+            description:
+                'Please confirm access to your account by entering one of your emergency recovery codes.',
+            buttonText: 'login using an authentication code',
+        };
+    }
 
-const form = useForm({
-    code: '',
-    recovery_code: '',
+    return {
+        title: 'Authentication Code',
+        description:
+            'Enter the authentication code provided by your authenticator application.',
+        buttonText: 'login using a recovery code',
+    };
 });
 
-const toggleRecovery = () => {
-    recovery.value = !recovery.value;
-    form.code = '';
-    form.recovery_code = '';
+const showRecoveryInput = ref<boolean>(false);
+
+const toggleRecoveryMode = (clearErrors: () => void): void => {
+    showRecoveryInput.value = !showRecoveryInput.value;
+    clearErrors();
+    code.value = '';
 };
 
-const submit = () => {
-    form.post(store.url(), {
-        onFinish: () => {
-            form.reset('code', 'recovery_code');
-        },
-    });
-};
+const code = ref<string>('');
 </script>
 
 <template>
-    <AuthLayout title="İki Adımlı Doğrulama" subtitle="Hesabınıza erişmek için doğrulama kodunuzu girin.">
-        <form @submit.prevent="submit" class="flex flex-col gap-4">
-            <p class="text-sm text-surface-600 dark:text-surface-400">
-                <template v-if="!recovery">
-                    Kimlik doğrulama uygulamanızdaki doğrulama kodunu girin.
-                </template>
-                <template v-else>
-                    Kurtarma kodlarınızdan birini girin.
-                </template>
-            </p>
+    <AuthLayout
+        :title="authConfigContent.title"
+        :description="authConfigContent.description"
+    >
+        <Head title="Two-Factor Authentication" />
 
-            <div v-if="!recovery" class="flex flex-col gap-2">
-                <label for="code" class="text-sm font-medium text-surface-700 dark:text-surface-300">Doğrulama Kodu</label>
-                <InputText id="code" v-model="form.code" inputmode="numeric" autocomplete="one-time-code" placeholder="000000" :invalid="!!form.errors.code" autofocus fluid />
-                <small v-if="form.errors.code" class="text-red-500">{{ form.errors.code }}</small>
-            </div>
+        <div class="space-y-6">
+            <template v-if="!showRecoveryInput">
+                <Form
+                    v-bind="store.form()"
+                    class="space-y-4"
+                    reset-on-error
+                    @error="code = ''"
+                    #default="{ errors, processing, clearErrors }"
+                >
+                    <input type="hidden" name="code" :value="code" />
+                    <div
+                        class="flex flex-col items-center justify-center space-y-3 text-center"
+                    >
+                        <div class="flex w-full items-center justify-center">
+                            <InputOTP
+                                id="otp"
+                                v-model="code"
+                                :maxlength="6"
+                                :disabled="processing"
+                                autofocus
+                            >
+                                <InputOTPGroup>
+                                    <InputOTPSlot
+                                        v-for="index in 6"
+                                        :key="index"
+                                        :index="index - 1"
+                                    />
+                                </InputOTPGroup>
+                            </InputOTP>
+                        </div>
+                        <InputError :message="errors.code" />
+                    </div>
+                    <Button type="submit" class="w-full" :disabled="processing"
+                        >Continue</Button
+                    >
+                    <div class="text-center text-sm text-muted-foreground">
+                        <span>or you can </span>
+                        <button
+                            type="button"
+                            class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                            @click="() => toggleRecoveryMode(clearErrors)"
+                        >
+                            {{ authConfigContent.buttonText }}
+                        </button>
+                    </div>
+                </Form>
+            </template>
 
-            <div v-else class="flex flex-col gap-2">
-                <label for="recovery_code" class="text-sm font-medium text-surface-700 dark:text-surface-300">Kurtarma Kodu</label>
-                <InputText id="recovery_code" v-model="form.recovery_code" autocomplete="one-time-code" placeholder="xxxx-xxxx" :invalid="!!form.errors.recovery_code" autofocus fluid />
-                <small v-if="form.errors.recovery_code" class="text-red-500">{{ form.errors.recovery_code }}</small>
-            </div>
+            <template v-else>
+                <Form
+                    v-bind="store.form()"
+                    class="space-y-4"
+                    reset-on-error
+                    #default="{ errors, processing, clearErrors }"
+                >
+                    <Input
+                        name="recovery_code"
+                        type="text"
+                        placeholder="Enter recovery code"
+                        :autofocus="showRecoveryInput"
+                        required
+                    />
+                    <InputError :message="errors.recovery_code" />
+                    <Button type="submit" class="w-full" :disabled="processing"
+                        >Continue</Button
+                    >
 
-            <Button type="submit" label="Doğrula" icon="pi pi-shield" :loading="form.processing" class="mt-2" fluid />
-
-            <div class="mt-2 text-center">
-                <button type="button" class="text-sm font-semibold text-primary-600 hover:text-primary-500" @click="toggleRecovery">
-                    <template v-if="!recovery">Kurtarma kodu kullan</template>
-                    <template v-else>Doğrulama kodu kullan</template>
-                </button>
-            </div>
-        </form>
+                    <div class="text-center text-sm text-muted-foreground">
+                        <span>or you can </span>
+                        <button
+                            type="button"
+                            class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                            @click="() => toggleRecoveryMode(clearErrors)"
+                        >
+                            {{ authConfigContent.buttonText }}
+                        </button>
+                    </div>
+                </Form>
+            </template>
+        </div>
     </AuthLayout>
 </template>

@@ -1,69 +1,110 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import Checkbox from 'primevue/checkbox';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import Password from 'primevue/password';
-import AuthLayout from '@/layouts/Auth.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import InputError from '@/components/common/InputError.vue';
+import TextLink from '@/components/common/TextLink.vue';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import AuthBase from '@/layouts/AuthLayout.vue';
+import { register } from '@/routes';
 import { store } from '@/routes/login';
+import { request } from '@/routes/password';
 
-// Form yönetimi (Inertia useForm)
-const form = useForm({
-    email: '',
-    password: '',
-    remember: false,
-});
-
-// Form gönderimi
-const submit = () => {
-    form.post(store.url(), {
-        onFinish: () => form.reset('password'),
-    });
-};
+defineProps<{
+    status?: string;
+    canResetPassword: boolean;
+    canRegister: boolean;
+}>();
 </script>
 
 <template>
-    <AuthLayout title="Giriş Yap" subtitle="Sisteme erişmek için bilgilerinizi kullanın.">
-        <form @submit.prevent="submit" class="flex flex-col gap-4">
-            <Message v-if="form.errors.email" severity="error" variant="simple" size="small">
-                {{ form.errors.email }}
-            </Message>
+    <AuthBase
+        title="Log in to your account"
+        description="Enter your email and password below to log in"
+    >
+        <Head title="Log in" />
 
-            <div class="flex flex-col gap-2">
-                <label for="email" class="text-sm font-medium text-surface-700 dark:text-surface-300">E-posta</label>
-                <InputText id="email" v-model="form.email" type="email" placeholder="ornek@alanadi.com" :invalid="!!form.errors.email" autofocus />
-                <div v-if="form.errors.email" class="mt-1 text-xs text-red-500">{{ form.errors.email }}</div>
-            </div>
+        <div
+            v-if="status"
+            class="mb-4 text-center text-sm font-medium text-green-600"
+        >
+            {{ status }}
+        </div>
 
-            <div class="flex flex-col gap-2">
-                <div class="flex items-center justify-between">
-                    <label for="password" class="text-sm font-medium text-surface-700 dark:text-surface-300">Şifre</label>
-                    <a href="/forgot-password" class="text-xs text-primary-600 transition-colors hover:text-primary-500">Şifremi Unuttum</a>
+        <Form
+            v-bind="store.form()"
+            :reset-on-success="['password']"
+            v-slot="{ errors, processing }"
+            class="flex flex-col gap-6"
+        >
+            <div class="grid gap-6">
+                <div class="grid gap-2">
+                    <Label for="email">Email address</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        required
+                        autofocus
+                        :tabindex="1"
+                        autocomplete="email"
+                        placeholder="email@example.com"
+                    />
+                    <InputError :message="errors.email" />
                 </div>
-                <Password
-                    id="password"
-                    v-model="form.password"
-                    :feedback="false"
-                    toggleMask
-                    placeholder="••••••••"
-                    :invalid="!!form.errors.password"
-                    fluid
-                />
-                <small v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</small>
+
+                <div class="grid gap-2">
+                    <div class="flex items-center justify-between">
+                        <Label for="password">Password</Label>
+                        <TextLink
+                            v-if="canResetPassword"
+                            :href="request()"
+                            class="text-sm"
+                            :tabindex="5"
+                        >
+                            Forgot password?
+                        </TextLink>
+                    </div>
+                    <Input
+                        id="password"
+                        type="password"
+                        name="password"
+                        required
+                        :tabindex="2"
+                        autocomplete="current-password"
+                        placeholder="Password"
+                    />
+                    <InputError :message="errors.password" />
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <Label for="remember" class="flex items-center space-x-3">
+                        <Checkbox id="remember" name="remember" :tabindex="3" />
+                        <span>Remember me</span>
+                    </Label>
+                </div>
+
+                <Button
+                    type="submit"
+                    class="mt-4 w-full"
+                    :tabindex="4"
+                    :disabled="processing"
+                    data-test="login-button"
+                >
+                    <Spinner v-if="processing" />
+                    Log in
+                </Button>
             </div>
 
-            <div class="flex items-center gap-2">
-                <Checkbox v-model="form.remember" inputId="remember" :binary="true" />
-                <label for="remember" class="text-sm text-surface-600 dark:text-surface-400">Beni Hatırla</label>
+            <div
+                class="text-center text-sm text-muted-foreground"
+                v-if="canRegister"
+            >
+                Don't have an account?
+                <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
             </div>
-
-            <Button type="submit" label="Giriş Yap" icon="pi pi-sign-in" :loading="form.processing" class="mt-2" fluid />
-
-            <div class="mt-4 text-center text-sm">
-                <span class="text-surface-600 dark:text-surface-400">Hesabınız yok mu?</span>
-                <a href="/register" class="ml-1 font-semibold text-primary-600 hover:text-primary-500">Ücretsiz Deneyin</a>
-            </div>
-        </form>
-    </AuthLayout>
+        </Form>
+    </AuthBase>
 </template>

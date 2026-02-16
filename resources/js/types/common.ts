@@ -1,10 +1,3 @@
-export interface FlashMessage {
-    success: string | null;
-    error: string | null;
-    warning: string | null;
-    info: string | null;
-}
-
 export interface PaginatedData<T> {
     data: T[];
     current_page: number;

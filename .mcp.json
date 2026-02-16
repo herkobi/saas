@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "laravel-boost": {
+      "command": "php",
+      "args": [
+        "artisan",
+        "boost:mcp"
+      ]
+    },
+    "herd": {
+      "command": "php",
+      "args": [
+        "C:/Users/bulent/.config/herd/bin/herd-mcp.phar"
+      ],
+      "env": {
+        "SITE_PATH": "C:\\Users\\bulent\\Herd\\saas2"
+      }
+    },
+    "shadcnVue": {
+      "command": "npx",
+      "args": [
+        "shadcn-vue@latest",
+        "mcp"
+      ]
+    }
+  }
+}

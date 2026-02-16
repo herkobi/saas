@@ -1,292 +1,543 @@
-# Claude Agent Instructions for Herkobi
+# Herkobi SaaS
 
-## Proje Özeti
+Herkobi, Laravel 12 uzerinde kurulu cok kiracili (multi-tenant) bir SaaS platformudur. Iki ana bolge vardir: **Panel** (admin yonetim paneli) ve **App** (tenant/musteri uygulamasi). Sistem; abonelik yonetimi, plan bazli ozellik erisimi, PayTR odeme entegrasyonu, addon sistemi, proration hesaplama, KVKK/GDPR uyumlu veri saklama ve event-driven mimari uzerine kuruludur.
 
-Herkobi, Laravel 12 üzerinde kurulu çok kiracılı (multi-tenant) bir SaaS platformudur. İki ana bölge vardır: **Panel** (admin yönetim paneli) ve **App** (tenant/müşteri uygulaması). Sistem; abonelik yönetimi, plan bazlı özellik erişimi, PayTR ödeme entegrasyonu, addon sistemi, proration (orantılı hesaplama), KVKK/GDPR uyumlu veri saklama ve event-driven mimari üzerine kuruludur.
+---
 
-## Teknik Yığın
+## 1. Teknik Yigin
+
+| Katman | Teknolojiler |
+|--------|-------------|
+| Backend | PHP 8.4+, Laravel 12, MySQL, Laravel Fortify (2FA), Pest 4, Pint |
+| Frontend | Vue 3.5 (`<script setup>`), Inertia.js 2, shadcn-vue (new-york-v4 + Reka UI), Tailwind CSS v4, TypeScript, Lucide Vue Next |
+| Araclar | Laravel Wayfinder (tip guvenli route), TanStack Vue Table, VueUse, Vue Sonner |
+| Odeme | PayTR gateway, TRY para birimi, %20 KDV |
+
+> Paket versiyonlarinin tam listesi icin asagidaki **Boost Kurallari > Temel Bagalam** bolumune bakin.
+
+---
+
+## 2. Proje Yapisi
 
 ### Backend
-- **PHP 8.2+** (çalışma ortamı 8.3), **Laravel 12.x**, **MySQL**
-- **Laravel Fortify** (kimlik doğrulama + 2FA)
-- **Pest 4.x** (test), **Laravel Pint** (formatlama)
-- **PayTR** (ödeme gateway), **TRY** (varsayılan para birimi), **%20 KDV**
-- PHP 8.2 backed enum'lar tüm durum/tip alanları için kullanılır
+
+```
+app/
+├── Contracts/          # 37 interface (her servisin bir interface'i var)
+├── Services/           # 37 servis (App/, Panel/, Shared/ altinda)
+├── Http/
+│   ├── Controllers/    # App/ ve Panel/ altinda izole controller'lar
+│   ├── Middleware/      # 12 ozel middleware
+│   └── Requests/       # Form Request siniflari
+├── Models/             # 18 Eloquent model (ULID, soft delete)
+├── Enums/              # 14 backed enum
+├── Events/             # Domain event'leri
+├── Listeners/          # Event handler'lari
+├── Jobs/               # 15 zamanlanmis gorev
+├── Providers/          # App/ ve Panel/ altinda service provider'lar
+└── Notifications/      # Bildirim siniflari
+
+config/herkobi.php      # Platform davranisi (tenant, abonelik, proration, odeme, addon, KVKK)
+config/paytr.php        # PayTR gateway ayarlari
+routes/app.php          # Tenant rotalari (middleware: tenant.context, subscription.active, write.access, feature.access)
+routes/panel.php        # Admin rotalari (middleware: auth, write.access)
+routes/console.php      # Zamanlanmis gorevler
+```
 
 ### Frontend
-- **Vue 3.5** (Composition API)
-- **Inertia.js 2.x** (SPA benzeri deneyim, Laravel routing korunur)
-- **PrimeVue 4.5** (UI component library, Aura theme, @primevue/forms)
-- **Tailwind CSS v4** (@tailwindcss/vite)
-- **TypeScript** (tam tip güvenliği)
-- **Laravel Wayfinder** (tip güvenli route yardımcıları)
-- **ESLint + Prettier** (kod kalitesi ve formatlama)
 
-## İlk Bakış — Kritik Dosyalar
+```
+resources/js/
+├── pages/
+│   ├── app/            # Tenant sayfalari (Dashboard, profile/*)
+│   ├── panel/          # Admin sayfalari (Dashboard, profile/*)
+│   └── auth/           # Paylasilan auth sayfalari (Login, Register, vb.)
+├── components/
+│   ├── app/            # 17 app-ozel component (AppShell, AppSidebar, NavMain, NavUser, TeamSwitcher, vb.)
+│   ├── panel/          # 17 panel-ozel component (ayni yapida izole)
+│   ├── ui/             # 57 shadcn-vue component (accordion, badge, button, card, dialog, table, vb.)
+│   └── common/         # 7 paylasilan component (AlertError, AppLogo, Breadcrumbs, InputError, vb.)
+├── layouts/
+│   ├── AppLayout.vue / PanelLayout.vue / AuthLayout.vue
+│   ├── app/            # AppSidebarLayout, AppHeaderLayout
+│   ├── panel/          # AppSidebarLayout, AppHeaderLayout
+│   └── auth/           # AuthSimpleLayout, AuthCardLayout, AuthSplitLayout
+├── composables/        # 10 composable (useAppearance, useFormatting, useTwoFactorAuth, useUserStatus, vb.)
+├── types/              # 11 TypeScript tip dosyasi (auth, tenant, billing, common, panel, site, navigation, ui, vb.)
+├── lib/utils.ts        # cn() ve yardimci fonksiyonlar
+├── actions/            # Wayfinder controller route fonksiyonlari (otomatik uretilir)
+└── routes/             # Wayfinder named route fonksiyonlari (otomatik uretilir)
+```
 
-### Konfigürasyon
-- `config/herkobi.php` — Platform davranışı: tenant ayarları, abonelik, proration, ödeme, addon, KVKK retention
-- `config/paytr.php` — PayTR ödeme gateway ayarları
+### Gelistirme Durumu
 
-### Rotalar
-- `routes/app.php` — Tenant rotaları. Middleware: `tenant.context`, `subscription.active`, `write.access`, `tenant.allow_team_members`, `feature.access`
-- `GET/POST /invitation/accept/{token}` — Public davetiye kabul rotaları (auth sadece POST için)
-- `routes/panel.php` — Admin rotaları. Middleware: `auth`, `write.access`
-- `routes/console.php` — Zamanlanmış görevler (cron schedule)
-- `POST /payment/callback` — PayTR webhook (kimlik doğrulama yok, `routes/app.php` içinde)
+**Hazir sayfalar:**
+- Auth: Login, Register, ForgotPassword, ResetPassword, VerifyEmail, ConfirmPassword, TwoFactorChallenge
+- App: Dashboard, Profile (Profile, Password, TwoFactor, Appearance)
+- Panel: Dashboard, Profile (Profile, Password, TwoFactor, Appearance)
 
-### İş Mantığı
-- `app/Contracts/**` — Interface tanımları (her servisin bir interface'i vardır)
-- `app/Services/**` — İş mantığı (controller'lar ince tutulur, servisler çağrılır)
-- `app/Providers/Panel/*ServiceProvider.php` ve `app/Providers/App/*ServiceProvider.php` — Interface → implementation bağlamaları
+**Frontend'i yapilmamis backend islemleri:**
+- Plan, Fiyat, Ozellik, Addon yonetimi (Panel CRUD)
+- Tenant yonetimi ve detay (Panel)
+- Abonelik islemleri (Panel + App)
+- Odeme listeleri ve checkout akisi (Panel + App)
+- Kullanici/davetiye yonetimi (App)
+- Bildirimler, aktiviteler, ayarlar
 
-### Event Sistemi
-- `app/Events/**` — Domain event'leri (abonelik, ödeme, addon, kullanıcı işlemleri)
-- `app/Listeners/**` — Event handler'ları (aktivite logu, bildirim, işlem tetikleme)
-- `app/Listeners/TenantProcessSuccessfulPayment.php` — Ödeme sonrası yönlendirme (kritik listener)
+---
 
-### Ödeme Akışı
-- `app/Http/Controllers/App/Account/PaymentCallbackController.php` — PayTR webhook handler
-- `app/Services/App/Account/PayTRService.php` — PayTR API entegrasyonu
-- `app/Services/App/Account/CheckoutService.php` — Checkout oluşturma ve tutar hesaplama
-- `app/Services/App/Account/PaymentService.php` — Ödeme kaydı işlemleri
+## 3. Mimari Kurallar
 
-## Mimari Kurallar ve Konvansiyonlar
+### Servis Katmani
+- Tum is mantigi `app/Services/` icinde. Controller'lar ince tutulur, servis cagirir
+- Her servisin bir interface'i (`app/Contracts/`) vardir
+- Baglamalar `app/Providers/` altindaki service provider'larda yapilir
+- Yeni servis: Interface → Service → ServiceProvider binding sirasi
 
-### ID Sistemi
-- Tüm modeller **ULID** tabanlı birincil anahtarlar kullanır
-- Migration'larda: `$table->ulid('id')->primary()`
-- Model'lerde: `use HasUlids` trait'i
-
-### Enum Kullanımı
-- PHP 8.2 backed enum'lar tüm durum/tip alanları için zorunludur
-- Enum değerleri **asla değiştirilmez** — değiştirmek için DB migration + data migration gerekir
-- Model cast'larda enum sınıfı kullanılır: `'status' => SubscriptionStatus::class`
+### ID ve Enum
+- Tum modeller **ULID** tabanli: migration'da `$table->ulid('id')->primary()`, model'de `use HasUlids`
+- PHP 8.2 backed enum'lar zorunlu. Enum degerleri **asla degistirilmez** (DB migration + data migration gerekir)
 - Mevcut enum'lar: `UserType`, `UserStatus`, `TenantUserRole`, `SubscriptionStatus`, `CheckoutType`, `CheckoutStatus`, `PaymentStatus`, `PlanInterval`, `FeatureType`, `AddonType`, `ResetPeriod`, `GracePeriod`, `ProrationType`, `InvitationStatus`
 
-### Servis Katmanı
-- Tüm iş mantığı `app/Services/` içindedir. Controller metotları ince tutulur, servis çağırır.
-- Her servisin bir interface'i (`app/Contracts/`) vardır
-- Bağlamalar `app/Providers/` altındaki service provider'larda yapılır
-- Yeni servis eklerken: Interface → Service → ServiceProvider binding sırası takip edilir
+### Multi-Tenant Izolasyon
+- `BaseTenant` soyut modeli global scope ile tenant izolasyonu saglar
+- `Subscription`, `Payment`, `TenantUsage`, `TenantFeature`, `TenantInvitation` → `BaseTenant`'tan turetilir
+- `TenantContextService` aktif tenant'i yonetir, `LoadTenantContext` middleware yukler
+- **Tenant.owner()** bir query helper'dir (relationship degil), `?User` dondurur
+- Scope'suz sorgu icin `withoutTenantScope()` kullan
 
-### Multi-Tenant İzolasyon
-- `BaseTenant` soyut modeli global scope ile tenant izolasyonu sağlar
-- `Subscription`, `Payment`, `TenantUsage`, `TenantFeature`, `TenantInvitation` modelleri `BaseTenant`'tan türetilir
-- `TenantContextService` aktif tenant'ı yönetir
-- `LoadTenantContext` middleware'i tenant context'i yükler
-- **Tenant.owner()** bir query helper metodudur (relationship değil), `?User` döndürür
+### Middleware'ler
 
-### Config ile Davranış Kontrolü (Hibrit Pattern)
-- `herkobi.tenant.allow_team_members` — Team özelliği (UI gizleme + servis seviyesi kontrol)
-- `herkobi.tenant.allow_multiple_tenants` — Çoklu tenant oluşturma
-- `herkobi.proration.upgrade_behavior` / `downgrade_behavior` — Varsayılan proration davranışı
+| Middleware | Gorevi |
+|-----------|--------|
+| `HandleInertiaRequests` | Shared data: auth, tenant, site |
+| `LoadTenantContext` | Tenant context yukleme |
+| `EnsureActiveSubscription` | Aktif abonelik kontrolu |
+| `EnsureActiveUser` | Aktif kullanici kontrolu |
+| `EnsureFeatureAccess` | Ozellik erisim kontrolu |
+| `EnsureTenant` | Tenant zorunlulugu |
+| `EnsureTenantOwner` | Tenant sahibi kontrolu |
+| `EnsureTenantAllowsTeamMembers` | Takim uyesi izni |
+| `EnsureTenantMemberActive` | Aktif uye kontrolu |
+| `EnsureWriteAccess` | Yazma erisimi (status != taslak) |
+| `EnsurePanel` | Panel erisim kontrolu |
+| `HandleAppearance` | Tema tercihi |
+
+### Config ile Davranis Kontrolu (Hibrit Pattern)
+- `herkobi.tenant.allow_team_members` — Team ozelligi (UI + servis seviyesi)
+- `herkobi.tenant.allow_multiple_tenants` — Coklu tenant
+- `herkobi.proration.upgrade_behavior` / `downgrade_behavior` — Varsayilan proration
 - `herkobi.addon.auto_renew` — Addon otomatik yenileme
-- `herkobi.invitation.expires_days` — Davetiye geçerlilik süresi (varsayılan: 7 gün)
-- **Hibrit kontrol**: Config kapalı → özellik tamamen engellenir. Config açık → plan bazlı `feature.access` middleware ile limit/erişim kontrolü yapılır.
-- Config ayarları UI'da gizleme yapar ve **servis seviyesinde de enforce edilir** (`TenantContextService.canInviteTeamMember()` hem config hem plan kontrolü yapar)
+- `herkobi.invitation.expires_days` — Davetiye suresi (varsayilan: 7 gun)
+- **Hibrit kontrol**: Config kapali → tamamen engel. Config acik → plan bazli `feature.access` middleware ile kontrol
+
+### Frontend Konvansiyonlar
+- **Dual interface**: App sayfalari → `AppLayout`, Panel → `PanelLayout`, Auth → `AuthLayout`
+- **Yeni sayfa**: `pages/app/` veya `pages/panel/` altina
+- **Yeni component**: Bolume ozelse `components/app/` veya `components/panel/`, paylasilacaksa `components/common/`
+- **Shared data**: `HandleInertiaRequests` ile global data (`auth`, `tenant`, `site`)
+- **Icon**: Lucide Vue Next (`Ban`, `CheckCircle`, `CreditCard`, `Eye`, `Info`, `Users`, vb.)
+- **Renk tokenleri**: shadcn CSS degiskenleri (`bg-muted`, `text-muted-foreground`, `bg-green-100 dark:bg-green-900/30`, vb.)
+- **Blade**: Sadece email template'leri icin (`resources/views/mail/`)
+
+---
+
+## 4. Is Mantigi
+
+### Odeme Akisi
+1. Checkout olusturulur → PayTR token alinir → Iframe gosterilir → Webhook callback gelir
+2. `TenantProcessSuccessfulPayment` listener checkout type'a gore yonlendirir:
+   - `NEW/RENEW` → `SubscriptionPurchaseService`
+   - `UPGRADE` → `PlanChangeService.processUpgrade()`
+   - `ADDON/ADDON_RENEW` → `AddonPurchaseService.processCheckout()`
+3. Webhook rotasi (`POST /payment/callback`) kimlik dogrulama gerektirmez; imza dogrulama `PayTRService` icinde
 
 ### Proration Sistemi
 - 4 senaryo: Upgrade/Downgrade × IMMEDIATE/END_OF_PERIOD
-- Varsayılan davranış `config/herkobi.php`'den gelir
-- Plan bazında override: `plans.upgrade_proration_type` ve `plans.downgrade_proration_type` (nullable)
-- `Plan.resolveUpgradeProration()` / `resolveDowngradeProration()` DB değerini kontrol eder, yoksa config'e düşer
-- `ProrationService.calculate()` gün bazlı kredi hesaplar (IMMEDIATE için) veya tam fiyat döndürür (END_OF_PERIOD için)
-- `PlanChangeService` 4 senaryoyu yönetir: anında geçiş, planlanan geçiş, checkout yönlendirmesi
-
-### Ödeme Akışı
-- Checkout oluşturulur → PayTR token alınır → Iframe gösterilir → Webhook callback gelir
-- `PaymentCallbackController.handle()` webhook'u işler
-- `TenantProcessSuccessfulPayment` listener checkout type'a göre yönlendirir:
-  - `NEW/RENEW` → `SubscriptionPurchaseService`
-  - `UPGRADE` → `PlanChangeService.processUpgrade()`
-  - `ADDON/ADDON_RENEW` → `AddonPurchaseService.processCheckout()`
-- Webhook rotası kimlik doğrulama gerektirmez; imza doğrulama `PayTRService` içinde yapılır
-- PayTR credential'ları `config/paytr.php`'den gelir, kodda asla açığa çıkmamalı
+- Varsayilan `config/herkobi.php`'den, plan bazinda override: `plans.upgrade_proration_type` / `downgrade_proration_type`
+- `ProrationService.calculate()` gun bazli kredi (IMMEDIATE) veya tam fiyat (END_OF_PERIOD)
+- `PlanChangeService` 4 senaryoyu yonetir
 
 ### Addon Sistemi
-- Addon'lar `Feature`'a bağlıdır ve plan limitlerini genişletir
-- 3 tip: `INCREMENT` (limite ekler), `UNLIMITED` (limiti kaldırır), `BOOLEAN` (özelliği açar)
-- `TenantAddon` modeli `Pivot` sınıfından türetilir, global tenant scope vardır
-- Recurring addon'ların `expires_at` alanı vardır
-- `CheckExpiredAddonsJob` süresi dolanları pasif yapar, `SendAddonExpiryReminderJob` hatırlatma gönderir
+- Addon'lar `Feature`'a baglidir, plan limitlerini genisletir
+- 3 tip: `INCREMENT` (limite ekler), `UNLIMITED` (limiti kaldirir), `BOOLEAN` (ozelligi acar)
+- `TenantAddon` modeli `Pivot` sinifindan turetilir, global tenant scope vardir
+- Recurring addon'larin `expires_at` alani vardir
 
-## Frontend Mimari (Vue 3 + Inertia)
+---
 
-### Dosya Yapısı
-```
-resources/
-├── views/
-│   └── app.blade.php          # Tek Inertia root template
-│   └── mail/                  # Email şablonları (Blade kalır)
-├── js/
-│   ├── app.ts                 # Vue + Inertia bootstrap
-│   ├── Pages/                 # Inertia sayfaları (Vue SFC)
-│   │   ├── Auth/              # Kimlik doğrulama (7 sayfa)
-│   │   ├── App/               # Tenant uygulaması (22 sayfa)
-│   │   └── Panel/             # Admin paneli (25+ sayfa)
-│   ├── Components/            # Paylaşılan componentler
-│   │   ├── Layout/            # AppLayout, PanelLayout, AuthLayout
-│   │   └── UI/                # PrimeVue wrapper/custom
-│   ├── Composables/           # Vue 3 composables (useAuth, useTenant)
-│   ├── types/                 # TypeScript tip tanımları
-│   └── wayfinder.ts           # Tip güvenli route() fonksiyonu
-└── css/
-    └── app.css                # Tailwind + PrimeVue tema
-```
-
-### Frontend Konvansiyonlar
-- **Composition API**: `<script setup>` syntax kullan (Options API değil)
-- **TypeScript**: Tüm Vue componentleri `.vue` dosyalarında TypeScript kullanır
-- **Route helpers**: `route('route.name')` (Wayfinder) ile tip güvenli routing
-- **Props**: `defineProps<{ ... }>()` ile TypeScript interface tanımları
-- **Inertia form**: `useForm()` helper ile form yönetimi ve validation
-- **Shared data**: `HandleInertiaRequests` middleware ile global data (`auth`, `tenant`, `flash`)
-- **PrimeVue**: Component import'ları doğrudan `primevue/*` yolundan yapılır
-- **Styling**: Tailwind utility class'ları + PrimeVue Aura theme
-
-### Controller → Inertia Dönüşümü
-```php
-// ÖNCE (Blade)
-return view('app.dashboard', ['data' => $data]);
-
-// SONRA (Inertia)
-return Inertia::render('app/dashboard', ['data' => $data]);
-```
-
-### Blade Kullanımı
-- **Sadece** email template'leri için Blade kullanılır (`resources/views/mail/`)
-- Web sayfaları artık Vue componentleridir (Blade değil)
-
-## Dil ve String'ler
-
-- Kullanıcı arayüzü string'leri genellikle **Türkçe**'dir
-- Enum label'ları Türkçe'dir (örneğin: "Aktif", "Süresi Doldu", "Eklenti Satın Alma")
-- Validation mesajları Türkçe'dir
-- Türkçe dil tutarlılığı korunmalı — lokalizasyon istenmedikçe değiştirmeyin
-- Türkçe label veya UX davranışı konusunda emin değilseniz, tahmin etmek yerine soru sorun
-
-## Geliştirici Komutları
-
-```bash
-# Kurulum (env, migrate, npm install, build)
-composer run setup
-
-# Geliştirme (server + queue + vite eş zamanlı)
-composer run dev
-
-# Testler (Pest)
-composer test
-
-# Kod formatlama (Pint)
-vendor/bin/pint
-```
-
-## Yeni Özellik Ekleme Kontrol Listesi
-
-1. Gerekiyorsa `app/Contracts/**` altına yeni interface ekle veya mevcut interface'i güncelle
-2. `app/Services/**` altında implement et — controller'lar ince tutulur
-3. `app/Providers/` altındaki uygun service provider'da binding yap
-4. DB değişikliği gerekiyorsa migration ekle (ULID konvansiyonu, enum varsayılanları)
-   - **users** ve **notifications** tabloları için YENİ migration dosyası oluştur
-   - Diğer tabloları mevcut migration dosyalarında güncelle
-5. Yan etkiler için `app/Events/**` altına event, `app/Listeners/**` altına listener ekle
-6. Rotaları güncelle (`routes/app.php` veya `routes/panel.php`) ve middleware uygula
-7. Servis seviyesinde config kontrollerinin rota guard'ları ile tutarlı olduğunu doğrula
-8. Test yaz (Pest tercih edilir) ve `composer test` çalıştır
-
-## Güvenlik ve Dikkat Notları
-
-- Enum değerlerini DB migration + data migration olmadan **değiştirme**
-- Ödeme/güvenlik hassas kodlarında credential'ları açığa çıkarma, `config/paytr.php` kullan
-- Webhook rotası (`/payment/callback`) kimlik doğrulama gerektirmez — imza doğrulama servistedir
-- Kodlarda **log bırakma** (logging statement'ları production kodunda olmamalı)
-- `Tenant.owner()` bir relationship değil, query helper — eager loading ile çalışmaz
-- `TenantAddon` bir `Pivot` sınıfıdır — standart model gibi davranmaz
-- `BaseTenant`'tan türetilen modellerde global tenant scope otomatik uygulanır — scope'suz sorgu için `withoutTenantScope()` kullan
-- Yeni checkout type eklerken `TenantProcessSuccessfulPayment` listener'daki match ifadesini güncelle
-- `ProcessScheduledDowngradesJob` hem upgrade hem downgrade işler — yön tespiti fiyat karşılaştırması ile yapılır
-- Davetiye token'ları SHA-256 ile hash'lenir (raw token sadece email'de bulunur, DB'de hash saklanır)
-- `TenantInvitation` cross-tenant sorgularda `withoutTenantScope()` kullanılmalı (token ile arama, expire job)
-
-## Veritabanı Şema Özeti
+## 5. Veritabani
 
 ### Temel Tablolar
-- `users` — Kullanıcılar (ULID, soft delete, 2FA, anonimizasyon)
-- `tenants` — Kiracılar (ULID, soft delete, JSON account/data)
-- `tenant_user` — Kullanıcı–tenant ilişkisi (pivot, role: owner/staff)
-- `plans` — Planlar (ULID, soft delete, proration tipi override'ları)
-- `plan_prices` — Plan fiyatları (ULID, soft delete, interval, trial_days)
-- `features` — Özellikler (ULID, soft delete, type: limit/feature/metered)
-- `plan_features` — Plan–özellik ilişkisi (pivot, value)
-- `subscriptions` — Abonelikler (ULID, soft delete, status enum, trial/grace period, next_plan_price_id)
-- `checkouts` — Checkout işlemleri (ULID, soft delete, type/status enum, PayTR token)
-- `payments` — Ödemeler (ULID, soft delete, tenant/plan_price/addon ilişkileri)
-- `addons` — Ek paketler (ULID, soft delete, recurring, feature bağlantısı)
-- `tenant_addons` — Tenant–addon ilişkisi (pivot, quantity, expires_at, is_active)
-- `tenant_features` — Tenant özellik override'ları
-- `tenant_usages` — Metered kullanım sayaçları
-- `tenant_invitations` — Davetiyeler (ULID, soft delete, token hash, status enum, expires_at)
-- `activities` — Aktivite günlüğü
-- `notifications` — Bildirimler (özel model, arşivleme desteği)
-- `archived_notifications` — Arşivlenmiş bildirimler
-- `settings` — Platform ayarları
+- `users` — ULID, soft delete, 2FA, anonimizasyon
+- `tenants` — ULID, soft delete, JSON account/data
+- `tenant_user` — Pivot (role: owner/staff, status)
+- `plans` / `plan_prices` / `features` / `plan_features` — Plan ve ozellik yapisi
+- `subscriptions` — Status enum, trial/grace period, next_plan_price_id
+- `checkouts` — Type/status enum, PayTR token
+- `payments` — Tenant, plan_price, addon iliskileri
+- `addons` / `tenant_addons` — Addon ve pivot (quantity, expires_at, is_active)
+- `tenant_features` / `tenant_usages` — Override ve metered sayaclar
+- `tenant_invitations` — Token hash, status enum, expires_at
+- `activities` / `notifications` / `archived_notifications` / `settings`
 
-### İlişki Haritası
+### Iliski Haritasi
 ```
-User --M:M--> Tenant (tenant_user pivot, role)
-Tenant --1:M--> Subscription
-Tenant --1:M--> Payment
-Tenant --M:M--> Addon (tenant_addons pivot)
-Tenant --1:M--> TenantFeature (override)
-Tenant --1:M--> TenantUsage
-Tenant --1:M--> TenantInvitation
-Plan --1:M--> PlanPrice
-Plan --M:M--> Feature (plan_features pivot, value)
-PlanPrice --1:M--> Subscription
-Subscription --> PlanPrice (plan_price_id, next_plan_price_id)
-Feature --1:M--> Addon
-Addon --1:M--> Payment
-Checkout --> Tenant, PlanPrice, Addon, Payment
+User ──M:M──▸ Tenant (tenant_user pivot)
+Tenant ──1:M──▸ Subscription, Payment, TenantFeature, TenantUsage, TenantInvitation
+Tenant ──M:M──▸ Addon (tenant_addons pivot)
+Plan ──1:M──▸ PlanPrice
+Plan ──M:M──▸ Feature (plan_features pivot)
+PlanPrice ──1:M──▸ Subscription
+Feature ──1:M──▸ Addon
+Checkout ──▸ Tenant, PlanPrice, Addon, Payment
 ```
 
-## Zamanlanmış Görevler
+---
 
-| Job | Sıklık | Açıklama |
-|-----|--------|----------|
-| `ExpireOldCheckoutsJob` | ~15 dk | Süresi geçmiş checkout'ları işaretler |
-| `CheckExpiredSubscriptionsJob` | Saatlik | Abonelik süresi dolma tespiti |
-| `CheckTrialExpiryJob` | Saatlik | Trial süresi dolma tespiti |
-| `SendSubscriptionRenewalReminderJob` | Günlük | Yenileme hatırlatması |
-| `SendTrialEndingReminderJob` | Günlük | Trial bitiş hatırlatması |
-| `CheckExpiredAddonsJob` | Günlük | Addon süresi dolma tespiti |
-| `SendAddonExpiryReminderJob` | Günlük | Addon hatırlatması |
-| `ProcessScheduledDowngradesJob` | Günlük | Planlanan plan değişikliklerini uygular |
-| `ResetMeteredUsageJob` | Günlük | Metered kullanım sıfırlama |
-| `ArchiveOldNotificationsJob` | Günlük | Bildirim arşivleme (90 gün) |
-| `AnonymizeOldNotificationsJob` | Günlük | Bildirim anonimizasyon (2 yıl) |
-| `AnonymizeOldActivitiesJob` | Günlük | Aktivite anonimizasyon (2 yıl) |
-| `ExpireOldInvitationsJob` | Günlük | Süresi dolmuş davetiyeleri expire eder |
-| `SoftDeleteOldActivitiesJob` | Günlük | Aktivite soft delete |
+## 6. Arka Plan Islemleri
 
-## Event–Listener Haritalaması
+### Zamanlanmis Gorevler
 
-Kritik event → listener ilişkileri:
+| Siklik | Gorevler |
+|--------|----------|
+| ~15 dk | `ExpireOldCheckoutsJob` |
+| Saatlik | `CheckExpiredSubscriptionsJob`, `CheckTrialExpiryJob` |
+| Gunluk | `ProcessScheduledDowngradesJob`, `ResetMeteredUsageJob`, `CheckExpiredAddonsJob`, `ExpireOldInvitationsJob` |
+| Gunluk (bildirim) | `SendSubscriptionRenewalReminderJob`, `SendTrialEndingReminderJob`, `SendAddonExpiryReminderJob` |
+| Gunluk (temizlik) | `ArchiveOldNotificationsJob` (90 gun), `AnonymizeOldNotificationsJob` (2 yil), `AnonymizeOldActivitiesJob` (2 yil), `SoftDeleteOldActivitiesJob` |
 
-- `TenantPaymentSucceeded` → `TenantProcessSuccessfulPayment` (checkout type'a göre abonelik/addon işleme)
-- `TenantPaymentSucceeded` → `LogTenantPaymentActivity`, `SendTenantPaymentNotifications`
+### Event–Listener Haritalamasi
+- `TenantPaymentSucceeded` → `TenantProcessSuccessfulPayment`, `LogTenantPaymentActivity`, `SendTenantPaymentNotifications`
 - `TenantSubscriptionPurchased` → `LogTenantSubscriptionActivity`, `SendTenantWelcomeEmail`
-- `TenantSubscriptionUpgraded` → `LogTenantSubscriptionActivity`
-- `TenantSubscriptionDowngraded` → `LogTenantSubscriptionActivity`
-- `TenantSubscriptionExpired` → `LogTenantSubscriptionActivity`, `SendTenantSubscriptionExpiry`
-- `TenantAddonPurchased` → `LogTenantAddonActivity`
-- `TenantAddonExpired` → `LogTenantAddonActivity`
-- `TenantAddonCancelled` → `LogTenantAddonActivity`
+- `TenantSubscriptionUpgraded/Downgraded/Expired` → `LogTenantSubscriptionActivity` (+ Expired: `SendTenantSubscriptionExpiry`)
+- `TenantAddonPurchased/Expired/Cancelled` → `LogTenantAddonActivity`
 - `TenantTrialEnded` → `LogTenantTrialActivity`, `SendTenantTrialEnded`
 - `TenantUsageLimitReached` → `LogTenantUsageLimitActivity`, `SendTenantUsageLimitReached`
 - `TenantUserInvited` → `SendInvitationEmail`, `LogTenantInvitationActivity`
-- `TenantUserDirectlyAdded` → `LogTenantInvitationActivity` (bildirim + aktivite)
-- `TenantInvitationAccepted` → `LogTenantInvitationActivity` (bildirim + aktivite)
-- `TenantInvitationRevoked` → `LogTenantInvitationActivity`
-- Panel event'leri → `LogPanel*Activity` listener'ları + bildirim listener'ları
+- Panel event'leri → `LogPanel*Activity` + bildirim listener'lari
 
+---
+
+## 7. Guvenlik ve Dikkat Notlari
+
+- Enum degerlerini DB migration + data migration olmadan **degistirme**
+- Odeme credential'lari `config/paytr.php` uzerinden, kodda aciga cikarma
+- Webhook rotasi auth gerektirmez — imza dogrulama servistedir
+- Kodlarda **log birakma** (production'da olmamali)
+- `TenantAddon` bir `Pivot` sinifi — standart model gibi davranmaz
+- `BaseTenant` scope'suz sorgu icin `withoutTenantScope()` kullan
+- Yeni checkout type → `TenantProcessSuccessfulPayment` listener'daki match'i guncelle
+- `ProcessScheduledDowngradesJob` hem upgrade hem downgrade isler (fiyat karsilastirmasi ile yon tespiti)
+- Davetiye token'lari SHA-256 ile hash'lenir (raw token sadece email'de)
+- `TenantInvitation` cross-tenant sorgularda `withoutTenantScope()` gerekir
+
+---
+
+## 8. Yeni Ozellik Ekleme Kontrol Listesi
+
+1. Interface (`app/Contracts/`) olustur veya guncelle
+2. Servis (`app/Services/`) implement et
+3. Service provider'da binding yap
+4. Migration ekle (ULID, enum varsayilanlari). `users`/`notifications` icin yeni dosya, digerleri mevcut dosyada
+5. Event + listener ekle (yan etkiler icin)
+6. Rotalari guncelle ve middleware uygula
+7. Config kontrollerinin rota guard'lari ile tutarli oldugunu dogrula
+8. Frontend sayfa/component olustur (shadcn-vue, Lucide, Tailwind)
+9. Test yaz (Pest) ve `composer test` calistir
+
+---
+
+## 9. Dil
+
+- UI string'leri **Turkce** (enum label, validation, UX metinleri)
+- Turkce tutarliligi korunmali — lokalizasyon istenmedikce degistirmeyin
+- Emin degilseniz tahmin yerine soru sorun
+
+---
+
+## 10. Gelistirici Komutlari
+
+```bash
+composer run dev      # Gelistirme (server + queue + vite es zamanli)
+composer test         # Testler (Pest)
+vendor/bin/pint       # Kod formatlama
+npm run build         # Frontend build
+```
+
+---
+
+<!-- Asagidaki bolum Laravel Boost MCP tarafindan yonetilen kod yazma kurallaridir. -->
+<!-- Proje-ozel bilgiler yukaridadir, genel gelistirme kurallari asagidadir. -->
+
+<laravel-boost-guidelines>
+=== temel kurallar ===
+
+# Laravel Boost Kurallari
+
+Laravel Boost kurallari bu uygulama icin ozel olarak Laravel gelistiricileri tarafindan hazirlanmistir. En iyi deneyimi saglamak icin bu kurallara uyulmalidir.
+
+## Temel Bagalam
+
+Bu uygulama bir Laravel uygulamasidir. Ana Laravel ekosistemi paket ve versiyonlari asagidadir. Tum bu paket ve versiyonlarda uzmansiniz. Bu spesifik paket ve versiyonlara uygun kod yazin.
+
+- php - 8.4.16
+- inertiajs/inertia-laravel (INERTIA) - v2
+- laravel/fortify (FORTIFY) - v1
+- laravel/framework (LARAVEL) - v12
+- laravel/prompts (PROMPTS) - v0
+- laravel/wayfinder (WAYFINDER) - v0
+- laravel/mcp (MCP) - v0
+- laravel/pint (PINT) - v1
+- laravel/sail (SAIL) - v1
+- pestphp/pest (PEST) - v4
+- phpunit/phpunit (PHPUNIT) - v12
+
+## Yetenek Aktivasyonu
+
+Bu projede alan-ozel yetenekler mevcuttur. Ilgili alanda calisirken ilgili yetenegi MUTLAKA aktive edin — takilana kadar beklemeyin.
+
+- `wayfinder-development` — Frontend component'lerinde backend rotalarina referans verildiginde aktive olur. `@/actions` veya `@/routes`'dan import ederken, TypeScript'ten Laravel rotalari cagirirken veya Wayfinder route fonksiyonlariyla calisirken kullanin.
+- `pest-testing` — Pest 4 PHP framework'u ile test yazmak icin. Test yazarken, unit veya feature test olustururken, assertion eklerken, test hatalarini debuglarken, dataset veya mock ile calisirken; veya kullanici test, spec, TDD, expects, assertion, coverage gibi terimlerden bahsettiginde aktive olur.
+
+## Konvansiyonlar
+
+- Uygulamadaki mevcut tum kod konvansiyonlarini takip edin. Dosya olusturur veya duzenlerken, dogru yapi, yaklasim ve isimlendirme icin komsu dosyalari kontrol edin.
+- Degiskenler ve metotlar icin aciklayici isimler kullanin. Ornegin: `isRegisteredForDiscounts`, `discount()` degil.
+- Yeni component yazmadan once mevcut component'leri kontrol edin.
+
+## Dogrulama Scriptleri
+
+- Testler islevseligi kanitliyorsa dogrulama scripti veya tinker olusturmayin. Unit ve feature testleri daha onemlidir.
+
+## Uygulama Yapisi ve Mimari
+
+- Mevcut dizin yapisina bagli kalin; onay almadan yeni ana klasor olusturmayin.
+- Onay almadan uygulamanin bagimlilik yapisini degistirmeyin.
+
+## Frontend Paketleme
+
+- Kullanici bir frontend degisikligini UI'da goremiyorsa, `npm run build`, `npm run dev` veya `composer run dev` calistirmalari gerekebilir. Sorun.
+
+## Dokumantasyon Dosyalari
+
+- Dokumantasyon dosyalari yalnizca kullanici tarafindan acikca istendiginde olusturulmalidir.
+
+## Yanitlar
+
+- Aciklamalarinizda kisa ve oz olun — bariz detaylari aciklamak yerine onemliye odaklanin.
+
+=== boost kurallari ===
+
+# Laravel Boost
+
+- Laravel Boost bu uygulama icin ozel olarak tasarlanmis guclu araclarla birlikte gelen bir MCP sunucusudur. Bunlari kullanin.
+
+## Artisan
+
+- Artisan komutu calistirmaniz gerektiginde mevcut parametreleri dogrulamak icin `list-artisan-commands` aracini kullanin.
+
+## URL'ler
+
+- Kullaniciyla proje URL'si paylasirken dogru scheme, domain/IP ve port kullandiginizdan emin olmak icin `get-absolute-url` aracini kullanin.
+
+## Tinker / Hata Ayiklama
+
+- PHP kodu calistirarak hata ayiklamak veya Eloquent modellerini dogrudan sorgulamak icin `tinker` aracini kullanin.
+- Yalnizca veritabanindan okuma yapmaniz gerektiginde `database-query` aracini kullanin.
+
+## Tarayici Loglarini `browser-logs` Araci ile Okuma
+
+- Boost'un `browser-logs` aracini kullanarak tarayici loglarini, hatalarini ve istisnalarini okuyabilirsiniz.
+- Yalnizca guncel tarayici loglari faydali olacaktir — eski loglari goz ardi edin.
+
+## Dokumantasyon Arama (Kritik Onem)
+
+- Boost, Laravel veya Laravel ekosistemi paketleriyle calisirken diger yaklasimlardan once kullanmaniz gereken guclu bir `search-docs` aracina sahiptir. Bu arac, yuklenmis paketlerin listesini ve versiyonlarini otomatik olarak Boost API'sine gonderir, bu sayede yalnizca versiyona ozel dokumantasyon doner. Belirli paketler icin docs gerektiyorsa paket dizisi gondermelisiniz.
+- Kod degisikligi yapmadan once dogru yaklasimi saglamak icin dokumantasyonu arayin.
+- Birden fazla, genis, basit, konu bazli sorgulamalari ayni anda kullanin. Ornegin: `['rate limiting', 'routing rate limiting', 'routing']`. En ilgili sonuclar ilk sirada doner.
+- Sorgulara paket isimleri eklemeyin; paket bilgisi zaten paylasiliyor. Ornegin: `test resource table` kullanin, `filament 4 test resource table` degil.
+
+### Mevcut Arama Sozdizimi
+
+1. Basit Kelime Aramalari (otomatik kok bulma) - query=authentication - 'authenticate' ve 'auth' bulur.
+2. Birden Fazla Kelime (VE Mantigi) - query=rate limit - hem "rate" HEM "limit" iceren bilgiyi bulur.
+3. Tirnak Icinde Ifadeler (Tam Konum) - query="infinite scroll" - kelimeler yan yana ve bu sirada olmalidir.
+4. Karisik Sorgular - query=middleware "rate limit" - "middleware" VE tam ifade "rate limit".
+5. Birden Fazla Sorgu - queries=["authentication", "middleware"] - bu terimlerden HERHANGI biri.
+
+=== php kurallari ===
+
+# PHP
+
+- Tek satirlik govdeler icin bile kontrol yapilarinda her zaman suslu parantez kullanin.
+
+## Constructor'lar
+
+- `__construct()` icinde PHP 8 constructor property promotion kullanin.
+    - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
+- Constructor private degilse sifir parametreli bos `__construct()` metotlarina izin vermeyin.
+
+## Tip Bildirimleri
+
+- Metotlar ve fonksiyonlar icin her zaman acik donus tipi bildirimi kullanin.
+- Metot parametreleri icin uygun PHP tip ipuclari kullanin.
+
+<code-snippet name="Acik Donus Tipleri ve Metot Parametreleri" lang="php">
+protected function isAccessible(User $user, ?string $path = null): bool
+{
+    ...
+}
+</code-snippet>
+
+## Enum'lar
+
+- Enum anahtarlari TitleCase olmalidir. Ornegin: `FavoritePerson`, `BestLake`, `Monthly`.
+
+## Yorumlar
+
+- Satir ici yorumlar yerine PHPDoc bloklari tercih edin. Mantik asiri karmasik degilse kodun icine yorum yazmayin.
+
+## PHPDoc Bloklari
+
+- Uygun oldugunda faydali dizi sekil tip tanimlari ekleyin.
+
+=== herd kurallari ===
+
+# Laravel Herd
+
+- Uygulama Laravel Herd tarafindan sunulur ve su adreste erisilebilir: `https?://[kebab-case-proje-dizini].test`. Kullanici icin gecerli URL olusturmak icin `get-absolute-url` aracini kullanin.
+- Siteyi HTTP(S) uzerinden erisilebilir kilmak icin herhangi bir komut calistirmayin. Laravel Herd uzerinden her zaman erisilebilirdir.
+
+=== test kurallari ===
+
+# Test Zorunlulugu
+
+- Her degisiklik programatik olarak test edilmelidir. Yeni bir test yazin veya mevcut testi guncelleyin, ardinda etkilenen testleri calistirarak gectiginden emin olun.
+- Kod kalitesi ve hiz icin gereken minimum sayida test calistirin. Belirli dosya adi veya filtre ile `php artisan test --compact` kullanin.
+
+=== inertia-laravel/temel kurallar ===
+
+# Inertia
+
+- Inertia, modern SPA karmasikligi olmadan tamamen istemci tarafinda render edilen SPA'lar olusturur, mevcut sunucu tarafi kaliplari kullanir.
+- Component'ler `resources/js/Pages` icinde bulunur (`vite.config.js`'de belirtilmedikce). Blade view'lari yerine `Inertia::render()` ile sunucu tarafi routing kullanin.
+- Versiyona ozel Inertia dokumantasyonu ve guncel kod ornekleri icin her zaman `search-docs` aracini kullanin.
+
+=== inertia-laravel/v2 kurallar ===
+
+# Inertia v2
+
+- v1 ve v2'nin tum Inertia ozelliklerini kullanin. Degisiklik yapmadan once dogru yaklasimdan emin olmak icin dokumantasyonu kontrol edin.
+- Yeni ozellikler: deferred props, infinite scrolling (merging props + `WhenVisible`), lazy loading on scroll, polling, prefetching.
+- Deferred props kullanirken, nabiz atan veya animasyonlu skeleton ile bos durum ekleyin.
+
+=== laravel/temel kurallar ===
+
+# Laravel Yontemiyle Yap
+
+- Yeni dosyalar olusturmak icin `php artisan make:` komutlarini kullanin (migration, controller, model, vb.). Mevcut Artisan komutlarini `list-artisan-commands` araci ile listeleyebilirsiniz.
+- Genel bir PHP sinifi olusturuyorsaniz `php artisan make:class` kullanin.
+- Kullanici girisi olmadan calistiklarindan emin olmak icin tum Artisan komutlarina `--no-interaction` gecin. Dogru davranis icin dogru `--options`'lari da gecin.
+
+## Veritabani
+
+- Her zaman donus tipi ipuclari ile uygun Eloquent iliski metotlari kullanin. Ham sorgular veya manuel join'ler yerine iliski metotlarini tercih edin.
+- Ham veritabani sorgulari onermeden once Eloquent modelleri ve iliskilerini kullanin.
+- `DB::` kullanmaktan kacinin; `Model::query()` tercih edin. Laravel'in ORM yeteneklerini kullanan kod uretin.
+- Eager loading kullanarak N+1 sorgu sorunlarini onleyen kod uretin.
+- Cok karmasik veritabani islemleri icin Laravel'in query builder'ini kullanin.
+
+### Model Olusturma
+
+- Yeni model olustururken onlar icin faydali factory ve seeder'lar da olusturun. Kullaniciya baska seyler gerekip gerekmediklerini sorun, `list-artisan-commands` ile `php artisan make:model` mevcut seceneklerini kontrol edin.
+
+### API'ler ve Eloquent Resources
+
+- API'ler icin, mevcut API rotalari kullanmiyorsa varsayilan olarak Eloquent API Resources ve API versiyonlama kullanin, aksi takdirde mevcut uygulama konvansiyonunu takip edin.
+
+## Controller'lar ve Validasyon
+
+- Validasyon icin controller icinde inline validasyon yerine her zaman Form Request siniflari olusturun. Hem validasyon kurallarini hem de ozel hata mesajlarini ekleyin.
+- Uygulamanin dizi mi yoksa string bazli validasyon kurallari mi kullandigini gormek icin komsu Form Request'leri kontrol edin.
+
+## Kimlik Dogrulama ve Yetkilendirme
+
+- Laravel'in yerlesik kimlik dogrulama ve yetkilendirme ozelliklerini kullanin (gate'ler, policy'ler, Sanctum, vb.).
+
+## URL Olusturma
+
+- Diger sayfalara link olustururken isimli rotalari ve `route()` fonksiyonunu tercih edin.
+
+## Kuyruklar
+
+- Zaman alan islemler icin `ShouldQueue` arayuzu ile kuyruga alinmis job'lar kullanin.
+
+## Konfigurasyon
+
+- Ortam degiskenlerini yalnizca konfigurasyon dosyalarinda kullanin — `env()` fonksiyonunu config dosyalari disinda asla dogrudan kullanmayin. Her zaman `config('app.name')` kullanin, `env('APP_NAME')` degil.
+
+## Test
+
+- Testlerde model olustururken model factory'lerini kullanin. Manuel kurulum yapmadan once factory'nin kullanilabilir ozel durumlarini (state) kontrol edin.
+- Faker: `$this->faker->word()` veya `fake()->randomDigit()` gibi metotlar kullanin. `$this->faker` mi yoksa `fake()` mi kullanildigina dair mevcut konvansiyonlari takip edin.
+- Test olustururken `php artisan make:test [options] {name}` kullanin (feature test icin), unit test icin `--unit` gecin. Cogu test feature test olmalidir.
+
+## Vite Hatasi
+
+- "Illuminate\Foundation\ViteException: Unable to locate file in Vite manifest" hatasi aldiginizda `npm run build` calistirabilir veya kullanicidan `npm run dev` ya da `composer run dev` calistirmasini isteyebilirsiniz.
+
+=== laravel/v12 kurallar ===
+
+# Laravel 12
+
+- KRITIK: Versiyona ozel Laravel dokumantasyonu ve guncel kod ornekleri icin her zaman `search-docs` aracini kullanin.
+- Laravel 11'den beri Laravel yeni basitlestirilmis dosya yapisini kullanir ve bu proje de onu kullanir.
+
+## Laravel 12 Yapisi
+
+- Laravel 12'de middleware'ler artik `app/Http/Kernel.php`'de kayit edilmez.
+- Middleware'ler `bootstrap/app.php` icinde `Application::configure()->withMiddleware()` ile deklaratif olarak yapilandirilir.
+- `bootstrap/app.php` middleware, istisna ve routing dosyalarinin kayit edildigi dosyadir.
+- `bootstrap/providers.php` uygulamaya ozel service provider'lari icerir.
+- `app\Console\Kernel.php` dosyasi artik yoktur; konsol yapilandirmasi icin `bootstrap/app.php` veya `routes/console.php` kullanin.
+- `app/Console/Commands/` icindeki konsol komutlari otomatik olarak kullanilabilir ve manuel kayit gerektirmez.
+
+## Veritabani
+
+- Bir sutunu degistirirken, migration onceden tanimlanmis tum nitelikleri icermelidir. Aksi takdirde silinir ve kaybolur.
+- Laravel 12, eager loading'de kayitlari harici paket olmadan dogal olarak sinirlandirmayi destekler: `$query->latest()->limit(10);`.
+
+### Modeller
+
+- Cast'lar `$casts` ozeligi yerine modeldeki `casts()` metodu ile ayarlanmali. Diger modellerden mevcut konvansiyonlari takip edin.
+
+=== wayfinder/temel kurallar ===
+
+# Laravel Wayfinder
+
+Wayfinder, Laravel rotalari icin TypeScript fonksiyonlari uretir. `@/actions/` (controller'lar) veya `@/routes/` (isimli rotalar) uzerinden import edin.
+
+- ONEMLI: Frontend component'lerinde backend rotalarina referans verildiginde `wayfinder-development` yetenegini aktive edin.
+- Invokable Controller'lar: `import StorePost from '@/actions/.../StorePostController'; StorePost()`.
+- Parametre Baglama: Rota anahtarlarini (`{post:slug}`) algilar — `show({ slug: "my-post" })`.
+- Sorgu Birlestirme: `show(1, { mergeQuery: { page: 2, sort: null } })` mevcut URL ile birlestirir, `null` parametreyi siler.
+- Inertia: `<Form>` component'i ile `.form()` veya useForm ile `form.submit(store())` kullanin.
+
+=== pint/temel kurallar ===
+
+# Laravel Pint Kod Formatlayici
+
+- Degisiklikleri sonlandirmadan once kodunuzun projenin beklenen stiline uygun oldugundan emin olmak icin `vendor/bin/pint --dirty` calistirmaniz gerekir.
+- `vendor/bin/pint --test` calistirmayin, formatlama sorunlarini duzeltemek icin basitce `vendor/bin/pint` calistirin.
+
+=== pest/temel kurallar ===
+
+## Pest
+
+- Bu proje test icin Pest kullanir. Test olusturma: `php artisan make:test --pest {name}`.
+- Test calistirma: `php artisan test --compact` veya filtre: `php artisan test --compact --filter=testName`.
+- Onay almadan testleri silmeyin.
+- KRITIK: Versiyona ozel Pest dokumantasyonu ve guncel kod ornekleri icin her zaman `search-docs` aracini kullanin.
+- ONEMLI: Pest veya test ile ilgili bir gorevde calistiginizda her zaman `pest-testing` yetenegini aktive edin.
+</laravel-boost-guidelines>

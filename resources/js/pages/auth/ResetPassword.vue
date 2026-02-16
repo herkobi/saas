@@ -1,68 +1,89 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Password from 'primevue/password';
-import AuthLayout from '@/layouts/Auth.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import { ref } from 'vue';
+import InputError from '@/components/common/InputError.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import AuthLayout from '@/layouts/AuthLayout.vue';
 import { update } from '@/routes/password';
 
 const props = defineProps<{
-    email: string;
     token: string;
+    email: string;
 }>();
 
-const form = useForm({
-    token: props.token,
-    email: props.email,
-    password: '',
-    password_confirmation: '',
-});
-
-const submit = () => {
-    form.post(update.url(), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
-};
+const inputEmail = ref(props.email);
 </script>
 
 <template>
-    <AuthLayout title="Şifre Sıfırla" subtitle="Yeni şifrenizi belirleyin.">
-        <form @submit.prevent="submit" class="flex flex-col gap-4">
-            <div class="flex flex-col gap-2">
-                <label for="email" class="text-sm font-medium text-surface-700 dark:text-surface-300">E-posta</label>
-                <InputText id="email" v-model="form.email" type="email" :invalid="!!form.errors.email" disabled fluid />
-                <small v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</small>
-            </div>
+    <AuthLayout
+        title="Reset password"
+        description="Please enter your new password below"
+    >
+        <Head title="Reset password" />
 
-            <div class="flex flex-col gap-2">
-                <label for="password" class="text-sm font-medium text-surface-700 dark:text-surface-300">Yeni Şifre</label>
-                <Password
-                    id="password"
-                    v-model="form.password"
-                    :feedback="false"
-                    toggleMask
-                    placeholder="••••••••"
-                    :invalid="!!form.errors.password"
-                    fluid
-                />
-                <small v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</small>
-            </div>
+        <Form
+            v-bind="update.form()"
+            :transform="(data) => ({ ...data, token, email })"
+            :reset-on-success="['password', 'password_confirmation']"
+            v-slot="{ errors, processing }"
+        >
+            <div class="grid gap-6">
+                <div class="grid gap-2">
+                    <Label for="email">Email</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        autocomplete="email"
+                        v-model="inputEmail"
+                        class="mt-1 block w-full"
+                        readonly
+                    />
+                    <InputError :message="errors.email" class="mt-2" />
+                </div>
 
-            <div class="flex flex-col gap-2">
-                <label for="password_confirmation" class="text-sm font-medium text-surface-700 dark:text-surface-300">Yeni Şifre Tekrar</label>
-                <Password
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    :feedback="false"
-                    toggleMask
-                    placeholder="••••••••"
-                    :invalid="!!form.errors.password_confirmation"
-                    fluid
-                />
-                <small v-if="form.errors.password_confirmation" class="text-red-500">{{ form.errors.password_confirmation }}</small>
-            </div>
+                <div class="grid gap-2">
+                    <Label for="password">Password</Label>
+                    <Input
+                        id="password"
+                        type="password"
+                        name="password"
+                        autocomplete="new-password"
+                        class="mt-1 block w-full"
+                        autofocus
+                        placeholder="Password"
+                    />
+                    <InputError :message="errors.password" />
+                </div>
 
-            <Button type="submit" label="Şifreyi Sıfırla" icon="pi pi-lock" :loading="form.processing" class="mt-2" fluid />
-        </form>
+                <div class="grid gap-2">
+                    <Label for="password_confirmation">
+                        Confirm Password
+                    </Label>
+                    <Input
+                        id="password_confirmation"
+                        type="password"
+                        name="password_confirmation"
+                        autocomplete="new-password"
+                        class="mt-1 block w-full"
+                        placeholder="Confirm password"
+                    />
+                    <InputError :message="errors.password_confirmation" />
+                </div>
+
+                <Button
+                    type="submit"
+                    class="mt-4 w-full"
+                    :disabled="processing"
+                    data-test="reset-password-button"
+                >
+                    <Spinner v-if="processing" />
+                    Reset password
+                </Button>
+            </div>
+        </Form>
     </AuthLayout>
 </template>

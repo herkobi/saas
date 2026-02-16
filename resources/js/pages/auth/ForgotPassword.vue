@@ -1,42 +1,65 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import AuthLayout from '@/layouts/Auth.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import InputError from '@/components/common/InputError.vue';
+import TextLink from '@/components/common/TextLink.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import AuthLayout from '@/layouts/AuthLayout.vue';
+import { login } from '@/routes';
 import { email } from '@/routes/password';
 
-const props = defineProps<{
+defineProps<{
     status?: string;
 }>();
-
-const form = useForm({
-    email: '',
-});
-
-const submit = () => {
-    form.post(email.url());
-};
 </script>
 
 <template>
-    <AuthLayout title="Şifremi Unuttum" subtitle="E-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim.">
-        <form @submit.prevent="submit" class="flex flex-col gap-4">
-            <Message v-if="props.status" severity="success" variant="simple" size="small">
-                {{ props.status }}
-            </Message>
+    <AuthLayout
+        title="Forgot password"
+        description="Enter your email to receive a password reset link"
+    >
+        <Head title="Forgot password" />
 
-            <div class="flex flex-col gap-2">
-                <label for="email" class="text-sm font-medium text-surface-700 dark:text-surface-300">E-posta</label>
-                <InputText id="email" v-model="form.email" type="email" placeholder="ornek@alanadi.com" :invalid="!!form.errors.email" autofocus fluid />
-                <small v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</small>
+        <div
+            v-if="status"
+            class="mb-4 text-center text-sm font-medium text-green-600"
+        >
+            {{ status }}
+        </div>
+
+        <div class="space-y-6">
+            <Form v-bind="email.form()" v-slot="{ errors, processing }">
+                <div class="grid gap-2">
+                    <Label for="email">Email address</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        autocomplete="off"
+                        autofocus
+                        placeholder="email@example.com"
+                    />
+                    <InputError :message="errors.email" />
+                </div>
+
+                <div class="my-6 flex items-center justify-start">
+                    <Button
+                        class="w-full"
+                        :disabled="processing"
+                        data-test="email-password-reset-link-button"
+                    >
+                        <Spinner v-if="processing" />
+                        Email password reset link
+                    </Button>
+                </div>
+            </Form>
+
+            <div class="space-x-1 text-center text-sm text-muted-foreground">
+                <span>Or, return to</span>
+                <TextLink :href="login()">log in</TextLink>
             </div>
-
-            <Button type="submit" label="Sıfırlama Bağlantısı Gönder" icon="pi pi-envelope" :loading="form.processing" class="mt-2" fluid />
-
-            <div class="mt-4 text-center text-sm">
-                <a href="/login" class="font-semibold text-primary-600 hover:text-primary-500">Giriş sayfasına dön</a>
-            </div>
-        </form>
+        </div>
     </AuthLayout>
 </template>

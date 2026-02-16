@@ -1,74 +1,108 @@
 <script setup lang="ts">
-import { useForm } from '@inertiajs/vue3';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import Password from 'primevue/password';
-import AuthLayout from '@/layouts/Auth.vue';
+import { Form, Head } from '@inertiajs/vue3';
+import InputError from '@/components/common/InputError.vue';
+import TextLink from '@/components/common/TextLink.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import AuthBase from '@/layouts/AuthLayout.vue';
+import { login } from '@/routes';
 import { store } from '@/routes/register';
-
-const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-});
-
-const submit = () => {
-    form.post(store.url(), {
-        onFinish: () => form.reset('password', 'password_confirmation'),
-    });
-};
 </script>
 
 <template>
-    <AuthLayout title="Kayıt Ol" subtitle="Hemen ücretsiz hesabınızı oluşturun.">
-        <form @submit.prevent="submit" class="flex flex-col gap-4">
-            <div class="flex flex-col gap-2">
-                <label for="name" class="text-sm font-medium text-surface-700 dark:text-surface-300">Ad Soyad</label>
-                <InputText id="name" v-model="form.name" placeholder="Adınız Soyadınız" :invalid="!!form.errors.name" autofocus fluid />
-                <small v-if="form.errors.name" class="text-red-500">{{ form.errors.name }}</small>
+    <AuthBase
+        title="Create an account"
+        description="Enter your details below to create your account"
+    >
+        <Head title="Register" />
+
+        <Form
+            v-bind="store.form()"
+            :reset-on-success="['password', 'password_confirmation']"
+            v-slot="{ errors, processing }"
+            class="flex flex-col gap-6"
+        >
+            <div class="grid gap-6">
+                <div class="grid gap-2">
+                    <Label for="name">Name</Label>
+                    <Input
+                        id="name"
+                        type="text"
+                        required
+                        autofocus
+                        :tabindex="1"
+                        autocomplete="name"
+                        name="name"
+                        placeholder="Full name"
+                    />
+                    <InputError :message="errors.name" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="email">Email address</Label>
+                    <Input
+                        id="email"
+                        type="email"
+                        required
+                        :tabindex="2"
+                        autocomplete="email"
+                        name="email"
+                        placeholder="email@example.com"
+                    />
+                    <InputError :message="errors.email" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="password">Password</Label>
+                    <Input
+                        id="password"
+                        type="password"
+                        required
+                        :tabindex="3"
+                        autocomplete="new-password"
+                        name="password"
+                        placeholder="Password"
+                    />
+                    <InputError :message="errors.password" />
+                </div>
+
+                <div class="grid gap-2">
+                    <Label for="password_confirmation">Confirm password</Label>
+                    <Input
+                        id="password_confirmation"
+                        type="password"
+                        required
+                        :tabindex="4"
+                        autocomplete="new-password"
+                        name="password_confirmation"
+                        placeholder="Confirm password"
+                    />
+                    <InputError :message="errors.password_confirmation" />
+                </div>
+
+                <Button
+                    type="submit"
+                    class="mt-2 w-full"
+                    tabindex="5"
+                    :disabled="processing"
+                    data-test="register-user-button"
+                >
+                    <Spinner v-if="processing" />
+                    Create account
+                </Button>
             </div>
 
-            <div class="flex flex-col gap-2">
-                <label for="email" class="text-sm font-medium text-surface-700 dark:text-surface-300">E-posta</label>
-                <InputText id="email" v-model="form.email" type="email" placeholder="ornek@alanadi.com" :invalid="!!form.errors.email" fluid />
-                <small v-if="form.errors.email" class="text-red-500">{{ form.errors.email }}</small>
+            <div class="text-center text-sm text-muted-foreground">
+                Already have an account?
+                <TextLink
+                    :href="login()"
+                    class="underline underline-offset-4"
+                    :tabindex="6"
+                    >Log in</TextLink
+                >
             </div>
-
-            <div class="flex flex-col gap-2">
-                <label for="password" class="text-sm font-medium text-surface-700 dark:text-surface-300">Şifre</label>
-                <Password
-                    id="password"
-                    v-model="form.password"
-                    :feedback="false"
-                    toggleMask
-                    placeholder="••••••••"
-                    :invalid="!!form.errors.password"
-                    fluid
-                />
-                <small v-if="form.errors.password" class="text-red-500">{{ form.errors.password }}</small>
-            </div>
-
-            <div class="flex flex-col gap-2">
-                <label for="password_confirmation" class="text-sm font-medium text-surface-700 dark:text-surface-300">Şifre Tekrar</label>
-                <Password
-                    id="password_confirmation"
-                    v-model="form.password_confirmation"
-                    :feedback="false"
-                    toggleMask
-                    placeholder="••••••••"
-                    :invalid="!!form.errors.password_confirmation"
-                    fluid
-                />
-                <small v-if="form.errors.password_confirmation" class="text-red-500">{{ form.errors.password_confirmation }}</small>
-            </div>
-
-            <Button type="submit" label="Kayıt Ol" icon="pi pi-user-plus" :loading="form.processing" class="mt-2" fluid />
-
-            <div class="mt-4 text-center text-sm">
-                <span class="text-surface-600 dark:text-surface-400">Zaten hesabınız var mı?</span>
-                <a href="/login" class="ml-1 font-semibold text-primary-600 hover:text-primary-500">Giriş Yap</a>
-            </div>
-        </form>
-    </AuthLayout>
+        </Form>
+    </AuthBase>
 </template>

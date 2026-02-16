@@ -1,101 +1,96 @@
 # Herkobi
 
-Herkobi, Laravel 12 üzerinde inşa edilmiş, çok kiracılı (multi-tenant) bir SaaS platformudur. Abonelik yönetimi, plan bazlı özellik erişimi, ödeme entegrasyonu (PayTR), addon sistemi ve kullanıcı yönetimi gibi temel SaaS ihtiyaçlarını kapsayan bir altyapı sunar.
+Herkobi, Laravel 12 uzerinde insa edilmis, cok kiracili (multi-tenant) bir SaaS platformudur. Abonelik yonetimi, plan bazli ozellik erisimi, odeme entegrasyonu (PayTR), addon sistemi ve kullanici yonetimi gibi temel SaaS ihtiyaclarini kapsayan bir altyapi sunar.
 
-## Teknik Altyapı
+## Teknik Altyapi
 
-| Bileşen | Versiyon / Değer |
+| Bilesen | Versiyon / Deger |
 |---------|-----------------|
-| PHP | 8.2+ (Çalışma ortamı: 8.3) |
+| PHP | 8.4+ |
 | Laravel | 12.x |
-| Veritabanı | MySQL |
-| Kimlik Doğrulama | Laravel Fortify (2FA dahil) |
+| Veritabani | MySQL |
+| Kimlik Dogrulama | Laravel Fortify (2FA dahil) |
 | Test Framework | Pest 4.x |
 | Kod Formatlama | Laravel Pint |
-| Ödeme Altyapısı | PayTR |
-| Varsayılan Para Birimi | TRY |
-| Varsayılan Vergi | %20 KDV |
+| Odeme Altyapisi | PayTR |
+| Varsayilan Para Birimi | TRY |
+| Varsayilan Vergi | %20 KDV |
 | **Frontend** | |
 | UI Framework | Vue 3.5 (Composition API) |
 | SPA Router | Inertia.js 2.x |
-| Component Library | PrimeVue 4.5 (Aura theme) |
+| Component Library | shadcn-vue (new-york-v4 style) + Reka UI |
 | CSS Framework | Tailwind CSS v4 |
+| Icon Library | Lucide Vue Next |
 | Type Safety | TypeScript + Laravel Wayfinder |
+| Data Table | TanStack Vue Table |
+| Toast | Vue Sonner |
 
-## Mimari Yapı
+## Mimari Yapi
 
-Herkobi iki ana bölgeden oluşur. Backend Laravel 12, frontend Vue 3 + Inertia.js ile SPA benzeri bir deneyim sunar.
-
-### Frontend Stack
-
-- **Vue 3.5**: Composition API ve TypeScript ile tip güvenli component geliştirme
-- **Inertia.js**: Server-side routing korunarak SPA deneyimi (tam sayfa yenilemesiz)
-- **PrimeVue 4.5**: 90+ hazır component (Aura tema, forms kütüphanesi)
-- **Tailwind CSS v4**: Utility-first CSS framework
-- **Laravel Wayfinder**: Tip güvenli `route()` yardımcıları
+Herkobi iki ana bolgeden olusur. Backend Laravel 12, frontend Vue 3 + Inertia.js ile SPA benzeri bir deneyim sunar.
 
 ### Panel (Admin)
 
-Platform yöneticileri için yönetim paneli. Rotaları `routes/panel.php` dosyasında tanımlıdır.
+Platform yoneticileri icin yonetim paneli. Rotalari `routes/panel.php` dosyasinda tanimlidir.
 
-- Plan, fiyat ve özellik yönetimi (CRUD)
-- Addon yönetimi (CRUD)
-- Tenant (müşteri) yönetimi ve detay görüntüleme
-- Tenant abonelik işlemleri (oluşturma, iptal, yenileme, plan değiştirme, deneme süresi uzatma, grace period uzatma)
-- Tenant addon yönetimi (uzatma, iptal)
-- Tenant özellik override yönetimi
-- Ödeme listesi, durum güncelleme, faturalandı olarak işaretleme
+- Plan, fiyat ve ozellik yonetimi (CRUD)
+- Addon yonetimi (CRUD)
+- Tenant (musteri) yonetimi ve detay goruntuleme
+- Tenant abonelik islemleri (olusturma, iptal, yenileme, plan degistirme, deneme suresi uzatma, grace period uzatma)
+- Tenant addon yonetimi (uzatma, iptal)
+- Tenant ozellik override yonetimi
+- Odeme listesi, durum guncelleme, faturalandirma
 - Abonelik listeleme
-- Genel ayarlar yönetimi
-- Profil, şifre, 2FA ve bildirim yönetimi
+- Genel ayarlar yonetimi
+- Profil, sifre, 2FA ve bildirim yonetimi
 
-### App (Tenant / Müşteri)
+### App (Tenant / Musteri)
 
-Kiracıların (müşterilerin) kullandığı uygulama tarafı. Rotaları `routes/app.php` dosyasında tanımlıdır.
+Kiracilarin (musterilerin) kullandigi uygulama tarafi. Rotalari `routes/app.php` dosyasinda tanimlidir.
 
 - Dashboard
-- Abonelik görüntüleme ve iptal
-- Fatura bilgisi görüntüleme ve güncelleme
-- Ödeme geçmişi
-- Checkout (ödeme) akışı
-- Addon satın alma ve iptal
-- Plan değiştirme (upgrade/downgrade)
-- Kullanıcı yönetimi (team members – config ile açılır/kapanır)
-- Davetiye sistemi (email davet, token, doğrudan ekleme, otomatik kabul)
-- Özellik kullanım takibi
-- Profil, şifre, 2FA ve bildirim yönetimi
+- Abonelik goruntuleme ve iptal
+- Fatura bilgisi goruntuleme ve guncelleme
+- Odeme gecmisi
+- Checkout (odeme) akisi
+- Addon satin alma ve iptal
+- Plan degistirme (upgrade/downgrade)
+- Kullanici yonetimi (team members — config ile acilir/kapanir)
+- Davetiye sistemi (email davet, token, dogrudan ekleme, otomatik kabul)
+- Ozellik kullanim takibi
+- Profil, sifre, 2FA ve bildirim yonetimi
 
-### Ödeme Callback
+### Odeme Callback
 
-`POST /payment/callback` rotası kimlik doğrulama gerektirmez (webhook). PayTR’den gelen ödeme sonuçlarını işler.
+`POST /payment/callback` rotasi kimlik dogrulama gerektirmez (webhook). PayTR'den gelen odeme sonuclarini isler.
 
-## Çok Kiracılı (Multi-Tenant) Mimari
+## Cok Kiracili (Multi-Tenant) Mimari
 
-Herkobi, tek veritabanı üzerinde çok kiracılı bir mimari kullanır:
+Herkobi, tek veritabani uzerinde cok kiracili bir mimari kullanir:
 
-- **Tenant izolasyonu**: `BaseTenant` soyut modeli, global scope ile her sorguyu otomatik olarak aktif tenant’a filtreler.
-- **Tenant context**: `LoadTenantContext` middleware’i, kimlik doğrulanmış kullanıcıyı baz alarak aktif tenant’ı belirler.
-- **Kullanıcı–Tenant ilişkisi**: Çoka-çok ilişki (`tenant_user` pivot tablosu). Roller: `OWNER`, `STAFF`.
-- **Config ile kontrol (hibrit)**: Team ve çoklu tenant özellikleri config ve plan bazlı middleware’ler ile yönetilir.
+- **Tenant izolasyonu**: `BaseTenant` soyut modeli, global scope ile her sorguyu otomatik olarak aktif tenant'a filtreler.
+- **Tenant context**: `LoadTenantContext` middleware'i, kimlik dogrulanmis kullaniciyi baz alarak aktif tenant'i belirler.
+- **Kullanici–Tenant iliskisi**: Coca-cok iliski (`tenant_user` pivot tablosu). Roller: `OWNER`, `STAFF`.
+- **Config ile kontrol (hibrit)**: Team ve coklu tenant ozellikleri config ve plan bazli middleware'ler ile yonetilir.
 
-## KVKK / GDPR Uyumluluğu
+## KVKK / GDPR Uyumlulugu
 
-Herkobi, veri saklama ve anonimleştirme politikalarını `config/herkobi.php` üzerinden yönetir:
+Herkobi, veri saklama ve anonimleistirme politikalarini `config/herkobi.php` uzerinden yonetir:
 
-- Aktivite logları: 2 yıl sonra anonimleştirme
-- Bildirimler: 3 ay sonra arşivleme, 2 yıl sonra anonimleştirme
-- Kullanıcı verileri: `UserAnonymizationService` ile kalıcı olarak temizlenebilir
+- Aktivite loglari: 2 yil sonra anonimleistirme
+- Bildirimler: 3 ay sonra arsivleme, 2 yil sonra anonimleistirme
+- Kullanici verileri: `UserAnonymizationService` ile kalici olarak temizlenebilir
 
 ## Kurulum
 
 ### Gereksinimler
 
-- PHP 8.2+
+- PHP 8.4+
 - MySQL
 - Node.js & NPM
 - Composer
 
-### Hızlı Kurulum
+### Hizli Kurulum
 
 ```bash
 git clone <repo-url> herkobi
@@ -103,15 +98,15 @@ cd herkobi
 composer run setup
 ```
 
-Bu komut sırasıyla bağımlılıkları kurar, ortam dosyasını oluşturur, veritabanını hazırlar ve frontend asset’lerini build eder.
+Bu komut sirasiyla bagimliliklari kurar, ortam dosyasini olusturur, veritabanini hazirlar ve frontend asset'lerini build eder.
 
-### Geliştirme Ortamı
+### Gelistirme Ortami
 
 ```bash
 composer run dev
 ```
 
-Laravel sunucusu, queue worker ve Vite geliştirme sunucusu eş zamanlı başlatılır.
+Laravel sunucusu, queue worker ve Vite gelistirme sunucusu es zamanli baslatilir.
 
 ### Testler
 
@@ -119,5 +114,4 @@ Laravel sunucusu, queue worker ve Vite geliştirme sunucusu eş zamanlı başlat
 composer test
 ```
 
-Pest 4.x test framework’ü ile yapılandırılmıştır.
-
+Pest 4.x test framework'u ile yapilandirilmistir.
