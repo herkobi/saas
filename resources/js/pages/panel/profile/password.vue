@@ -2,7 +2,7 @@
 import { Form, Head } from '@inertiajs/vue3';
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import InputError from '@/components/common/InputError.vue';
-import Heading from '@/components/panel/Heading.vue';
+import Heading from '@/components/common/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

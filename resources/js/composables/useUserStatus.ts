@@ -6,11 +6,11 @@ export function useUserStatus() {
         return 'Aktif';
     };
 
-    const statusSeverity = (status: number | undefined): string => {
+    const statusColor = (status: number | undefined): { bg: string; text: string } => {
         const s = status ?? 1;
-        if (s === 0) return 'secondary';
-        if (s === 2) return 'warning';
-        return 'success';
+        if (s === 0) return { bg: 'bg-muted', text: 'text-muted-foreground' };
+        if (s === 2) return { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' };
+        return { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' };
     };
 
     const statusIcon = (status: number | undefined): string => {
@@ -18,13 +18,6 @@ export function useUserStatus() {
         if (s === 0) return 'Ban';
         if (s === 2) return 'Eye';
         return 'CheckCircle';
-    };
-
-    const statusColor = (status: number | undefined): { bg: string; text: string } => {
-        const s = status ?? 1;
-        if (s === 0) return { bg: 'bg-muted', text: 'text-muted-foreground' };
-        if (s === 2) return { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' };
-        return { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' };
     };
 
     const statusDotColor = (status: number | undefined): string => {
@@ -41,22 +34,23 @@ export function useUserStatus() {
         return 'Tam erişim';
     };
 
-    const roleLabel = (role: string | undefined): string => {
-        return role === 'owner' ? 'Sahip' : 'Üye';
+    const roleLabel = (role: number | undefined): string => {
+        return role === 1 ? 'Sahip' : 'Üye';
     };
 
-    const roleSeverity = (role: string | undefined): string => {
-        return role === 'owner' ? 'warning' : 'info';
+    const roleColor = (role: number | undefined): { bg: string; text: string } => {
+        return role === 1
+            ? { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' }
+            : { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' };
     };
 
     return {
         statusLabel,
-        statusSeverity,
-        statusIcon,
         statusColor,
+        statusIcon,
         statusDotColor,
         statusDescription,
         roleLabel,
-        roleSeverity,
+        roleColor,
     };
 }

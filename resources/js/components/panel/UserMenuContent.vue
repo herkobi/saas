@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
 import { LogOut, Settings } from 'lucide-vue-next';
-import UserInfo from '@/components/panel/UserInfo.vue';
+import UserInfo from '@/components/common/UserInfo.vue';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,

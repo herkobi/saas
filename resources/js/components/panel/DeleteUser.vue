@@ -3,7 +3,7 @@ import { Form } from '@inertiajs/vue3';
 import { useTemplateRef } from 'vue';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import InputError from '@/components/common/InputError.vue';
-import Heading from '@/components/panel/Heading.vue';
+import Heading from '@/components/common/Heading.vue';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

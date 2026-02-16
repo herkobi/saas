@@ -18,7 +18,10 @@ export interface Activity {
     id: string;
     type: string;
     description: string;
-    properties?: Record<string, any>;
+    log?: Record<string, any>;
+    user_id?: string;
+    user_type?: 'admin' | 'tenant';
+    tenant_id?: string | null;
     created_at: string;
 }
 

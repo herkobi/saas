@@ -8,13 +8,13 @@ export function useFeatureType() {
         return map[type ?? ''] ?? type ?? '-';
     };
 
-    const typeSeverity = (type: string | undefined): string => {
-        const map: Record<string, string> = {
-            limit: 'info',
-            feature: 'success',
-            metered: 'warn',
+    const typeColor = (type: string | undefined): { bg: string; text: string } => {
+        const map: Record<string, { bg: string; text: string }> = {
+            limit: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
+            feature: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' },
+            metered: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' },
         };
-        return map[type ?? ''] ?? 'secondary';
+        return map[type ?? ''] ?? { bg: 'bg-muted', text: 'text-muted-foreground' };
     };
 
     const sourceLabel = (source: string | undefined): string => {
@@ -27,15 +27,15 @@ export function useFeatureType() {
         return map[source ?? ''] ?? source ?? '-';
     };
 
-    const sourceSeverity = (source: string | undefined): string => {
-        const map: Record<string, string> = {
-            plan: 'info',
-            override: 'warn',
-            addon: 'success',
-            default: 'secondary',
+    const sourceColor = (source: string | undefined): { bg: string; text: string } => {
+        const map: Record<string, { bg: string; text: string }> = {
+            plan: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' },
+            override: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400' },
+            addon: { bg: 'bg-green-100 dark:bg-green-900/30', text: 'text-green-600 dark:text-green-400' },
+            default: { bg: 'bg-muted', text: 'text-muted-foreground' },
         };
-        return map[source ?? ''] ?? 'secondary';
+        return map[source ?? ''] ?? { bg: 'bg-muted', text: 'text-muted-foreground' };
     };
 
-    return { typeLabel, typeSeverity, sourceLabel, sourceSeverity };
+    return { typeLabel, typeColor, sourceLabel, sourceColor };
 }

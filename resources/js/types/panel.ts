@@ -36,8 +36,8 @@ export interface PlanListItem {
     name: string;
     slug: string;
     is_active: boolean;
-    is_published: boolean;
-    trial_days: number;
+    is_public: boolean;
+    is_free: boolean;
     prices_count: number;
     features_count: number;
     created_at: string;

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
-import Heading from '@/components/app/Heading.vue';
+import Heading from '@/components/common/Heading.vue';
 import InputError from '@/components/common/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

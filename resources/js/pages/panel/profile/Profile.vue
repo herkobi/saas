@@ -3,7 +3,7 @@ import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import InputError from '@/components/common/InputError.vue';
 import DeleteUser from '@/components/panel/DeleteUser.vue';
-import Heading from '@/components/panel/Heading.vue';
+import Heading from '@/components/common/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import Heading from '@/components/panel/Heading.vue';
+import Heading from '@/components/common/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';

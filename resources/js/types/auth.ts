@@ -2,8 +2,8 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    type: string;
-    status: string;
+    type: 'admin' | 'tenant';
+    status: number;
     two_factor_enabled: boolean;
     email_verified_at?: string | null;
     created_at?: string;
@@ -13,7 +13,7 @@ export interface User {
 export interface AuthTenant {
     id: string;
     name: string;
-    role: string;
+    role: number;
     status: number;
 }
 
