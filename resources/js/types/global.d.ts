@@ -23,6 +23,10 @@ declare module '@inertiajs/core' {
             tenant: Tenant | null;
             site: Site | null;
             sidebarOpen: boolean;
+            flash: {
+                success: string | null;
+                error: string | null;
+            };
             [key: string]: unknown;
         };
     }
