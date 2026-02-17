@@ -202,9 +202,9 @@ function daysUntil(dateStr: string): number {
             </Card>
 
             <!-- Two Column Layout: Left (tables) / Right (activities) -->
-            <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">
+            <div class="grid gap-4 lg:grid-cols-3">
                 <!-- Left: Tables -->
-                <div class="flex flex-col gap-6">
+                <div class="lg:col-span-2 flex flex-col gap-4">
                     <!-- Son Ödemeler -->
                     <Card>
                         <CardHeader class="flex flex-row items-center justify-between">
@@ -294,7 +294,7 @@ function daysUntil(dateStr: string): number {
                 </div>
 
                 <!-- Right: Activities -->
-                <Card class="h-fit">
+                <Card class="h-fit lg:col-span-1">
                     <CardHeader>
                         <CardTitle class="text-sm font-medium">Son Aktiviteler</CardTitle>
                     </CardHeader>

@@ -185,9 +185,9 @@ const booleanFeatures = props.features.filter(
             </div>
 
             <!-- Two Column Layout -->
-            <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">
+            <div class="grid gap-4 lg:grid-cols-3">
                 <!-- Left Column -->
-                <div class="flex flex-col gap-6">
+                <div class="lg:col-span-2 flex flex-col gap-4">
                     <!-- Feature Usage (numeric) -->
                     <Card v-if="numericFeatures.length > 0">
                         <CardHeader>
@@ -257,7 +257,7 @@ const booleanFeatures = props.features.filter(
                 </div>
 
                 <!-- Right Column -->
-                <div class="flex flex-col gap-6">
+                <div class="h-fit lg:col-span-1">
                     <!-- Boolean Features -->
                     <Card v-if="booleanFeatures.length > 0">
                         <CardHeader>
