@@ -31,6 +31,7 @@ use App\Http\Controllers\App\Account\UserController;
 use App\Http\Controllers\App\DashboardController;
 use App\Http\Controllers\App\InvitationAcceptController;
 use App\Http\Controllers\App\TenantController;
+use App\Http\Controllers\App\Profile\AppearanceController;
 use App\Http\Controllers\App\Profile\NotificationController;
 use App\Http\Controllers\App\Profile\PasswordController;
 use App\Http\Controllers\App\Profile\ProfileController;
@@ -126,6 +127,13 @@ Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
          */
         Route::controller(TwoFactorAuthenticationController::class)->group(function () {
             Route::get('/two-factor', 'show')->name('two-factor.show');
+        });
+
+        /**
+         * Appearance Routes
+         */
+        Route::controller(AppearanceController::class)->group(function () {
+            Route::get('/appearance', 'show')->name('appearance.show');
         });
 
         /**

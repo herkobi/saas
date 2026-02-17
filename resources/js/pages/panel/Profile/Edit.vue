@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import InputError from '@/components/common/InputError.vue';
-import DeleteUser from '@/components/panel/DeleteUser.vue';
+import ProfileController from '@/actions/App/Http/Controllers/Panel/Profile/ProfileController';
 import Heading from '@/components/common/Heading.vue';
+import InputError from '@/components/common/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/PanelLayout.vue';
-import SettingsLayout from '@/pages/panel/profile/layout/Layout.vue';
-import { edit } from '@/routes/profile';
+import SettingsLayout from '@/pages/panel/Profile/layout/Layout.vue';
+import { edit } from '@/routes/panel/profile';
 import { send } from '@/routes/verification';
 import { type BreadcrumbItem } from '@/types';
 
@@ -22,7 +21,7 @@ defineProps<Props>();
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Profile settings',
+        title: 'Profil ayarları',
         href: edit().url,
     },
 ];
@@ -33,16 +32,16 @@ const user = page.props.auth.user;
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Profile settings" />
+        <Head title="Profil ayarları" />
 
-        <h1 class="sr-only">Profile Settings</h1>
+        <h1 class="sr-only">Profil Ayarları</h1>
 
         <SettingsLayout>
             <div class="flex flex-col space-y-6">
                 <Heading
                     variant="small"
-                    title="Profile information"
-                    description="Update your name and email address"
+                    title="Profil bilgileri"
+                    description="Adınızı ve e-posta adresinizi güncelleyin"
                 />
 
                 <Form
@@ -51,7 +50,7 @@ const user = page.props.auth.user;
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
                     <div class="grid gap-2">
-                        <Label for="name">Name</Label>
+                        <Label for="name">Ad Soyad</Label>
                         <Input
                             id="name"
                             class="mt-1 block w-full"
@@ -59,13 +58,13 @@ const user = page.props.auth.user;
                             :default-value="user.name"
                             required
                             autocomplete="name"
-                            placeholder="Full name"
+                            placeholder="Ad Soyad"
                         />
                         <InputError class="mt-2" :message="errors.name" />
                     </div>
 
                     <div class="grid gap-2">
-                        <Label for="email">Email address</Label>
+                        <Label for="email">E-posta adresi</Label>
                         <Input
                             id="email"
                             type="email"
@@ -74,20 +73,21 @@ const user = page.props.auth.user;
                             :default-value="user.email"
                             required
                             autocomplete="username"
-                            placeholder="Email address"
+                            placeholder="E-posta adresi"
                         />
                         <InputError class="mt-2" :message="errors.email" />
                     </div>
 
                     <div v-if="mustVerifyEmail && !user.email_verified_at">
                         <p class="-mt-4 text-sm text-muted-foreground">
-                            Your email address is unverified.
+                            E-posta adresiniz doğrulanmamış.
                             <Link
                                 :href="send()"
                                 as="button"
                                 class="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                             >
-                                Click here to resend the verification email.
+                                Doğrulama e-postasını tekrar göndermek için
+                                tıklayın.
                             </Link>
                         </p>
 
@@ -95,8 +95,8 @@ const user = page.props.auth.user;
                             v-if="status === 'verification-link-sent'"
                             class="mt-2 text-sm font-medium text-green-600"
                         >
-                            A new verification link has been sent to your email
-                            address.
+                            E-posta adresinize yeni bir doğrulama bağlantısı
+                            gönderildi.
                         </div>
                     </div>
 
@@ -104,7 +104,7 @@ const user = page.props.auth.user;
                         <Button
                             :disabled="processing"
                             data-test="update-profile-button"
-                            >Save</Button
+                            >Kaydet</Button
                         >
 
                         <Transition
@@ -117,14 +117,12 @@ const user = page.props.auth.user;
                                 v-show="recentlySuccessful"
                                 class="text-sm text-neutral-600"
                             >
-                                Saved.
+                                Kaydedildi.
                             </p>
                         </Transition>
                     </div>
                 </Form>
             </div>
-
-            <DeleteUser />
         </SettingsLayout>
     </AppLayout>
 </template>

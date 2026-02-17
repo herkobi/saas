@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings } from 'lucide-vue-next';
+import { Bell, LogOut, User } from 'lucide-vue-next';
 import UserInfo from '@/components/common/UserInfo.vue';
 import {
     DropdownMenuGroup,
@@ -9,11 +9,12 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { logout } from '@/routes';
-import { edit } from '@/routes/profile';
-import type { User } from '@/types';
+import { edit } from '@/routes/app/profile';
+import { index as notificationsIndex } from '@/routes/app/profile/notifications';
+import type { User as UserType } from '@/types';
 
 type Props = {
-    user: User;
+    user: UserType;
 };
 
 const handleLogout = () => {
@@ -33,8 +34,14 @@ defineProps<Props>();
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
-                <Settings class="mr-2 h-4 w-4" />
-                Settings
+                <User class="mr-2 h-4 w-4" />
+                Profil Bilgileri
+            </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem :as-child="true">
+            <Link class="block w-full cursor-pointer" :href="notificationsIndex()" prefetch>
+                <Bell class="mr-2 h-4 w-4" />
+                Bildirimler
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>
@@ -48,7 +55,7 @@ defineProps<Props>();
             data-test="logout-button"
         >
             <LogOut class="mr-2 h-4 w-4" />
-            Log out
+            Çıkış Yap
         </Link>
     </DropdownMenuItem>
 </template>

@@ -5,28 +5,33 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editProfile } from '@/routes/profile';
-import { show } from '@/routes/two-factor';
-import { edit as editPassword } from '@/routes/user-password';
+import { edit as editProfile } from '@/routes/app/profile';
+import { index as notificationsIndex } from '@/routes/app/profile/notifications';
+import { edit as editPassword } from '@/routes/app/profile/password';
+import { show as showAppearance } from '@/routes/app/profile/appearance';
+import { show } from '@/routes/app/profile/two-factor';
 import { type NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'Profil',
         href: editProfile(),
     },
     {
-        title: 'Password',
+        title: 'Parola',
         href: editPassword(),
     },
     {
-        title: 'Two-Factor Auth',
+        title: 'İki Faktörlü Doğrulama',
         href: show(),
     },
     {
-        title: 'Appearance',
-        href: editAppearance(),
+        title: 'Bildirimler',
+        href: notificationsIndex(),
+    },
+    {
+        title: 'Görünüm',
+        href: showAppearance(),
     },
 ];
 
@@ -36,15 +41,15 @@ const { isCurrentUrl } = useCurrentUrl();
 <template>
     <div class="px-4 py-6">
         <Heading
-            title="Settings"
-            description="Manage your profile and account settings"
+            title="Ayarlar"
+            description="Profil ve hesap ayarlarınızı yönetin"
         />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
                 <nav
                     class="flex flex-col space-y-1 space-x-0"
-                    aria-label="Settings"
+                    aria-label="Ayarlar"
                 >
                     <Button
                         v-for="item in sidebarNavItems"

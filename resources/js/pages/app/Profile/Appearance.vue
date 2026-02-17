@@ -3,30 +3,30 @@ import { Head } from '@inertiajs/vue3';
 import AppearanceTabs from '@/components/common/AppearanceTabs.vue';
 import Heading from '@/components/common/Heading.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
-import SettingsLayout from '@/pages/app/profile/layout/Layout.vue';
-import { edit } from '@/routes/appearance';
+import SettingsLayout from '@/pages/app/Profile/layout/Layout.vue';
+import { show } from '@/routes/app/profile/appearance';
 import { type BreadcrumbItem } from '@/types';
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Appearance settings',
-        href: edit().url,
+        title: 'Görünüm ayarları',
+        href: show().url,
     },
 ];
 </script>
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
-        <Head title="Appearance settings" />
+        <Head title="Görünüm ayarları" />
 
-        <h1 class="sr-only">Appearance Settings</h1>
+        <h1 class="sr-only">Görünüm Ayarları</h1>
 
         <SettingsLayout>
             <div class="space-y-6">
                 <Heading
                     variant="small"
-                    title="Appearance settings"
-                    description="Update your account's appearance settings"
+                    title="Görünüm ayarları"
+                    description="Hesabınızın görünüm ayarlarını güncelleyin"
                 />
                 <AppearanceTabs />
             </div>

@@ -4,13 +4,14 @@ import { ShieldBan, ShieldCheck } from 'lucide-vue-next';
 import { onUnmounted, ref } from 'vue';
 import Heading from '@/components/common/Heading.vue';
 import TwoFactorRecoveryCodes from '@/components/common/TwoFactorRecoveryCodes.vue';
-import TwoFactorSetupModal from '@/components/common/TwoFactorRecoveryCodes.vue';
+import TwoFactorSetupModal from '@/components/common/TwoFactorSetupModal.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth';
 import AppLayout from '@/layouts/AppLayout.vue';
-import SettingsLayout from '@/pages/app/profile/layout/Layout.vue';
-import { disable, enable, show } from '@/routes/two-factor';
+import SettingsLayout from '@/pages/app/Profile/layout/Layout.vue';
+import { show } from '@/routes/app/profile/two-factor';
+import { disable, enable } from '@/routes/two-factor';
 import type { BreadcrumbItem } from '@/types';
 
 type Props = {
@@ -25,7 +26,7 @@ withDefaults(defineProps<Props>(), {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Two-Factor Authentication',
+        title: 'İki Faktörlü Doğrulama',
         href: show.url(),
     },
 ];
@@ -40,29 +41,29 @@ onUnmounted(() => {
 
 <template>
     <AppLayout :breadcrumbs="breadcrumbs">
-        <Head title="Two-Factor Authentication" />
+        <Head title="İki Faktörlü Doğrulama" />
 
-        <h1 class="sr-only">Two-Factor Authentication Settings</h1>
+        <h1 class="sr-only">İki Faktörlü Doğrulama Ayarları</h1>
 
         <SettingsLayout>
             <div class="space-y-6">
                 <Heading
                     variant="small"
-                    title="Two-Factor Authentication"
-                    description="Manage your two-factor authentication settings"
+                    title="İki Faktörlü Doğrulama"
+                    description="İki faktörlü doğrulama ayarlarınızı yönetin"
                 />
 
                 <div
                     v-if="!twoFactorEnabled"
                     class="flex flex-col items-start justify-start space-y-4"
                 >
-                    <Badge variant="destructive">Disabled</Badge>
+                    <Badge variant="destructive">Devre Dışı</Badge>
 
                     <p class="text-muted-foreground">
-                        When you enable two-factor authentication, you will be
-                        prompted for a secure pin during login. This pin can be
-                        retrieved from a TOTP-supported application on your
-                        phone.
+                        İki faktörlü doğrulamayı etkinleştirdiğinizde, giriş
+                        sırasında güvenli bir pin kodu girmeniz istenecektir. Bu
+                        pin kodunu telefonunuzdaki TOTP destekli bir
+                        uygulamadan alabilirsiniz.
                     </p>
 
                     <div>
@@ -70,7 +71,7 @@ onUnmounted(() => {
                             v-if="hasSetupData"
                             @click="showSetupModal = true"
                         >
-                            <ShieldCheck />Continue Setup
+                            <ShieldCheck />Kuruluma Devam Et
                         </Button>
                         <Form
                             v-else
@@ -79,7 +80,7 @@ onUnmounted(() => {
                             #default="{ processing }"
                         >
                             <Button type="submit" :disabled="processing">
-                                <ShieldCheck />Enable 2FA</Button
+                                <ShieldCheck />2FA'yı Etkinleştir</Button
                             ></Form
                         >
                     </div>
@@ -89,13 +90,13 @@ onUnmounted(() => {
                     v-else
                     class="flex flex-col items-start justify-start space-y-4"
                 >
-                    <Badge variant="default">Enabled</Badge>
+                    <Badge variant="default">Aktif</Badge>
 
                     <p class="text-muted-foreground">
-                        With two-factor authentication enabled, you will be
-                        prompted for a secure, random pin during login, which
-                        you can retrieve from the TOTP-supported application on
-                        your phone.
+                        İki faktörlü doğrulama etkinleştirildiğinde, giriş
+                        sırasında güvenli ve rastgele bir pin kodu girmeniz
+                        istenecektir. Bu kodu telefonunuzdaki TOTP destekli
+                        uygulamadan alabilirsiniz.
                     </p>
 
                     <TwoFactorRecoveryCodes />
@@ -108,7 +109,7 @@ onUnmounted(() => {
                                 :disabled="processing"
                             >
                                 <ShieldBan />
-                                Disable 2FA
+                                2FA'yı Devre Dışı Bırak
                             </Button>
                         </Form>
                     </div>

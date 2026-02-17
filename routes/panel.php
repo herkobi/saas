@@ -27,6 +27,7 @@ use App\Http\Controllers\Panel\Plan\{
     PlanPriceController
 };
 use App\Http\Controllers\Panel\Profile\{
+    AppearanceController,
     NotificationController,
     PasswordController,
     ProfileController,
@@ -77,6 +78,13 @@ Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
          */
         Route::controller(TwoFactorAuthenticationController::class)->group(function () {
             Route::get('/two-factor', 'show')->name('two-factor.show');
+        });
+
+        /**
+         * Appearance Routes
+         */
+        Route::controller(AppearanceController::class)->group(function () {
+            Route::get('/appearance', 'show')->name('appearance.show');
         });
 
         /**
