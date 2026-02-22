@@ -83,3 +83,47 @@ export interface StatusOption {
     value: number | string;
     label: string;
 }
+
+// Subscription list item
+export interface SubscriptionListItem {
+    id: string;
+    tenant_name: string;
+    tenant_id: string;
+    plan_name: string;
+    price_label?: string;
+    status: string;
+    status_label: string;
+    status_badge?: string;
+    starts_at: string;
+    ends_at: string | null;
+    trial_ends_at: string | null;
+    created_at: string;
+}
+
+// Payment list item
+export interface PaymentListItem {
+    id: string;
+    tenant_name?: string;
+    tenant_id?: string;
+    amount: number;
+    currency: string;
+    status: string;
+    status_label: string;
+    status_badge?: { variant?: string };
+    gateway?: string;
+    description?: string | null;
+    paid_at: string | null;
+    invoiced_at: string | null;
+    created_at: string;
+}
+
+// Tenant statistics
+export interface TenantStatistics {
+    total_users: number;
+    total_payments: number;
+    total_revenue: number;
+    subscription_status?: string;
+    current_plan?: string;
+    subscription_ends_at?: string | null;
+    created_at: string;
+}

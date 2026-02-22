@@ -1,37 +1,36 @@
-# Panel Tasarımları - İş Takibi
+# App (Tenant) Tasarımları - İş Takibi
 
-## Plan Yönetimi
-- [ ] Plans/Index.vue — Plan listesi (paginated, archived filtre)
-- [ ] Plans/Create.vue — Plan oluşturma formu
-- [ ] Plans/Edit.vue — Plan düzenleme (fiyat yönetimi + özellik atama)
+## Tenant Yönetimi
+- [ ] Tenant/Create.vue — Yeni tenant oluşturma formu
 
-## Özellik Yönetimi
-- [ ] Plans/Features/Index.vue — Özellik listesi (paginated, filterable)
-- [ ] Plans/Features/Create.vue — Özellik oluşturma formu
-- [ ] Plans/Features/Edit.vue — Özellik düzenleme formu
+## Davet
+- [ ] Invitation/Accept.vue — Davet kabul sayfası
 
-## Eklenti Yönetimi
-- [ ] Addons/Index.vue — Eklenti listesi (paginated, filterable)
-- [ ] Addons/Create.vue — Eklenti oluşturma formu
-- [ ] Addons/Edit.vue — Eklenti düzenleme formu
+## Hesap - Abonelik
+- [ ] Account/Subscription/Index.vue — Abonelik detayları ve yönetim
 
-## Hesap (Tenant) Yönetimi
-- [ ] Tenants/Index.vue — Tenant listesi (paginated, filterable)
-- [ ] Tenants/Show.vue — Tenant detay (genel bilgi + istatistik + aktiviteler)
-- [ ] Tenants/Subscription.vue — Tenant abonelik yönetimi
-- [ ] Tenants/Users.vue — Tenant kullanıcıları
-- [ ] Tenants/Payments.vue — Tenant ödemeleri
-- [ ] Tenants/Addons.vue — Tenant eklentileri
-- [ ] Tenants/Features.vue — Tenant özellik override'ları
-- [ ] Tenants/Activities.vue — Tenant aktivite geçmişi
+## Hesap - Fatura Bilgileri
+- [ ] Account/Billing/Index.vue — Fatura bilgileri formu
 
-## Abonelik Yönetimi
-- [ ] Subscriptions/Index.vue — Abonelik listesi (paginated, filterable)
-- [ ] Subscriptions/Show.vue — Abonelik detay
+## Hesap - Ödemeler
+- [ ] Account/Payments/Index.vue — Ödeme geçmişi listesi
+- [ ] Account/Payments/Show.vue — Ödeme detay
 
-## Ödeme Yönetimi
-- [ ] Payments/Index.vue — Ödeme listesi (paginated, filterable, stats)
-- [ ] Payments/Show.vue — Ödeme detay
+## Hesap - Ödeme (Checkout)
+- [ ] Account/Checkout/Index.vue — Checkout sayfası (plan, tutar, fatura bilgisi)
+- [ ] Account/Checkout/Processing.vue — PayTR iframe ödeme işlemi
+- [ ] Account/Checkout/Success.vue — Ödeme başarılı
+- [ ] Account/Checkout/Failed.vue — Ödeme başarısız
 
-## Sistem Ayarları
-- [ ] Settings/General/Index.vue — Genel ayarlar formu (site, firma bilgileri, logo)
+## Hesap - Eklentiler
+- [ ] Account/Addons/Index.vue — Eklenti listesi ve satın alma/iptal
+
+## Hesap - Plan Değişikliği
+- [ ] Account/Plan/Change.vue — Plan yükseltme/düşürme seçenekleri
+- [ ] Account/Plan/Confirm.vue — Plan değişikliği onay (proration)
+
+## Hesap - Kullanıcılar
+- [ ] Account/Users/Index.vue — Takım üyeleri listesi
+- [ ] Account/Users/Show.vue — Kullanıcı detay (rol/durum yönetimi)
+- [ ] Account/Users/Activities.vue — Kullanıcı aktivite geçmişi
+- [ ] Account/Users/Invitations.vue — Davetiye listesi ve yönetimi

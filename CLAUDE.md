@@ -4,14 +4,19 @@ Herkobi, Laravel 12 uzerinde kurulu cok kiracili (multi-tenant) bir SaaS platfor
 
 ---
 
+## 0. Genel Kod Yazım Kuralları
+
+1. asla test yazma
+2. asla konsol komutu çalıştırma. php, npm vb. komutları söyle ben çalıştırırım.
+
 ## 1. Teknik Yigin
 
-| Katman | Teknolojiler |
-|--------|-------------|
-| Backend | PHP 8.4+, Laravel 12, MySQL, Laravel Fortify (2FA), Pest 4, Pint |
+| Katman   | Teknolojiler                                                                                                               |
+| -------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Backend  | PHP 8.4+, Laravel 12, MySQL, Laravel Fortify (2FA), Pest 4, Pint                                                           |
 | Frontend | Vue 3.5 (`<script setup>`), Inertia.js 2, shadcn-vue (new-york-v4 + Reka UI), Tailwind CSS v4, TypeScript, Lucide Vue Next |
-| Araclar | Laravel Wayfinder (tip guvenli route), TanStack Vue Table, VueUse, Vue Sonner |
-| Odeme | PayTR gateway, TRY para birimi, %20 KDV |
+| Araclar  | Laravel Wayfinder (tip guvenli route), TanStack Vue Table, VueUse, Vue Sonner                                              |
+| Odeme    | PayTR gateway, TRY para birimi, %20 KDV                                                                                    |
 
 > Paket versiyonlarinin tam listesi icin asagidaki **Boost Kurallari > Temel Bagalam** bolumune bakin.
 
@@ -72,11 +77,13 @@ resources/js/
 ### Gelistirme Durumu
 
 **Hazir sayfalar:**
+
 - Auth: Login, Register, ForgotPassword, ResetPassword, VerifyEmail, ConfirmPassword, TwoFactorChallenge
 - App: Dashboard, Profile (Profile, Password, TwoFactor, Appearance)
 - Panel: Dashboard, Profile (Profile, Password, TwoFactor, Appearance)
 
 **Frontend'i yapilmamis backend islemleri:**
+
 - Plan, Fiyat, Ozellik, Addon yonetimi (Panel CRUD)
 - Tenant yonetimi ve detay (Panel)
 - Abonelik islemleri (Panel + App)
@@ -89,17 +96,20 @@ resources/js/
 ## 3. Mimari Kurallar
 
 ### Servis Katmani
+
 - Tum is mantigi `app/Services/` icinde. Controller'lar ince tutulur, servis cagirir
 - Her servisin bir interface'i (`app/Contracts/`) vardir
 - Baglamalar `app/Providers/` altindaki service provider'larda yapilir
 - Yeni servis: Interface → Service → ServiceProvider binding sirasi
 
 ### ID ve Enum
+
 - Tum modeller **ULID** tabanli: migration'da `$table->ulid('id')->primary()`, model'de `use HasUlids`
 - PHP 8.2 backed enum'lar zorunlu. Enum degerleri **asla degistirilmez** (DB migration + data migration gerekir)
 - Mevcut enum'lar: `UserType`, `UserStatus`, `TenantUserRole`, `SubscriptionStatus`, `CheckoutType`, `CheckoutStatus`, `PaymentStatus`, `PlanInterval`, `FeatureType`, `AddonType`, `ResetPeriod`, `GracePeriod`, `ProrationType`, `InvitationStatus`
 
 ### Multi-Tenant Izolasyon
+
 - `BaseTenant` soyut modeli global scope ile tenant izolasyonu saglar
 - `Subscription`, `Payment`, `TenantUsage`, `TenantFeature`, `TenantInvitation` → `BaseTenant`'tan turetilir
 - `TenantContextService` aktif tenant'i yonetir, `LoadTenantContext` middleware yukler
@@ -108,22 +118,23 @@ resources/js/
 
 ### Middleware'ler
 
-| Middleware | Gorevi |
-|-----------|--------|
-| `HandleInertiaRequests` | Shared data: auth, tenant, site |
-| `LoadTenantContext` | Tenant context yukleme |
-| `EnsureActiveSubscription` | Aktif abonelik kontrolu |
-| `EnsureActiveUser` | Aktif kullanici kontrolu |
-| `EnsureFeatureAccess` | Ozellik erisim kontrolu |
-| `EnsureTenant` | Tenant zorunlulugu |
-| `EnsureTenantOwner` | Tenant sahibi kontrolu |
-| `EnsureTenantAllowsTeamMembers` | Takim uyesi izni |
-| `EnsureTenantMemberActive` | Aktif uye kontrolu |
-| `EnsureWriteAccess` | Yazma erisimi (status != taslak) |
-| `EnsurePanel` | Panel erisim kontrolu |
-| `HandleAppearance` | Tema tercihi |
+| Middleware                      | Gorevi                           |
+| ------------------------------- | -------------------------------- |
+| `HandleInertiaRequests`         | Shared data: auth, tenant, site  |
+| `LoadTenantContext`             | Tenant context yukleme           |
+| `EnsureActiveSubscription`      | Aktif abonelik kontrolu          |
+| `EnsureActiveUser`              | Aktif kullanici kontrolu         |
+| `EnsureFeatureAccess`           | Ozellik erisim kontrolu          |
+| `EnsureTenant`                  | Tenant zorunlulugu               |
+| `EnsureTenantOwner`             | Tenant sahibi kontrolu           |
+| `EnsureTenantAllowsTeamMembers` | Takim uyesi izni                 |
+| `EnsureTenantMemberActive`      | Aktif uye kontrolu               |
+| `EnsureWriteAccess`             | Yazma erisimi (status != taslak) |
+| `EnsurePanel`                   | Panel erisim kontrolu            |
+| `HandleAppearance`              | Tema tercihi                     |
 
 ### Config ile Davranis Kontrolu (Hibrit Pattern)
+
 - `herkobi.tenant.allow_team_members` — Team ozelligi (UI + servis seviyesi)
 - `herkobi.tenant.allow_multiple_tenants` — Coklu tenant
 - `herkobi.proration.upgrade_behavior` / `downgrade_behavior` — Varsayilan proration
@@ -132,6 +143,7 @@ resources/js/
 - **Hibrit kontrol**: Config kapali → tamamen engel. Config acik → plan bazli `feature.access` middleware ile kontrol
 
 ### Frontend Konvansiyonlar
+
 - **Dual interface**: App sayfalari → `AppLayout`, Panel → `PanelLayout`, Auth → `AuthLayout`
 - **Yeni sayfa**: `pages/app/` veya `pages/panel/` altina
 - **Yeni component**: Bolume ozelse `components/app/` veya `components/panel/`, paylasilacaksa `components/common/`
@@ -145,20 +157,23 @@ resources/js/
 ## 4. Is Mantigi
 
 ### Odeme Akisi
+
 1. Checkout olusturulur → PayTR token alinir → Iframe gosterilir → Webhook callback gelir
 2. `TenantProcessSuccessfulPayment` listener checkout type'a gore yonlendirir:
-   - `NEW/RENEW` → `SubscriptionPurchaseService`
-   - `UPGRADE` → `PlanChangeService.processUpgrade()`
-   - `ADDON/ADDON_RENEW` → `AddonPurchaseService.processCheckout()`
+    - `NEW/RENEW` → `SubscriptionPurchaseService`
+    - `UPGRADE` → `PlanChangeService.processUpgrade()`
+    - `ADDON/ADDON_RENEW` → `AddonPurchaseService.processCheckout()`
 3. Webhook rotasi (`POST /payment/callback`) kimlik dogrulama gerektirmez; imza dogrulama `PayTRService` icinde
 
 ### Proration Sistemi
+
 - 4 senaryo: Upgrade/Downgrade × IMMEDIATE/END_OF_PERIOD
 - Varsayilan `config/herkobi.php`'den, plan bazinda override: `plans.upgrade_proration_type` / `downgrade_proration_type`
 - `ProrationService.calculate()` gun bazli kredi (IMMEDIATE) veya tam fiyat (END_OF_PERIOD)
 - `PlanChangeService` 4 senaryoyu yonetir
 
 ### Addon Sistemi
+
 - Addon'lar `Feature`'a baglidir, plan limitlerini genisletir
 - 3 tip: `INCREMENT` (limite ekler), `UNLIMITED` (limiti kaldirir), `BOOLEAN` (ozelligi acar)
 - `TenantAddon` modeli `Pivot` sinifindan turetilir, global tenant scope vardir
@@ -169,6 +184,7 @@ resources/js/
 ## 5. Veritabani
 
 ### Temel Tablolar
+
 - `users` — ULID, soft delete, 2FA, anonimizasyon
 - `tenants` — ULID, soft delete, JSON account/data
 - `tenant_user` — Pivot (role: owner/staff, status)
@@ -182,6 +198,7 @@ resources/js/
 - `activities` / `notifications` / `archived_notifications` / `settings`
 
 ### Iliski Haritasi
+
 ```
 User ──M:M──▸ Tenant (tenant_user pivot)
 Tenant ──1:M──▸ Subscription, Payment, TenantFeature, TenantUsage, TenantInvitation
@@ -199,15 +216,16 @@ Checkout ──▸ Tenant, PlanPrice, Addon, Payment
 
 ### Zamanlanmis Gorevler
 
-| Siklik | Gorevler |
-|--------|----------|
-| ~15 dk | `ExpireOldCheckoutsJob` |
-| Saatlik | `CheckExpiredSubscriptionsJob`, `CheckTrialExpiryJob` |
-| Gunluk | `ProcessScheduledDowngradesJob`, `ResetMeteredUsageJob`, `CheckExpiredAddonsJob`, `ExpireOldInvitationsJob` |
-| Gunluk (bildirim) | `SendSubscriptionRenewalReminderJob`, `SendTrialEndingReminderJob`, `SendAddonExpiryReminderJob` |
+| Siklik            | Gorevler                                                                                                                                         |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ~15 dk            | `ExpireOldCheckoutsJob`                                                                                                                          |
+| Saatlik           | `CheckExpiredSubscriptionsJob`, `CheckTrialExpiryJob`                                                                                            |
+| Gunluk            | `ProcessScheduledDowngradesJob`, `ResetMeteredUsageJob`, `CheckExpiredAddonsJob`, `ExpireOldInvitationsJob`                                      |
+| Gunluk (bildirim) | `SendSubscriptionRenewalReminderJob`, `SendTrialEndingReminderJob`, `SendAddonExpiryReminderJob`                                                 |
 | Gunluk (temizlik) | `ArchiveOldNotificationsJob` (90 gun), `AnonymizeOldNotificationsJob` (2 yil), `AnonymizeOldActivitiesJob` (2 yil), `SoftDeleteOldActivitiesJob` |
 
 ### Event–Listener Haritalamasi
+
 - `TenantPaymentSucceeded` → `TenantProcessSuccessfulPayment`, `LogTenantPaymentActivity`, `SendTenantPaymentNotifications`
 - `TenantSubscriptionPurchased` → `LogTenantSubscriptionActivity`, `SendTenantWelcomeEmail`
 - `TenantSubscriptionUpgraded/Downgraded/Expired` → `LogTenantSubscriptionActivity` (+ Expired: `SendTenantSubscriptionExpiry`)
@@ -375,7 +393,7 @@ Bu projede alan-ozel yetenekler mevcuttur. Ilgili alanda calisirken ilgili yeten
 ## Constructor'lar
 
 - `__construct()` icinde PHP 8 constructor property promotion kullanin.
-    - <code-snippet>public function __construct(public GitHub $github) { }</code-snippet>
+    - <code-snippet>public function \_\_construct(public GitHub $github) { }</code-snippet>
 - Constructor private degilse sifir parametreli bos `__construct()` metotlarina izin vermeyin.
 
 ## Tip Bildirimleri
@@ -540,4 +558,4 @@ Wayfinder, Laravel rotalari icin TypeScript fonksiyonlari uretir. `@/actions/` (
 - Onay almadan testleri silmeyin.
 - KRITIK: Versiyona ozel Pest dokumantasyonu ve guncel kod ornekleri icin her zaman `search-docs` aracini kullanin.
 - ONEMLI: Pest veya test ile ilgili bir gorevde calistiginizda her zaman `pest-testing` yetenegini aktive edin.
-</laravel-boost-guidelines>
+  </laravel-boost-guidelines>
