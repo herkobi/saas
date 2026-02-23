@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\BillingServiceInterface;
 use App\Events\TenantBillingUpdated;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Helpers\PaymentHelper;
 
-class BillingService implements BillingServiceInterface
+class BillingService
 {
     public function getAccount(Tenant $tenant): array
     {

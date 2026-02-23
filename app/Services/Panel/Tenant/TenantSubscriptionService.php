@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Tenant;
 
-use App\Contracts\Panel\Tenant\TenantSubscriptionServiceInterface;
 use App\Enums\SubscriptionStatus;
 use App\Events\PanelTenantGracePeriodExtended;
 use App\Events\PanelTenantSubscriptionCancelled;
@@ -39,7 +38,7 @@ use Illuminate\Support\Collection;
  * Provides methods for subscription CRUD operations with comprehensive
  * audit logging and event dispatching.
  */
-class TenantSubscriptionService implements TenantSubscriptionServiceInterface
+class TenantSubscriptionService
 {
     /**
      * Get the current active subscription for a tenant.
@@ -341,6 +340,36 @@ class TenantSubscriptionService implements TenantSubscriptionServiceInterface
             $oldStatus,
             $status,
             $reason,
+            $admin,
+            $ipAddress,
+            $userAgent
+        );
+
+        return $subscription->fresh(['price.plan']);
+    }
+
+    /**
+     * Update the custom price for a subscription.
+     */
+    public function updateCustomPrice(
+        Subscription $subscription,
+        ?float $customPrice,
+        ?string $customCurrency,
+        User $admin,
+        string $ipAddress,
+        string $userAgent
+    ): Subscription {
+        $oldPrice = $subscription->custom_price ? (float) $subscription->custom_price : null;
+
+        $subscription->update([
+            'custom_price' => $customPrice,
+            'custom_currency' => $customCurrency,
+        ]);
+
+        \App\Events\PanelTenantSubscriptionCustomPriceUpdated::dispatch(
+            $subscription,
+            $oldPrice,
+            $customPrice,
             $admin,
             $ipAddress,
             $userAgent

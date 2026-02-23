@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Payment;
 
-use App\Contracts\Panel\Payment\PaymentServiceInterface;
+use App\Services\Panel\Payment\PaymentService;
 use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Payment\MarkInvoicedRequest;
@@ -41,10 +41,10 @@ class PaymentController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param PaymentServiceInterface $paymentService Service for payment operations
+     * @param PaymentService $paymentService Service for payment operations
      */
     public function __construct(
-        private readonly PaymentServiceInterface $paymentService
+        private readonly PaymentService $paymentService
     ) {}
 
     /**

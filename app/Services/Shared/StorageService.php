@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-use App\Contracts\Shared\StorageServiceInterface;
 use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
@@ -29,7 +28,7 @@ use Illuminate\Support\Facades\Storage;
  * Service implementation for managing tenant and user
  * storage paths across different disks.
  */
-class StorageService implements StorageServiceInterface
+class StorageService
 {
     /**
      * Get the base path for a tenant.

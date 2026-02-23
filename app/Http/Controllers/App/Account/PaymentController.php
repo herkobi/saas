@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\PaymentServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\PaymentService;
+use App\Services\Shared\TenantContextService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\App\Account\PaymentFilterRequest;
 use Illuminate\Http\RedirectResponse;
@@ -38,10 +38,10 @@ class PaymentController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param PaymentServiceInterface $paymentService Service for payment operations
+     * @param PaymentService $paymentService Service for payment operations
      */
     public function __construct(
-        private readonly PaymentServiceInterface $paymentService
+        private readonly PaymentService $paymentService
     ) {}
 
     /**
@@ -52,7 +52,7 @@ class PaymentController extends Controller
      */
     public function index(PaymentFilterRequest $request): Response
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         $payments = $this->paymentService->getPaginated(
             $tenant,
@@ -76,7 +76,7 @@ class PaymentController extends Controller
      */
     public function show(Request $request, string $paymentId): Response|RedirectResponse
     {
-        $payment = $this->paymentService->findById(app(TenantContextServiceInterface::class)->currentTenant(), $paymentId);
+        $payment = $this->paymentService->findById(app(TenantContextService::class)->currentTenant(), $paymentId);
 
         if (!$payment) {
             return redirect()

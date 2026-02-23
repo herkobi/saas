@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Profile;
 
-use App\Contracts\App\Profile\ProfileServiceInterface;
 use App\Events\TenantProfileDeleted;
 use App\Events\TenantProfileUpdated;
 use App\Models\User;
@@ -30,7 +29,7 @@ use App\Traits\HasTenantContext;
  * Service implementation for managing tenant user profiles
  * including update and delete operations with event dispatching.
  */
-class ProfileService implements ProfileServiceInterface
+class ProfileService
 {
     use HasTenantContext;
 

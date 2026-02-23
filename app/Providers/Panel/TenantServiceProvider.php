@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Panel;
 
-use App\Contracts\Panel\Tenant\TenantServiceInterface;
-use App\Contracts\Panel\Tenant\TenantFeatureServiceInterface;
-use App\Contracts\Panel\Tenant\TenantSubscriptionServiceInterface;
-use App\Services\Panel\Tenant\TenantService;
-use App\Services\Panel\Tenant\TenantFeatureService;
-use App\Services\Panel\Tenant\TenantSubscriptionService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -37,8 +31,6 @@ class TenantServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(TenantServiceInterface::class, TenantService::class);
-        $this->app->bind(TenantFeatureServiceInterface::class, TenantFeatureService::class);
-        $this->app->bind(TenantSubscriptionServiceInterface::class, TenantSubscriptionService::class);
+        //
     }
 }

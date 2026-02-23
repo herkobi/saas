@@ -17,9 +17,9 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\App\Account\AddonPurchaseServiceInterface;
-use App\Contracts\App\Account\PlanChangeServiceInterface;
-use App\Contracts\App\Account\SubscriptionPurchaseServiceInterface;
+use App\Services\App\Account\AddonPurchaseService;
+use App\Services\App\Account\PlanChangeService;
+use App\Services\App\Account\SubscriptionPurchaseService;
 use App\Enums\CheckoutType;
 use App\Events\TenantPaymentSucceeded;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -41,14 +41,14 @@ class TenantProcessSuccessfulPayment implements ShouldQueue
     /**
      * Create a new listener instance.
      *
-     * @param SubscriptionPurchaseServiceInterface $purchaseService
-     * @param PlanChangeServiceInterface $planChangeService
-     * @param AddonPurchaseServiceInterface $addonPurchaseService
+     * @param SubscriptionPurchaseService $purchaseService
+     * @param PlanChangeService $planChangeService
+     * @param AddonPurchaseService $addonPurchaseService
      */
     public function __construct(
-        protected SubscriptionPurchaseServiceInterface $purchaseService,
-        protected PlanChangeServiceInterface $planChangeService,
-        protected AddonPurchaseServiceInterface $addonPurchaseService
+        protected SubscriptionPurchaseService $purchaseService,
+        protected PlanChangeService $planChangeService,
+        protected AddonPurchaseService $addonPurchaseService
     ) {}
 
     /**

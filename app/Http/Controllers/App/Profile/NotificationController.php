@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Profile;
 
-use App\Contracts\Shared\NotificationServiceInterface;
+use App\Services\Shared\NotificationService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\App\Profile\Notification\MarkAsReadRequest;
 use Illuminate\Http\RedirectResponse;
@@ -37,10 +37,10 @@ class NotificationController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param NotificationServiceInterface $notificationService Service for notification operations
+     * @param NotificationService $notificationService Service for notification operations
      */
     public function __construct(
-        private readonly NotificationServiceInterface $notificationService
+        private readonly NotificationService $notificationService
     ) {}
 
     /**

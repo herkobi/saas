@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\SubscriptionPurchaseServiceInterface;
 use App\Enums\CheckoutType;
 use App\Enums\PlanInterval;
 use App\Events\TenantSubscriptionPurchased;
@@ -36,7 +35,7 @@ use Illuminate\Support\Facades\DB;
  * Provides methods for creating new subscriptions and renewing
  * existing ones after successful payment processing.
  */
-class SubscriptionPurchaseService implements SubscriptionPurchaseServiceInterface
+class SubscriptionPurchaseService
 {
     /**
      * Process a successful checkout and create/update subscription.

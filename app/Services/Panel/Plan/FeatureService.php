@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Plan;
 
-use App\Contracts\Panel\Plan\FeatureServiceInterface;
 use App\Events\PanelFeatureCreated;
 use App\Events\PanelFeatureDeleted;
 use App\Events\PanelFeatureUpdated;
@@ -14,7 +13,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-class FeatureService implements FeatureServiceInterface
+class FeatureService
 {
     public function getPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {

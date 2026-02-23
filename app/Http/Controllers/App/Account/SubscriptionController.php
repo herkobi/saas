@@ -18,9 +18,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\FeatureUsageServiceInterface;
-use App\Contracts\App\Account\SubscriptionServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\FeatureUsageService;
+use App\Services\App\Account\SubscriptionService;
+use App\Services\Shared\TenantContextService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,12 +37,12 @@ class SubscriptionController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param SubscriptionServiceInterface $subscriptionService Service for subscription operations
-     * @param FeatureUsageServiceInterface $featureUsageService Service for feature usage operations
+     * @param SubscriptionService $subscriptionService Service for subscription operations
+     * @param FeatureUsageService $featureUsageService Service for feature usage operations
      */
     public function __construct(
-        private readonly SubscriptionServiceInterface $subscriptionService,
-        private readonly FeatureUsageServiceInterface $featureUsageService
+        private readonly SubscriptionService $subscriptionService,
+        private readonly FeatureUsageService $featureUsageService
     ) {}
 
     /**
@@ -53,7 +53,7 @@ class SubscriptionController extends Controller
      */
     public function index(Request $request): Response
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         return Inertia::render('app/Account/Subscription/Index', [
             'subscription' => $this->subscriptionService->getSubscriptionDetails($tenant),

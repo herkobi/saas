@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Tenant;
 
-use App\Contracts\Panel\Tenant\TenantFeatureServiceInterface;
-use App\Contracts\Panel\Tenant\TenantServiceInterface;
+use App\Services\Panel\Tenant\TenantFeatureService;
+use App\Services\Panel\Tenant\TenantService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Tenant\SyncTenantFeaturesRequest;
 use App\Models\Feature;
@@ -41,12 +41,12 @@ class TenantFeatureController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param TenantFeatureServiceInterface $featureService Service for feature operations
-     * @param TenantServiceInterface $tenantService Service for tenant operations
+     * @param TenantFeatureService $featureService Service for feature operations
+     * @param TenantService $tenantService Service for tenant operations
      */
     public function __construct(
-        private readonly TenantFeatureServiceInterface $featureService,
-        private readonly TenantServiceInterface $tenantService
+        private readonly TenantFeatureService $featureService,
+        private readonly TenantService $tenantService
     ) {}
 
     /**

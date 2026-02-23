@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Profile;
 
-use App\Contracts\Panel\Profile\ProfileServiceInterface;
 use App\Events\PanelProfileUpdated;
 use App\Models\User;
 
@@ -28,7 +27,7 @@ use App\Models\User;
  * Service implementation for managing panel user profiles
  * including update operations with event dispatching.
  */
-class ProfileService implements ProfileServiceInterface
+class ProfileService
 {
     /**
      * Update the user's profile.

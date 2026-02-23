@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Panel;
 
-use App\Contracts\Panel\Settings\SettingServiceInterface;
-use App\Services\Panel\Settings\SettingService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -33,6 +31,6 @@ class SettingsServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(SettingServiceInterface::class, SettingService::class);
+        //
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Addon;
 
-use App\Contracts\Panel\Addon\TenantAddonServiceInterface;
 use App\Enums\PlanInterval;
 use App\Models\Addon;
 use App\Models\Tenant;
@@ -12,7 +11,7 @@ use App\Models\TenantAddon;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
-class TenantAddonService implements TenantAddonServiceInterface
+class TenantAddonService
 {
     public function getByTenant(Tenant $tenant): Collection
     {

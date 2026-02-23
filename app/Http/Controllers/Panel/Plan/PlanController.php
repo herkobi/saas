@@ -18,10 +18,10 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Plan;
 
-use App\Contracts\Panel\Plan\FeatureServiceInterface;
-use App\Contracts\Panel\Plan\PlanServiceInterface;
-use App\Contracts\Panel\Plan\PlanPriceServiceInterface;
-use App\Contracts\Panel\Tenant\TenantServiceInterface;
+use App\Services\Panel\Plan\FeatureService;
+use App\Services\Panel\Plan\PlanService;
+use App\Services\Panel\Plan\PlanPriceService;
+use App\Services\Panel\Tenant\TenantService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Plan\StorePlanRequest;
 use App\Http\Requests\Panel\Plan\UpdatePlanRequest;
@@ -42,16 +42,16 @@ class PlanController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param PlanServiceInterface $planService Service for plan operations
-     * @param PlanPriceServiceInterface $planPriceService Service for plan price operations
-     * @param FeatureServiceInterface $featureService Service for feature operations
-     * @param TenantServiceInterface $tenantService Service for tenant operations
+     * @param PlanService $planService Service for plan operations
+     * @param PlanPriceService $planPriceService Service for plan price operations
+     * @param FeatureService $featureService Service for feature operations
+     * @param TenantService $tenantService Service for tenant operations
      */
     public function __construct(
-        private readonly PlanServiceInterface $planService,
-        private readonly PlanPriceServiceInterface $planPriceService,
-        private readonly FeatureServiceInterface $featureService,
-        private readonly TenantServiceInterface $tenantService
+        private readonly PlanService $planService,
+        private readonly PlanPriceService $planPriceService,
+        private readonly FeatureService $featureService,
+        private readonly TenantService $tenantService
     ) {}
 
     /**

@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Plan;
 
-use App\Contracts\Panel\Plan\FeatureServiceInterface;
+use App\Services\Panel\Plan\FeatureService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Plan\StoreFeatureRequest;
 use App\Http\Requests\Panel\Plan\UpdateFeatureRequest;
@@ -38,10 +38,10 @@ class FeatureController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param FeatureServiceInterface $featureService Service for feature operations
+     * @param FeatureService $featureService Service for feature operations
      */
     public function __construct(
-        private readonly FeatureServiceInterface $featureService
+        private readonly FeatureService $featureService
     ) {}
 
     /**

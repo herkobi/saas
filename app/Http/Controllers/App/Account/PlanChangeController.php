@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\PlanChangeServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\PlanChangeService;
+use App\Services\Shared\TenantContextService;
 use App\Http\Controllers\Controller;
 use App\Enums\CheckoutType;
 use App\Http\Requests\App\Account\ChangePlanRequest;
@@ -40,10 +40,10 @@ class PlanChangeController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param PlanChangeServiceInterface $planChangeService The plan change service
+     * @param PlanChangeService $planChangeService The plan change service
      */
     public function __construct(
-        private readonly PlanChangeServiceInterface $planChangeService
+        private readonly PlanChangeService $planChangeService
     ) {}
 
     /**
@@ -53,7 +53,7 @@ class PlanChangeController extends Controller
      */
     public function index(): Response
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
         $subscription = $tenant->subscription;
 
         if (!$subscription) {
@@ -102,7 +102,7 @@ class PlanChangeController extends Controller
      */
     public function confirm(string $planPriceId): Response
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
         $subscription = $tenant->subscription;
 
         if (!$subscription) {
@@ -149,7 +149,7 @@ class PlanChangeController extends Controller
      */
     public function change(ChangePlanRequest $request): RedirectResponse
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
         $subscription = $tenant->subscription;
 
         if (!$subscription) {
@@ -190,7 +190,7 @@ class PlanChangeController extends Controller
      */
     public function cancelDowngrade(): RedirectResponse
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
         $subscription = $tenant->subscription;
 
         if (!$subscription || !$subscription->next_plan_price_id) {

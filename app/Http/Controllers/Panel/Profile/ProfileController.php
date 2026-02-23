@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Profile;
 
-use App\Contracts\Panel\Profile\ProfileServiceInterface;
+use App\Services\Panel\Profile\ProfileService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Profile\ProfileUpdateRequest;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -38,10 +38,10 @@ class ProfileController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param ProfileServiceInterface $profileService Service for profile operations
+     * @param ProfileService $profileService Service for profile operations
      */
     public function __construct(
-        private readonly ProfileServiceInterface $profileService
+        private readonly ProfileService $profileService
     ) {}
 
     /**

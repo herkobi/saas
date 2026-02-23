@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import InputError from '@/components/common/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
+import AccountLayout from '@/pages/app/Account/layout/Layout.vue';
 import { dashboard } from '@/routes/app';
 import { index as billingIndex, update } from '@/routes/app/account/billing';
 import type { BreadcrumbItem } from '@/types';
@@ -24,6 +25,7 @@ const props = defineProps<{
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Başlangıç', href: dashboard().url },
+    { title: 'Hesap Yönetimi' },
     { title: 'Fatura Bilgileri', href: billingIndex().url },
 ];
 
@@ -48,8 +50,9 @@ function submit() {
     <Head title="Fatura Bilgileri" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
-            <div class="mx-auto w-full max-w-2xl">
+        <AccountLayout>
+        <div class="flex flex-col gap-6">
+            <div class="w-full max-w-2xl">
                 <Card>
                     <CardHeader>
                         <div class="flex items-center gap-2">
@@ -146,5 +149,6 @@ function submit() {
                 </Card>
             </div>
         </div>
+        </AccountLayout>
     </AppLayout>
 </template>

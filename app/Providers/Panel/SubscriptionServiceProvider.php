@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Panel;
 
-use App\Contracts\Panel\Subscription\SubscriptionServiceInterface;
-use App\Services\Panel\Subscription\SubscriptionService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -33,6 +31,6 @@ class SubscriptionServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(SubscriptionServiceInterface::class, SubscriptionService::class);
+        //
     }
 }

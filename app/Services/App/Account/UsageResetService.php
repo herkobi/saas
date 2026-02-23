@@ -2,8 +2,7 @@
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\UsageResetServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Enums\FeatureType;
 use App\Events\TenantMeteredUsageReset;
 use App\Models\Feature;
@@ -12,10 +11,10 @@ use App\Models\TenantUsage;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
-class UsageResetService implements UsageResetServiceInterface
+class UsageResetService
 {
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService
+        private readonly TenantContextService $tenantContextService
     ) {}
 
     public function resetExpiredUsages(): int

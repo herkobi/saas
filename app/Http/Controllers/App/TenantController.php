@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App;
 
-use App\Contracts\App\TenantServiceInterface;
+use App\Services\App\TenantService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ use Inertia\Response;
 class TenantController extends Controller
 {
     public function __construct(
-        private readonly TenantServiceInterface $tenantService
+        private readonly TenantService $tenantService
     ) {}
 
     public function create(Request $request): Response|RedirectResponse

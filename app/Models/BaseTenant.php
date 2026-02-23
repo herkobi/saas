@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,7 +16,7 @@ abstract class BaseTenant extends Model
         parent::booted();
 
         static::addGlobalScope('tenant', function (Builder $builder) {
-            $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+            $tenant = app(TenantContextService::class)->currentTenant();
 
             if ($tenant instanceof Tenant) {
                 $builder->where($builder->getModel()->getTable() . '.tenant_id', $tenant->id);
@@ -25,7 +25,7 @@ abstract class BaseTenant extends Model
 
         static::creating(function (Model $model) {
             if (empty($model->tenant_id)) {
-                $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+                $tenant = app(TenantContextService::class)->currentTenant();
 
                 if ($tenant instanceof Tenant) {
                     $model->tenant_id = $tenant->id;

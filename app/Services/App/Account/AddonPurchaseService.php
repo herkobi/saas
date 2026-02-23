@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\AddonPurchaseServiceInterface;
 use App\Enums\CheckoutType;
 use App\Enums\PlanInterval;
 use App\Events\TenantAddonPurchased;
@@ -19,7 +18,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class AddonPurchaseService implements AddonPurchaseServiceInterface
+class AddonPurchaseService
 {
     public function getAvailableAddons(Tenant $tenant): Collection
     {

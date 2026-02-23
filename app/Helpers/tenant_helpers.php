@@ -15,7 +15,7 @@
 
 declare(strict_types=1);
 
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Models\Tenant;
 
 if (!function_exists('current_tenant')) {
@@ -26,6 +26,6 @@ if (!function_exists('current_tenant')) {
      */
     function current_tenant(): ?Tenant
     {
-        return app(TenantContextServiceInterface::class)->currentTenant();
+        return app(TenantContextService::class)->currentTenant();
     }
 }

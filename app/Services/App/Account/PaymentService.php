@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\PaymentServiceInterface;
 use App\Models\Payment;
 use App\Models\Tenant;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class PaymentService implements PaymentServiceInterface
+class PaymentService
 {
     public function getPaginated(Tenant $tenant, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {

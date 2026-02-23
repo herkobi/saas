@@ -2,8 +2,8 @@
 
 namespace App\Actions\Fortify;
 
-use App\Contracts\App\Account\InvitationServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\InvitationService;
+use App\Services\Shared\TenantContextService;
 use App\Enums\InvitationStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\TenantUserRole;
@@ -24,7 +24,7 @@ class CreateNewUser implements CreatesNewUsers
     use PasswordValidationRules;
 
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService
+        private readonly TenantContextService $tenantContextService
     ) {}
 
     /**
@@ -109,8 +109,8 @@ class CreateNewUser implements CreatesNewUsers
             return;
         }
 
-        /** @var InvitationServiceInterface $invitationService */
-        $invitationService = app(InvitationServiceInterface::class);
+        /** @var InvitationService $invitationService */
+        $invitationService = app(InvitationService::class);
 
         /** @var TenantInvitation $invitation */
         foreach ($pendingInvitations as $invitation) {

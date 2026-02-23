@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Profile;
 
-use App\Contracts\App\Profile\TwoFactorServiceInterface;
 use App\Events\TenantTwoFactorDisabled;
 use App\Events\TenantTwoFactorEnabled;
 use App\Models\User;
@@ -30,7 +29,7 @@ use App\Traits\HasTenantContext;
  * Service implementation for managing tenant user two-factor authentication
  * including enable and disable operations with event dispatching.
  */
-class TwoFactorService implements TwoFactorServiceInterface
+class TwoFactorService
 {
     use HasTenantContext;
 

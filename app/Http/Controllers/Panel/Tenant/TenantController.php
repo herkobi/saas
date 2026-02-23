@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Tenant;
 
-use App\Contracts\Panel\Tenant\TenantServiceInterface;
+use App\Services\Panel\Tenant\TenantService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Tenant\TenantFilterRequest;
 use App\Http\Requests\Panel\Tenant\UpdateTenantRequest;
@@ -41,10 +41,10 @@ class TenantController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param TenantServiceInterface $tenantService Service for tenant operations
+     * @param TenantService $tenantService Service for tenant operations
      */
     public function __construct(
-        private readonly TenantServiceInterface $tenantService
+        private readonly TenantService $tenantService
     ) {}
 
     /**

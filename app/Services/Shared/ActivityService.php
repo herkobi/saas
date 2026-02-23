@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-use App\Contracts\Shared\ActivityServiceInterface;
 use App\Events\ActivityLogged;
 use App\Models\Activity;
 use App\Models\User;
@@ -31,7 +30,7 @@ use Illuminate\Support\Str;
  * Service implementation for managing panel user activities including
  * activity logging, retrieval, and cache management for the panel context.
  */
-class ActivityService implements ActivityServiceInterface
+class ActivityService
 {
     /**
      * Log user-specific activity with full context.

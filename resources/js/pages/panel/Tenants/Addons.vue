@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import { Calendar, Package, X } from 'lucide-vue-next';
 import { ref } from 'vue';
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
+import EmptyState from '@/components/common/EmptyState.vue';
 import InputError from '@/components/common/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,9 +32,9 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { formatCurrency, formatDate } from '@/composables/useFormatting';
-import { useTenantTabs } from '@/composables/useTenantTabs';
 import PanelLayout from '@/layouts/PanelLayout.vue';
-import { index } from '@/routes/panel/tenants';
+import TenantLayout from '@/pages/panel/Tenants/layout/Layout.vue';
+import { index, show as tenantShow } from '@/routes/panel/tenants';
 import { index as addonsIndex, extend, cancel } from '@/routes/panel/tenants/addons';
 import type { BreadcrumbItem } from '@/types';
 import type { TenantAddon } from '@/types/billing';
@@ -45,11 +47,10 @@ type Props = {
 };
 
 const props = defineProps<Props>();
-const tabs = useTenantTabs(props.tenant.id);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Müşteriler', href: index().url },
-    { title: props.tenant.name, href: `/panel/tenants/${props.tenant.id}` },
+    { title: props.tenant.name, href: tenantShow(props.tenant.id).url },
     { title: 'Eklentiler', href: addonsIndex(props.tenant.id).url },
 ];
 
@@ -72,10 +73,23 @@ function submitExtend() {
     });
 }
 
+const showConfirm = ref(false);
+let pendingConfirmAction: (() => void) | null = null;
+
+function requestConfirm(action: () => void) {
+    pendingConfirmAction = action;
+    showConfirm.value = true;
+}
+
+function onConfirmed() {
+    pendingConfirmAction?.();
+    pendingConfirmAction = null;
+}
+
 function handleCancel(addonId: string) {
-    if (confirm('Bu eklentiyi iptal etmek istediğinize emin misiniz?')) {
+    requestConfirm(() => {
         router.post(cancel({ tenant: props.tenant.id, addon: addonId }).url, {}, { preserveScroll: true });
-    }
+    });
 }
 
 const addonTypeLabels: Record<string, string> = {
@@ -89,27 +103,12 @@ const addonTypeLabels: Record<string, string> = {
     <Head title="Eklentiler" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
-            <div>
-                <h1 class="text-lg font-semibold">{{ tenant.name }}</h1>
-                <p class="text-sm text-muted-foreground">Eklenti yönetimi</p>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="flex gap-1 overflow-x-auto border-b">
-                <Link
-                    v-for="tab in tabs"
-                    :key="tab.href"
-                    :href="tab.href"
-                    class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="tab.href === addonsIndex(tenant.id).url
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'"
-                >
-                    {{ tab.title }}
-                </Link>
-            </div>
-
+        <TenantLayout
+            :tenant-id="tenant.id"
+            :tenant-name="tenant.name"
+            :tenant-code="tenant.code"
+            :tenant-slug="tenant.slug"
+        >
             <!-- Active Addons -->
             <Card>
                 <CardHeader>
@@ -163,10 +162,7 @@ const addonTypeLabels: Record<string, string> = {
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <Package class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Aktif eklenti bulunmuyor</p>
-                    </div>
+                    <EmptyState v-else :icon="Package" message="Aktif eklenti bulunmuyor" />
                 </CardContent>
             </Card>
 
@@ -203,7 +199,7 @@ const addonTypeLabels: Record<string, string> = {
                     </Table>
                 </CardContent>
             </Card>
-        </div>
+        </TenantLayout>
 
         <!-- Extend Dialog -->
         <Dialog v-model:open="showExtendDialog">
@@ -225,5 +221,6 @@ const addonTypeLabels: Record<string, string> = {
                 </form>
             </DialogContent>
         </Dialog>
+        <ConfirmDialog v-model="showConfirm" description="Bu eklentiyi iptal etmek istediğinize emin misiniz?" @confirm="onConfirmed" />
     </PanelLayout>
 </template>

@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-use App\Contracts\Shared\NotificationServiceInterface;
 use App\Helpers\MaskHelper;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -30,7 +29,7 @@ use Illuminate\Support\Facades\DB;
  * Service implementation for managing user notifications including
  * retrieval, reading, and archiving operations.
  */
-class NotificationService implements NotificationServiceInterface
+class NotificationService
 {
     /**
      * Get paginated notifications for the authenticated user.

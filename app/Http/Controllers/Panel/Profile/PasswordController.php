@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Profile;
 
-use App\Contracts\Panel\Profile\PasswordServiceInterface;
+use App\Services\Panel\Profile\PasswordService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Profile\UpdatePasswordRequest;
 use Illuminate\Http\RedirectResponse;
@@ -36,10 +36,10 @@ class PasswordController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param PasswordServiceInterface $passwordService Service for password operations
+     * @param PasswordService $passwordService Service for password operations
      */
     public function __construct(
-        private readonly PasswordServiceInterface $passwordService
+        private readonly PasswordService $passwordService
     ) {}
 
     /**

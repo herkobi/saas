@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\FeatureUsageServiceInterface;
-use App\Contracts\App\Account\UserServiceInterface;
+use App\Services\App\Account\FeatureUsageService;
+use App\Services\App\Account\UserService;
 use App\Http\Controllers\Controller;
 use App\Enums\UserStatus;
 use App\Http\Requests\App\Account\UpdateUserRoleRequest;
@@ -21,8 +21,8 @@ class UserController extends Controller
     use HasTenantContext;
 
     public function __construct(
-        private readonly UserServiceInterface $userService,
-        private readonly FeatureUsageServiceInterface $featureUsageService
+        private readonly UserService $userService,
+        private readonly FeatureUsageService $featureUsageService
     ) {}
 
     public function index(Request $request): Response|RedirectResponse

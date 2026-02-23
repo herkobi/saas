@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use Closure;
 use Illuminate\Http\Request;
 
 class LoadTenantContext
 {
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService
+        private readonly TenantContextService $tenantContextService
     ) {}
 
     public function handle(Request $request, Closure $next)

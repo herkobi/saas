@@ -11,6 +11,8 @@ import {
     TrendingUp,
 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -302,29 +304,11 @@ function payBadgeVariant(status: string): 'default' | 'secondary' | 'destructive
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <CreditCard class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Ödeme bulunamadı</p>
-                    </div>
+                    <EmptyState v-else :icon="CreditCard" message="Ödeme bulunamadı" />
                 </CardContent>
             </Card>
 
-            <!-- Pagination -->
-            <div v-if="payments.last_page > 1" class="flex items-center justify-between">
-                <p class="text-sm text-muted-foreground">
-                    {{ payments.from }}–{{ payments.to }} / {{ payments.total }} ödeme
-                </p>
-                <div class="flex gap-2">
-                    <Button variant="outline" size="sm" :disabled="!payments.links.prev" as-child>
-                        <Link v-if="payments.links.prev" :href="payments.links.prev">Önceki</Link>
-                        <span v-else>Önceki</span>
-                    </Button>
-                    <Button variant="outline" size="sm" :disabled="!payments.links.next" as-child>
-                        <Link v-if="payments.links.next" :href="payments.links.next">Sonraki</Link>
-                        <span v-else>Sonraki</span>
-                    </Button>
-                </div>
-            </div>
+            <SimplePagination :data="payments" label="ödeme" />
         </div>
     </PanelLayout>
 </template>

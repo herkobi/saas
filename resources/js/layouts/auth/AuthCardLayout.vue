@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AppLogoIcon from '@/components/common/AppLogoIcon.vue';
 import {
     Card,
@@ -9,6 +10,10 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { home } from '@/routes';
+
+const page = usePage();
+const siteName = computed(() => page.props.site?.name ?? 'Herkobi');
+const siteLogo = computed(() => page.props.site?.logo ?? null);
 
 defineProps<{
     title?: string;
@@ -26,7 +31,14 @@ defineProps<{
                 class="flex items-center gap-2 self-center font-medium"
             >
                 <div class="flex h-9 w-9 items-center justify-center">
+                    <img
+                        v-if="siteLogo"
+                        :src="siteLogo"
+                        :alt="siteName"
+                        class="size-9 object-contain"
+                    />
                     <AppLogoIcon
+                        v-else
                         class="size-9 fill-current text-black dark:text-white"
                     />
                 </div>

@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Contracts\App\Account\UsageResetServiceInterface;
+use App\Services\App\Account\UsageResetService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,7 +15,7 @@ class ResetMeteredUsageJob implements ShouldQueue
     public int $tries = 3;
     public int $timeout = 60;
 
-    public function handle(UsageResetServiceInterface $service): void
+    public function handle(UsageResetService $service): void
     {
         $service->resetExpiredUsages();
     }

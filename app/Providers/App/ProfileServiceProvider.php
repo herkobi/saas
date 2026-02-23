@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\App;
 
-use App\Contracts\App\Profile\PasswordServiceInterface;
-use App\Contracts\App\Profile\ProfileServiceInterface;
-use App\Contracts\App\Profile\TwoFactorServiceInterface;
-use App\Services\App\Profile\PasswordService;
-use App\Services\App\Profile\ProfileService;
-use App\Services\App\Profile\TwoFactorService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -37,8 +31,6 @@ class ProfileServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(ProfileServiceInterface::class, ProfileService::class);
-        $this->app->bind(PasswordServiceInterface::class, PasswordService::class);
-        $this->app->bind(TwoFactorServiceInterface::class, TwoFactorService::class);
+        //
     }
 }

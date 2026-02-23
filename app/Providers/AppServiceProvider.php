@@ -2,17 +2,7 @@
 
 namespace App\Providers;
 
-use App\Contracts\Shared\ActivityServiceInterface;
-use App\Contracts\Shared\NotificationServiceInterface;
-use App\Contracts\Shared\StorageServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
-use App\Contracts\Shared\UserAnonymizationServiceInterface;
 use App\Enums\ProrationType;
-use App\Services\Shared\ActivityService;
-use App\Services\Shared\NotificationService;
-use App\Services\Shared\StorageService;
-use App\Services\Shared\TenantContextService;
-use App\Services\Shared\UserAnonymizationService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,7 +14,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerPanelProviders();
         $this->registerTenantProviders();
-        $this->sharedProviders();
     }
 
     /**
@@ -84,14 +73,5 @@ class AppServiceProvider extends ServiceProvider
                 "Invalid herkobi.proration.downgrade_behavior: '{$downgrade}'. Valid: " . implode(', ', $validProrationTypes)
             );
         }
-    }
-
-    private function sharedProviders(): void
-    {
-        $this->app->bind(ActivityServiceInterface::class, ActivityService::class);
-        $this->app->bind(NotificationServiceInterface::class, NotificationService::class);
-        $this->app->bind(StorageServiceInterface::class, StorageService::class);
-        $this->app->bind(TenantContextServiceInterface::class, TenantContextService::class);
-        $this->app->bind(UserAnonymizationServiceInterface::class, UserAnonymizationService::class);
     }
 }

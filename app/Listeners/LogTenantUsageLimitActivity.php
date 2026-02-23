@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Events\TenantUsageLimitReached;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -30,10 +30,10 @@ class LogTenantUsageLimitActivity implements ShouldQueue
     /**
      * Create the event listener.
      *
-     * @param ActivityServiceInterface $activityService The activity logging service
+     * @param ActivityService $activityService The activity logging service
      */
     public function __construct(
-        private readonly ActivityServiceInterface $activityService
+        private readonly ActivityService $activityService
     ) {}
 
     /**

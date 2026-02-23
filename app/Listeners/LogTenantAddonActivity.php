@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Events\TenantAddonCancelled;
 use App\Events\TenantAddonExpired;
 use App\Events\TenantAddonPurchased;
@@ -13,7 +13,7 @@ use Illuminate\Events\Dispatcher;
 class LogTenantAddonActivity
 {
     public function __construct(
-        protected ActivityServiceInterface $activityService
+        protected ActivityService $activityService
     ) {}
 
     /**

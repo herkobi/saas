@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Plan;
 
-use App\Contracts\Panel\Plan\PlanPriceServiceInterface;
+use App\Services\Panel\Plan\PlanPriceService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Plan\StorePlanPriceRequest;
 use App\Http\Requests\Panel\Plan\UpdatePlanPriceRequest;
@@ -38,10 +38,10 @@ class PlanPriceController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param PlanPriceServiceInterface $planPriceService Service for plan price operations
+     * @param PlanPriceService $planPriceService Service for plan price operations
      */
     public function __construct(
-        private readonly PlanPriceServiceInterface $planPriceService
+        private readonly PlanPriceService $planPriceService
     ) {}
 
     /**

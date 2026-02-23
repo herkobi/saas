@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Traits;
 
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
 
@@ -12,7 +12,7 @@ trait HasTenantContext
 {
     protected function currentTenant(): ?Tenant
     {
-        return app(TenantContextServiceInterface::class)->currentTenant();
+        return app(TenantContextService::class)->currentTenant();
     }
 
     protected function requireTenant(): Tenant|RedirectResponse

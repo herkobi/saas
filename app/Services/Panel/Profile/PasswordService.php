@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Profile;
 
-use App\Contracts\Panel\Profile\PasswordServiceInterface;
 use App\Events\PanelPasswordChanged;
 use App\Models\User;
 
@@ -28,7 +27,7 @@ use App\Models\User;
  * Service implementation for managing panel user passwords
  * including update operations with event dispatching.
  */
-class PasswordService implements PasswordServiceInterface
+class PasswordService
 {
     /**
      * Update the user's password.

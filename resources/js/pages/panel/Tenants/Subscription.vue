@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Head, router, useForm } from '@inertiajs/vue3';
 import {
     Ban,
     Calendar,
     Clock,
     CreditCard,
+    Pencil,
     Plus,
     RefreshCw,
     Repeat,
+    X,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
+import EmptyState from '@/components/common/EmptyState.vue';
 import InputError from '@/components/common/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -47,9 +51,9 @@ import {
 } from '@/components/ui/table';
 import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import { useSubscriptionStatus } from '@/composables/useSubscriptionStatus';
-import { useTenantTabs } from '@/composables/useTenantTabs';
 import PanelLayout from '@/layouts/PanelLayout.vue';
-import { index } from '@/routes/panel/tenants';
+import TenantLayout from '@/pages/panel/Tenants/layout/Layout.vue';
+import { index, show as tenantShow } from '@/routes/panel/tenants';
 import {
     show,
     store,
@@ -78,11 +82,10 @@ type Props = {
 
 const props = defineProps<Props>();
 const { statusLabel } = useSubscriptionStatus();
-const tabs = useTenantTabs(props.tenant.id);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Müşteriler', href: index().url },
-    { title: props.tenant.name, href: `/panel/tenants/${props.tenant.id}` },
+    { title: props.tenant.name, href: tenantShow(props.tenant.id).url },
     { title: 'Abonelik', href: show(props.tenant.id).url },
 ];
 
@@ -92,6 +95,7 @@ const showCancelDialog = ref(false);
 const showExtendTrialDialog = ref(false);
 const showExtendGraceDialog = ref(false);
 const showChangePlanDialog = ref(false);
+const showCustomPriceDialog = ref(false);
 
 // Forms
 const createForm = useForm({
@@ -117,6 +121,11 @@ const changePlanForm = useForm({
     immediate: true,
 });
 
+const customPriceForm = useForm({
+    custom_price: props.subscription?.custom_price ?? null as number | null,
+    custom_currency: props.subscription?.custom_currency ?? 'TRY',
+});
+
 function submitCreate() {
     createForm.post(store(props.tenant.id).url, {
         onSuccess: () => { showCreateDialog.value = false; createForm.reset(); },
@@ -129,10 +138,23 @@ function submitCancel() {
     });
 }
 
+const showConfirm = ref(false);
+let pendingConfirmAction: (() => void) | null = null;
+
+function requestConfirm(action: () => void) {
+    pendingConfirmAction = action;
+    showConfirm.value = true;
+}
+
+function onConfirmed() {
+    pendingConfirmAction?.();
+    pendingConfirmAction = null;
+}
+
 function submitRenew() {
-    if (confirm('Aboneliği yenilemek istediğinize emin misiniz?')) {
+    requestConfirm(() => {
         router.post(renew(props.tenant.id).url, {}, { preserveScroll: true });
-    }
+    });
 }
 
 function submitExtendTrial() {
@@ -150,6 +172,25 @@ function submitExtendGrace() {
 function submitChangePlan() {
     changePlanForm.post(changePlan(props.tenant.id).url, {
         onSuccess: () => { showChangePlanDialog.value = false; changePlanForm.reset(); },
+    });
+}
+
+function openCustomPriceDialog() {
+    customPriceForm.custom_price = props.subscription?.custom_price ?? null;
+    customPriceForm.custom_currency = props.subscription?.custom_currency ?? 'TRY';
+    showCustomPriceDialog.value = true;
+}
+
+function submitCustomPrice() {
+    customPriceForm.put(`/panel/tenants/${props.tenant.id}/subscription/custom-price`, {
+        onSuccess: () => { showCustomPriceDialog.value = false; },
+    });
+}
+
+function removeCustomPrice() {
+    const form = useForm({ custom_price: null, custom_currency: null });
+    form.put(`/panel/tenants/${props.tenant.id}/subscription/custom-price`, {
+        onSuccess: () => { showCustomPriceDialog.value = false; },
     });
 }
 
@@ -174,28 +215,12 @@ function intervalLabel(interval: string, count: number): string {
     <Head title="Abonelik Yönetimi" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
-            <!-- Header -->
-            <div>
-                <h1 class="text-lg font-semibold">{{ tenant.name }}</h1>
-                <p class="text-sm text-muted-foreground">Abonelik yönetimi</p>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="flex gap-1 overflow-x-auto border-b">
-                <Link
-                    v-for="tab in tabs"
-                    :key="tab.href"
-                    :href="tab.href"
-                    class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="tab.href === show(tenant.id).url
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'"
-                >
-                    {{ tab.title }}
-                </Link>
-            </div>
-
+        <TenantLayout
+            :tenant-id="tenant.id"
+            :tenant-name="tenant.name"
+            :tenant-code="tenant.code"
+            :tenant-slug="tenant.slug"
+        >
             <!-- Current Subscription -->
             <template v-if="subscription">
                 <Card>
@@ -216,8 +241,12 @@ function intervalLabel(interval: string, count: number): string {
                         <dl class="grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
                             <div>
                                 <dt class="text-muted-foreground">Fiyat</dt>
-                                <dd class="font-medium">
+                                <dd class="flex items-center gap-2 font-medium">
                                     {{ formatCurrency(subscription.custom_price ?? subscription.plan_price?.price ?? 0) }}
+                                    <Badge v-if="subscription.custom_price" variant="outline" class="text-xs">Özel</Badge>
+                                    <Button variant="ghost" size="icon" class="h-5 w-5" @click="openCustomPriceDialog">
+                                        <Pencil class="h-3 w-3" />
+                                    </Button>
                                 </dd>
                             </div>
                             <div>
@@ -302,13 +331,13 @@ function intervalLabel(interval: string, count: number): string {
             <!-- No Subscription -->
             <template v-else>
                 <Card>
-                    <CardContent class="flex flex-col items-center justify-center py-12 text-center">
-                        <CreditCard class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Aktif abonelik bulunmuyor</p>
-                        <Button size="sm" class="mt-4" @click="showCreateDialog = true">
-                            <Plus class="mr-1.5 h-4 w-4" />
-                            Abonelik Oluştur
-                        </Button>
+                    <CardContent>
+                        <EmptyState :icon="CreditCard" message="Aktif abonelik bulunmuyor">
+                            <Button size="sm" @click="showCreateDialog = true">
+                                <Plus class="mr-1.5 h-4 w-4" />
+                                Abonelik Oluştur
+                            </Button>
+                        </EmptyState>
                     </CardContent>
                 </Card>
             </template>
@@ -343,7 +372,7 @@ function intervalLabel(interval: string, count: number): string {
                     </Table>
                 </CardContent>
             </Card>
-        </div>
+        </TenantLayout>
 
         <!-- Create Subscription Dialog -->
         <Dialog v-model:open="showCreateDialog">
@@ -482,5 +511,63 @@ function intervalLabel(interval: string, count: number): string {
                 </form>
             </DialogContent>
         </Dialog>
+        <!-- Custom Price Dialog -->
+        <Dialog v-model:open="showCustomPriceDialog">
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Özel Fiyat Belirle</DialogTitle>
+                    <DialogDescription>Bu müşteri için plan fiyatından bağımsız özel bir fiyat belirleyin. Boş bırakırsanız plan fiyatı geçerli olur.</DialogDescription>
+                </DialogHeader>
+                <form @submit.prevent="submitCustomPrice" class="space-y-4">
+                    <div class="grid gap-2">
+                        <Label for="custom_price">Özel Fiyat</Label>
+                        <div class="flex gap-2">
+                            <Input
+                                id="custom_price"
+                                type="number"
+                                v-model.number="customPriceForm.custom_price"
+                                min="0"
+                                step="0.01"
+                                placeholder="Plan fiyatı geçerli"
+                                class="flex-1"
+                            />
+                            <Input
+                                id="custom_currency"
+                                v-model="customPriceForm.custom_currency"
+                                maxlength="3"
+                                class="w-20"
+                                placeholder="TRY"
+                            />
+                        </div>
+                        <InputError :message="customPriceForm.errors.custom_price" />
+                        <InputError :message="customPriceForm.errors.custom_currency" />
+                        <p v-if="subscription?.plan_price?.price" class="text-xs text-muted-foreground">
+                            Plan fiyatı: {{ formatCurrency(subscription.plan_price.price) }}
+                        </p>
+                    </div>
+                    <DialogFooter class="gap-2 sm:gap-0">
+                        <Button
+                            v-if="subscription?.custom_price"
+                            type="button"
+                            variant="outline"
+                            @click="removeCustomPrice"
+                        >
+                            <X class="mr-1.5 h-4 w-4" />
+                            Özel Fiyatı Kaldır
+                        </Button>
+                        <Button type="button" variant="outline" @click="showCustomPriceDialog = false">İptal</Button>
+                        <Button type="submit" :disabled="customPriceForm.processing">Kaydet</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+
+        <ConfirmDialog
+            v-model="showConfirm"
+            description="Aboneliği yenilemek istediğinize emin misiniz?"
+            :destructive="false"
+            confirm-label="Yenile"
+            @confirm="onConfirmed"
+        />
     </PanelLayout>
 </template>

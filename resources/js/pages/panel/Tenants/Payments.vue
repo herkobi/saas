@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { CreditCard, TrendingUp, Clock, AlertTriangle } from 'lucide-vue-next';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -19,9 +20,9 @@ import {
 } from '@/components/ui/table';
 import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import { usePaymentStatus } from '@/composables/usePaymentStatus';
-import { useTenantTabs } from '@/composables/useTenantTabs';
 import PanelLayout from '@/layouts/PanelLayout.vue';
-import { index } from '@/routes/panel/tenants';
+import TenantLayout from '@/pages/panel/Tenants/layout/Layout.vue';
+import { index, show as tenantShow } from '@/routes/panel/tenants';
 import { index as paymentsIndex } from '@/routes/panel/tenants/payments';
 import type { BreadcrumbItem } from '@/types';
 import type { PaginatedData } from '@/types/common';
@@ -42,11 +43,10 @@ type Props = {
 
 const props = defineProps<Props>();
 const { statusLabel, statusColor } = usePaymentStatus();
-const tabs = useTenantTabs(props.tenant.id);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Müşteriler', href: index().url },
-    { title: props.tenant.name, href: `/panel/tenants/${props.tenant.id}` },
+    { title: props.tenant.name, href: tenantShow(props.tenant.id).url },
     { title: 'Ödemeler', href: paymentsIndex(props.tenant.id).url },
 ];
 
@@ -66,27 +66,12 @@ function paymentBadgeVariant(status: string): 'default' | 'secondary' | 'destruc
     <Head title="Ödemeler" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
-            <div>
-                <h1 class="text-lg font-semibold">{{ tenant.name }}</h1>
-                <p class="text-sm text-muted-foreground">Ödeme geçmişi</p>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="flex gap-1 overflow-x-auto border-b">
-                <Link
-                    v-for="tab in tabs"
-                    :key="tab.href"
-                    :href="tab.href"
-                    class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="tab.href === paymentsIndex(tenant.id).url
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'"
-                >
-                    {{ tab.title }}
-                </Link>
-            </div>
-
+        <TenantLayout
+            :tenant-id="tenant.id"
+            :tenant-name="tenant.name"
+            :tenant-code="tenant.code"
+            :tenant-slug="tenant.slug"
+        >
             <!-- Stats -->
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -163,29 +148,11 @@ function paymentBadgeVariant(status: string): 'default' | 'secondary' | 'destruc
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <CreditCard class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Ödeme bulunamadı</p>
-                    </div>
+                    <EmptyState v-else :icon="CreditCard" message="Ödeme bulunamadı" />
                 </CardContent>
             </Card>
 
-            <!-- Pagination -->
-            <div v-if="payments.last_page > 1" class="flex items-center justify-between">
-                <p class="text-sm text-muted-foreground">
-                    {{ payments.from }}–{{ payments.to }} / {{ payments.total }} ödeme
-                </p>
-                <div class="flex gap-2">
-                    <Button variant="outline" size="sm" :disabled="!payments.links.prev" as-child>
-                        <Link v-if="payments.links.prev" :href="payments.links.prev">Önceki</Link>
-                        <span v-else>Önceki</span>
-                    </Button>
-                    <Button variant="outline" size="sm" :disabled="!payments.links.next" as-child>
-                        <Link v-if="payments.links.next" :href="payments.links.next">Sonraki</Link>
-                        <span v-else>Sonraki</span>
-                    </Button>
-                </div>
-            </div>
-        </div>
+            <SimplePagination :data="payments" label="ödeme" />
+        </TenantLayout>
     </PanelLayout>
 </template>

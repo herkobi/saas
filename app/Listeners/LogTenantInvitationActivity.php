@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Enums\TenantUserRole;
 use App\Events\TenantInvitationAccepted;
 use App\Events\TenantInvitationRevoked;
@@ -17,7 +17,7 @@ use Illuminate\Events\Dispatcher;
 class LogTenantInvitationActivity
 {
     public function __construct(
-        private readonly ActivityServiceInterface $activityService
+        private readonly ActivityService $activityService
     ) {}
 
     public function handleUserInvited(TenantUserInvited $event): void

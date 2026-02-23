@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Subscription;
 
-use App\Contracts\Panel\Subscription\SubscriptionServiceInterface;
+use App\Services\Panel\Subscription\SubscriptionService;
 use App\Enums\SubscriptionStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Subscription\SubscriptionFilterRequest;
@@ -38,10 +38,10 @@ class SubscriptionController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param SubscriptionServiceInterface $subscriptionService Service for subscription operations
+     * @param SubscriptionService $subscriptionService Service for subscription operations
      */
     public function __construct(
-        private readonly SubscriptionServiceInterface $subscriptionService
+        private readonly SubscriptionService $subscriptionService
     ) {}
 
     /**

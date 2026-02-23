@@ -2,6 +2,8 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Building2, Eye, Search } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -204,29 +206,11 @@ function subscriptionBadgeVariant(status?: string): 'default' | 'secondary' | 'd
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <Building2 class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Müşteri bulunamadı</p>
-                    </div>
+                    <EmptyState v-else :icon="Building2" message="Müşteri bulunamadı" />
                 </CardContent>
             </Card>
 
-            <!-- Pagination -->
-            <div v-if="tenants.last_page > 1" class="flex items-center justify-between">
-                <p class="text-sm text-muted-foreground">
-                    {{ tenants.from }}–{{ tenants.to }} / {{ tenants.total }} müşteri
-                </p>
-                <div class="flex gap-2">
-                    <Button variant="outline" size="sm" :disabled="!tenants.links.prev" as-child>
-                        <Link v-if="tenants.links.prev" :href="tenants.links.prev">Önceki</Link>
-                        <span v-else>Önceki</span>
-                    </Button>
-                    <Button variant="outline" size="sm" :disabled="!tenants.links.next" as-child>
-                        <Link v-if="tenants.links.next" :href="tenants.links.next">Sonraki</Link>
-                        <span v-else>Sonraki</span>
-                    </Button>
-                </div>
-            </div>
+            <SimplePagination :data="tenants" label="müşteri" />
         </div>
     </PanelLayout>
 </template>

@@ -18,8 +18,7 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\UserServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Enums\TenantUserRole;
 use App\Enums\UserStatus;
 use App\Events\TenantUserRemoved;
@@ -34,10 +33,10 @@ use Illuminate\Support\Collection;
 /**
  * Service for managing tenant users.
  */
-class UserService implements UserServiceInterface
+class UserService
 {
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService
+        private readonly TenantContextService $tenantContextService
     ) {}
 
     /**

@@ -10,6 +10,8 @@ import {
     AlertTriangle,
 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -252,29 +254,11 @@ function badgeVariant(status: string): 'default' | 'secondary' | 'destructive' |
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <CreditCard class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Abonelik bulunamadı</p>
-                    </div>
+                    <EmptyState v-else :icon="CreditCard" message="Abonelik bulunamadı" />
                 </CardContent>
             </Card>
 
-            <!-- Pagination -->
-            <div v-if="subscriptions.last_page > 1" class="flex items-center justify-between">
-                <p class="text-sm text-muted-foreground">
-                    {{ subscriptions.from }}–{{ subscriptions.to }} / {{ subscriptions.total }} abonelik
-                </p>
-                <div class="flex gap-2">
-                    <Button variant="outline" size="sm" :disabled="!subscriptions.links.prev" as-child>
-                        <Link v-if="subscriptions.links.prev" :href="subscriptions.links.prev">Önceki</Link>
-                        <span v-else>Önceki</span>
-                    </Button>
-                    <Button variant="outline" size="sm" :disabled="!subscriptions.links.next" as-child>
-                        <Link v-if="subscriptions.links.next" :href="subscriptions.links.next">Sonraki</Link>
-                        <span v-else>Sonraki</span>
-                    </Button>
-                </div>
-            </div>
+            <SimplePagination :data="subscriptions" label="abonelik" />
         </div>
     </PanelLayout>
 </template>

@@ -10,6 +10,7 @@ import {
     Users,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import InputError from '@/components/common/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -170,11 +171,11 @@ function submitPrice() {
 }
 
 function handleDeletePrice(price: PlanPrice) {
-    if (confirm('Bu fiyatı silmek istediğinize emin misiniz?')) {
+    requestConfirm(() => {
         router.delete(destroyPrice({ plan: props.plan.id, price: price.id }).url, {
             preserveScroll: true,
         });
-    }
+    });
 }
 
 // Features sync
@@ -207,6 +208,19 @@ function handlePublish() {
 
 function handleUnpublish() {
     router.post(unpublish(props.plan.id).url, {}, { preserveScroll: true });
+}
+
+const showConfirm = ref(false);
+let pendingConfirmAction: (() => void) | null = null;
+
+function requestConfirm(action: () => void) {
+    pendingConfirmAction = action;
+    showConfirm.value = true;
+}
+
+function onConfirmed() {
+    pendingConfirmAction?.();
+    pendingConfirmAction = null;
 }
 
 const intervalLabels: Record<string, string> = {
@@ -592,5 +606,6 @@ const intervalLabels: Record<string, string> = {
                 </div>
             </div>
         </div>
+        <ConfirmDialog v-model="showConfirm" description="Bu fiyatı silmek istediğinize emin misiniz?" @confirm="onConfirmed" />
     </PanelLayout>
 </template>

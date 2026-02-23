@@ -18,8 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-use App\Contracts\Shared\NotificationServiceInterface;
-use App\Contracts\Shared\UserAnonymizationServiceInterface;
 use App\Helpers\MaskHelper;
 use App\Models\Activity;
 use App\Models\User;
@@ -31,10 +29,10 @@ use Illuminate\Support\Facades\DB;
  * Handles complete user anonymization including activity logs,
  * notifications, and profile data masking for KVKK/GDPR compliance.
  */
-class UserAnonymizationService implements UserAnonymizationServiceInterface
+class UserAnonymizationService
 {
     public function __construct(
-        private readonly NotificationServiceInterface $notificationService,
+        private readonly NotificationService $notificationService,
     ) {}
 
     /**

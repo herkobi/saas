@@ -6,6 +6,7 @@ import { computed, nextTick, ref, useTemplateRef, watch } from 'vue';
 import AlertError from '@/components/common/AlertError.vue';
 import InputError from '@/components/common/InputError.vue';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     Dialog,
     DialogContent,
@@ -213,22 +214,24 @@ watch(
                                     <Spinner />
                                 </div>
                                 <template v-else>
-                                    <input
+                                    <Input
                                         type="text"
                                         readonly
-                                        :value="manualSetupKey"
-                                        class="h-full w-full bg-background p-3 text-foreground"
+                                        :model-value="manualSetupKey"
+                                        class="h-full rounded-none border-0 shadow-none focus-visible:ring-0"
                                     />
-                                    <button
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        class="h-auto shrink-0 rounded-none border-l border-border px-3"
                                         @click="copy(manualSetupKey || '')"
-                                        class="relative block h-auto border-l border-border px-3 hover:bg-muted"
                                     >
                                         <Check
                                             v-if="copied"
                                             class="w-4 text-green-500"
                                         />
                                         <Copy v-else class="w-4" />
-                                    </button>
+                                    </Button>
                                 </template>
                             </div>
                         </div>

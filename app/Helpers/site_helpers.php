@@ -15,7 +15,7 @@
 
 declare(strict_types=1);
 
-use App\Contracts\Panel\Settings\SettingServiceInterface;
+use App\Services\Panel\Settings\SettingService;
 
 if (!function_exists('settings')) {
     /**
@@ -32,7 +32,7 @@ if (!function_exists('settings')) {
      */
     function settings(string $key, mixed $default = null): mixed
     {
-        return app(SettingServiceInterface::class)->get($key, $default);
+        return app(SettingService::class)->get($key, $default);
     }
 }
 
@@ -57,8 +57,8 @@ if (!function_exists('logo')) {
         }
 
         // Fallback to default logo
-        $defaultLogo = $type === 'dark' 
-            ? 'herkobi.png.png' 
+        $defaultLogo = $type === 'dark'
+            ? 'herkobi-dark.png'
             : 'herkobi.png';
 
         return asset($defaultLogo);

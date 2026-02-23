@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -45,7 +45,7 @@ class TenantAddon extends Pivot
         parent::booted();
 
         static::addGlobalScope('tenant', function ($builder) {
-            $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+            $tenant = app(TenantContextService::class)->currentTenant();
 
             if ($tenant instanceof Tenant) {
                 $builder->where('tenant_addons.tenant_id', $tenant->id);

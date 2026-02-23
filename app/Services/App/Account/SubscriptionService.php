@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\SubscriptionServiceInterface;
 use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\Tenant;
 
-class SubscriptionService implements SubscriptionServiceInterface
+class SubscriptionService
 {
     public function getCurrentSubscription(Tenant $tenant): ?Subscription
     {

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\App;
 
-use App\Contracts\App\TenantServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Enums\SubscriptionStatus;
 use App\Enums\TenantUserRole;
 use App\Events\TenantRegistered;
@@ -15,10 +14,10 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class TenantService implements TenantServiceInterface
+class TenantService
 {
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService
+        private readonly TenantContextService $tenantContextService
     ) {}
 
     public function getOwnedTenants(User $user): Collection

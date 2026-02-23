@@ -17,8 +17,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\UserServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\UserService;
+use App\Services\Shared\TenantContextService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,10 +34,10 @@ class UserActivityController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param UserServiceInterface $userService The user management service
+     * @param UserService $userService The user management service
      */
     public function __construct(
-        private readonly UserServiceInterface $userService
+        private readonly UserService $userService
     ) {}
 
     /**
@@ -49,7 +49,7 @@ class UserActivityController extends Controller
      */
     public function index(Request $request, string $userId): Response|RedirectResponse
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
         $user = $this->userService->findById($tenant, $userId);
 
         if (!$user) {

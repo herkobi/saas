@@ -2,6 +2,9 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Package, Pencil, Plus, Trash2 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,6 +26,7 @@ import {
 } from '@/components/ui/table';
 import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import PlansLayout from '@/pages/panel/Plans/layout/Layout.vue';
 import { index, create, edit, destroy } from '@/routes/panel/plans/addons';
 import type { BreadcrumbItem } from '@/types';
 import type { PaginatedData } from '@/types/common';
@@ -70,10 +74,23 @@ function applyFilters(override: Record<string, string | undefined> = {}) {
     router.get(index().url, params, { preserveState: true, replace: true });
 }
 
+const showConfirm = ref(false);
+let pendingConfirmAction: (() => void) | null = null;
+
+function requestConfirm(action: () => void) {
+    pendingConfirmAction = action;
+    showConfirm.value = true;
+}
+
+function onConfirmed() {
+    pendingConfirmAction?.();
+    pendingConfirmAction = null;
+}
+
 function handleDelete(addon: AddonListItem) {
-    if (confirm('Bu eklentiyi silmek istediğinize emin misiniz?')) {
+    requestConfirm(() => {
         router.delete(destroy(addon.id).url, { preserveScroll: true });
-    }
+    });
 }
 
 const addonTypeLabels: Record<string, string> = {
@@ -87,7 +104,7 @@ const addonTypeLabels: Record<string, string> = {
     <Head title="Eklentiler" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
+        <PlansLayout>
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-lg font-semibold">Eklentiler</h1>
@@ -165,34 +182,19 @@ const addonTypeLabels: Record<string, string> = {
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <Package class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Henüz eklenti oluşturulmamış</p>
-                        <Button variant="outline" size="sm" class="mt-4" as-child>
+                    <EmptyState v-else :icon="Package" message="Henüz eklenti oluşturulmamış">
+                        <Button variant="outline" size="sm" as-child>
                             <Link :href="create().url">
                                 <Plus class="mr-1.5 h-4 w-4" />
                                 İlk Eklentiyi Oluştur
                             </Link>
                         </Button>
-                    </div>
+                    </EmptyState>
                 </CardContent>
             </Card>
 
-            <div v-if="addons.last_page > 1" class="flex items-center justify-between">
-                <p class="text-sm text-muted-foreground">
-                    {{ addons.from }}–{{ addons.to }} / {{ addons.total }} eklenti
-                </p>
-                <div class="flex gap-2">
-                    <Button variant="outline" size="sm" :disabled="!addons.links.prev" as-child>
-                        <Link v-if="addons.links.prev" :href="addons.links.prev">Önceki</Link>
-                        <span v-else>Önceki</span>
-                    </Button>
-                    <Button variant="outline" size="sm" :disabled="!addons.links.next" as-child>
-                        <Link v-if="addons.links.next" :href="addons.links.next">Sonraki</Link>
-                        <span v-else>Sonraki</span>
-                    </Button>
-                </div>
-            </div>
-        </div>
+            <SimplePagination :data="addons" label="eklenti" />
+        </PlansLayout>
+        <ConfirmDialog v-model="showConfirm" description="Bu eklentiyi silmek istediğinize emin misiniz?" @confirm="onConfirmed" />
     </PanelLayout>
 </template>

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Panel;
 
-use App\Contracts\Panel\Payment\PaymentServiceInterface;
-use App\Services\Panel\Payment\PaymentService;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -33,6 +31,6 @@ class PaymentServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(PaymentServiceInterface::class, PaymentService::class);
+        //
     }
 }

@@ -2,6 +2,8 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ArchiveX, Bell, ArrowLeft } from 'lucide-vue-next';
 import Heading from '@/components/common/Heading.vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDateTime } from '@/composables/useFormatting';
@@ -51,11 +53,13 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     </Button>
                 </div>
 
-                <div v-if="archivedNotifications.data.length === 0" class="flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center">
-                    <ArchiveX class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                    <p class="text-sm font-medium text-muted-foreground">Arşivlenmiş bildirim bulunmuyor</p>
-                    <p class="mt-1 text-xs text-muted-foreground/70">Eski bildirimler burada görünecek.</p>
-                </div>
+                <EmptyState
+                    v-if="archivedNotifications.data.length === 0"
+                    :icon="ArchiveX"
+                    message="Arşivlenmiş bildirim bulunmuyor"
+                    description="Eski bildirimler burada görünecek."
+                    bordered
+                />
 
                 <div v-else class="space-y-3">
                     <Card
@@ -86,36 +90,7 @@ const breadcrumbItems: BreadcrumbItem[] = [
                     </Card>
                 </div>
 
-                <!-- Pagination -->
-                <div v-if="archivedNotifications.last_page > 1" class="flex items-center justify-between pt-2">
-                    <p class="text-sm text-muted-foreground">
-                        {{ archivedNotifications.from }}–{{ archivedNotifications.to }} / {{ archivedNotifications.total }} bildirim
-                    </p>
-                    <div class="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            :disabled="!archivedNotifications.links.prev"
-                            as-child
-                        >
-                            <Link v-if="archivedNotifications.links.prev" :href="archivedNotifications.links.prev">
-                                Önceki
-                            </Link>
-                            <span v-else>Önceki</span>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            :disabled="!archivedNotifications.links.next"
-                            as-child
-                        >
-                            <Link v-if="archivedNotifications.links.next" :href="archivedNotifications.links.next">
-                                Sonraki
-                            </Link>
-                            <span v-else>Sonraki</span>
-                        </Button>
-                    </div>
-                </div>
+                <SimplePagination :data="archivedNotifications" label="bildirim" class="pt-2" />
             </div>
         </SettingsLayout>
     </AppLayout>

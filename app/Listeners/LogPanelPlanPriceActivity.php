@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Events\PanelPlanPriceCreated;
 use App\Events\PanelPlanPriceUpdated;
 use App\Events\PanelPlanPriceDeleted;
@@ -12,7 +12,7 @@ use App\Events\PanelPlanPriceDeleted;
 class LogPanelPlanPriceActivity
 {
     public function __construct(
-        private readonly ActivityServiceInterface $activityService
+        private readonly ActivityService $activityService
     ) {}
 
     public function handleCreated(PanelPlanPriceCreated $event): void

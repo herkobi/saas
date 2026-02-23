@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Plan;
 
-use App\Contracts\Panel\Plan\PlanPriceServiceInterface;
 use App\Events\PanelPlanPriceCreated;
 use App\Events\PanelPlanPriceDeleted;
 use App\Events\PanelPlanPriceUpdated;
@@ -33,7 +32,7 @@ use Illuminate\Support\Collection;
  *
  * Service implementation for managing plan pricing configurations.
  */
-class PlanPriceService implements PlanPriceServiceInterface
+class PlanPriceService
 {
     /**
      * Get all prices for a plan.

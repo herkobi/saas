@@ -34,6 +34,7 @@ import { Separator } from '@/components/ui/separator';
 import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import { useSubscriptionStatus } from '@/composables/useSubscriptionStatus';
 import AppLayout from '@/layouts/AppLayout.vue';
+import AccountLayout from '@/pages/app/Account/layout/Layout.vue';
 import { dashboard } from '@/routes/app';
 import { index as subscriptionIndex, cancel } from '@/routes/app/account/subscription';
 import { index as planChangeIndex } from '@/routes/app/account/plans';
@@ -93,6 +94,7 @@ const { getStatusLabel, getStatusVariant } = useSubscriptionStatus();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Başlangıç', href: dashboard().url },
+    { title: 'Hesap Yönetimi' },
     { title: 'Abonelik', href: subscriptionIndex().url },
 ];
 
@@ -124,7 +126,8 @@ const booleanFeatures = props.features.filter(
     <Head title="Abonelik" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
+        <AccountLayout>
+        <div class="flex flex-col gap-6">
             <!-- No Subscription -->
             <Card v-if="!subscription" class="border-amber-200 dark:border-amber-900/50">
                 <CardContent class="flex flex-col items-center gap-4 py-12 text-center">
@@ -336,6 +339,8 @@ const booleanFeatures = props.features.filter(
                 </div>
             </template>
         </div>
+
+        </AccountLayout>
 
         <!-- Cancel Dialog -->
         <Dialog v-model:open="showCancelDialog">

@@ -18,9 +18,7 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\CheckoutServiceInterface;
-use App\Contracts\App\Account\PaymentGatewayInterface;
-use App\Contracts\App\Account\ProrationServiceInterface;
+use App\Services\App\Account\ProrationService;
 use App\Enums\CheckoutStatus;
 use App\Enums\CheckoutType;
 use App\Enums\PaymentStatus;
@@ -43,17 +41,17 @@ use Illuminate\Support\Facades\DB;
  * Provides methods for initiating checkouts, generating payment tokens,
  * processing callbacks, and managing checkout lifecycle.
  */
-class CheckoutService implements CheckoutServiceInterface
+class CheckoutService
 {
     /**
      * Create a new checkout service instance.
      *
-     * @param PaymentGatewayInterface $gateway The payment gateway
-     * @param ProrationServiceInterface $prorationService The proration service
+     * @param PayTRService $gateway The payment gateway
+     * @param ProrationService $prorationService The proration service
      */
     public function __construct(
-        protected PaymentGatewayInterface $gateway,
-        protected ProrationServiceInterface $prorationService
+        protected PayTRService $gateway,
+        protected ProrationService $prorationService
     ) {}
 
     /**

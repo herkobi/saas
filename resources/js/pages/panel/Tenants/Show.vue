@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import {
     Building2,
     CreditCard,
-    Globe,
-    Hash,
     TrendingUp,
     Users,
 } from 'lucide-vue-next';
@@ -17,8 +15,8 @@ import {
 } from '@/components/ui/card';
 import { formatCurrency, formatDate, formatDateTime } from '@/composables/useFormatting';
 import { useSubscriptionStatus } from '@/composables/useSubscriptionStatus';
-import { useTenantTabs } from '@/composables/useTenantTabs';
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import TenantLayout from '@/pages/panel/Tenants/layout/Layout.vue';
 import { index, show } from '@/routes/panel/tenants';
 import type { BreadcrumbItem } from '@/types';
 import type { Activity } from '@/types/common';
@@ -33,7 +31,6 @@ type Props = {
 
 const props = defineProps<Props>();
 const { statusLabel, statusColor } = useSubscriptionStatus();
-const tabs = useTenantTabs(props.tenant.id);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Müşteriler', href: index().url },
@@ -56,28 +53,12 @@ function subscriptionBadgeVariant(status?: string): 'default' | 'secondary' | 'd
     <Head :title="tenant.name" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
-            <!-- Header -->
-            <div>
-                <h1 class="text-lg font-semibold">{{ tenant.name }}</h1>
-                <p class="text-sm text-muted-foreground">{{ tenant.code }} &middot; {{ tenant.slug }}</p>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="flex gap-1 overflow-x-auto border-b">
-                <Link
-                    v-for="tab in tabs"
-                    :key="tab.href"
-                    :href="tab.href"
-                    class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="tab.href === show(tenant.id).url
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'"
-                >
-                    {{ tab.title }}
-                </Link>
-            </div>
-
+        <TenantLayout
+            :tenant-id="tenant.id"
+            :tenant-name="tenant.name"
+            :tenant-code="tenant.code"
+            :tenant-slug="tenant.slug"
+        >
             <!-- Stat Cards -->
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -225,6 +206,6 @@ function subscriptionBadgeVariant(status?: string): 'default' | 'secondary' | 'd
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </TenantLayout>
     </PanelLayout>
 </template>

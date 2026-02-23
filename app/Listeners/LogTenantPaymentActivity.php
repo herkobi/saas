@@ -17,7 +17,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Events\TenantCheckoutInitiated;
 use App\Events\TenantPaymentFailed;
 use App\Events\TenantPaymentSucceeded;
@@ -45,10 +45,10 @@ class LogTenantPaymentActivity implements ShouldQueue
     /**
      * Create the event listener.
      *
-     * @param ActivityServiceInterface $activityService Service for logging activities
+     * @param ActivityService $activityService Service for logging activities
      */
     public function __construct(
-        private readonly ActivityServiceInterface $activityService
+        private readonly ActivityService $activityService
     ) {}
 
     /**

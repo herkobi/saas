@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, router } from '@inertiajs/vue3';
 import { Users } from 'lucide-vue-next';
+import EmptyState from '@/components/common/EmptyState.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,9 +27,9 @@ import {
 } from '@/components/ui/table';
 import { formatDate } from '@/composables/useFormatting';
 import { useUserStatus } from '@/composables/useUserStatus';
-import { useTenantTabs } from '@/composables/useTenantTabs';
 import PanelLayout from '@/layouts/PanelLayout.vue';
-import { index } from '@/routes/panel/tenants';
+import TenantLayout from '@/pages/panel/Tenants/layout/Layout.vue';
+import { index, show as tenantShow } from '@/routes/panel/tenants';
 import { index as usersIndex, updateStatus } from '@/routes/panel/tenants/users';
 import type { BreadcrumbItem } from '@/types';
 import type { TenantUser, Tenant } from '@/types/tenant';
@@ -48,11 +49,10 @@ type Props = {
 
 const props = defineProps<Props>();
 const { statusLabel, roleLabel, statusColor } = useUserStatus();
-const tabs = useTenantTabs(props.tenant.id);
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Müşteriler', href: index().url },
-    { title: props.tenant.name, href: `/panel/tenants/${props.tenant.id}` },
+    { title: props.tenant.name, href: tenantShow(props.tenant.id).url },
     { title: 'Kullanıcılar', href: usersIndex(props.tenant.id).url },
 ];
 
@@ -80,28 +80,12 @@ function roleBadgeVariant(role: number): 'default' | 'secondary' {
     <Head title="Kullanıcılar" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
-            <!-- Header -->
-            <div>
-                <h1 class="text-lg font-semibold">{{ tenant.name }}</h1>
-                <p class="text-sm text-muted-foreground">Kullanıcı yönetimi</p>
-            </div>
-
-            <!-- Tab Navigation -->
-            <div class="flex gap-1 overflow-x-auto border-b">
-                <Link
-                    v-for="tab in tabs"
-                    :key="tab.href"
-                    :href="tab.href"
-                    class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="tab.href === usersIndex(tenant.id).url
-                        ? 'border-primary text-primary'
-                        : 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'"
-                >
-                    {{ tab.title }}
-                </Link>
-            </div>
-
+        <TenantLayout
+            :tenant-id="tenant.id"
+            :tenant-name="tenant.name"
+            :tenant-code="tenant.code"
+            :tenant-slug="tenant.slug"
+        >
             <!-- Stats -->
             <div class="grid gap-4 sm:grid-cols-4">
                 <Card>
@@ -195,12 +179,9 @@ function roleBadgeVariant(role: number): 'default' | 'secondary' {
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <Users class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Kullanıcı bulunamadı</p>
-                    </div>
+                    <EmptyState v-else :icon="Users" message="Kullanıcı bulunamadı" />
                 </CardContent>
             </Card>
-        </div>
+        </TenantLayout>
     </PanelLayout>
 </template>

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\FeatureUsageServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Enums\AddonType;
 use App\Enums\FeatureType;
 use App\Models\Feature;
@@ -13,10 +12,10 @@ use App\Models\Tenant;
 use App\Models\TenantUsage;
 use Illuminate\Support\Collection;
 
-class FeatureUsageService implements FeatureUsageServiceInterface
+class FeatureUsageService
 {
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService
+        private readonly TenantContextService $tenantContextService
     ) {}
 
     public function getAllFeatures(Tenant $tenant): Collection

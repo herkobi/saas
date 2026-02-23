@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Pencil, Plus, SlidersHorizontal, Trash2 } from 'lucide-vue-next';
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +29,7 @@ import {
 import { formatDate } from '@/composables/useFormatting';
 import { useFeatureType } from '@/composables/useFeatureType';
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import PlansLayout from '@/pages/panel/Plans/layout/Layout.vue';
 import { index, create, edit, destroy } from '@/routes/panel/plans/features';
 import type { BreadcrumbItem } from '@/types';
 import type { PaginatedData } from '@/types/common';
@@ -78,10 +82,23 @@ function filterByType(val: string) {
     applyFilters({ type: val || undefined });
 }
 
+const showConfirm = ref(false);
+let pendingConfirmAction: (() => void) | null = null;
+
+function requestConfirm(action: () => void) {
+    pendingConfirmAction = action;
+    showConfirm.value = true;
+}
+
+function onConfirmed() {
+    pendingConfirmAction?.();
+    pendingConfirmAction = null;
+}
+
 function handleDelete(feature: FeatureListItem) {
-    if (confirm('Bu özelliği silmek istediğinize emin misiniz?')) {
+    requestConfirm(() => {
         router.delete(destroy(feature.id).url, { preserveScroll: true });
-    }
+    });
 }
 </script>
 
@@ -89,7 +106,7 @@ function handleDelete(feature: FeatureListItem) {
     <Head title="Özellikler" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
+        <PlansLayout>
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-lg font-semibold">Özellikler</h1>
@@ -182,35 +199,19 @@ function handleDelete(feature: FeatureListItem) {
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <SlidersHorizontal class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">Henüz özellik oluşturulmamış</p>
-                        <Button variant="outline" size="sm" class="mt-4" as-child>
+                    <EmptyState v-else :icon="SlidersHorizontal" message="Henüz özellik oluşturulmamış">
+                        <Button variant="outline" size="sm" as-child>
                             <Link :href="create().url">
                                 <Plus class="mr-1.5 h-4 w-4" />
                                 İlk Özelliği Oluştur
                             </Link>
                         </Button>
-                    </div>
+                    </EmptyState>
                 </CardContent>
             </Card>
 
-            <!-- Pagination -->
-            <div v-if="features.last_page > 1" class="flex items-center justify-between">
-                <p class="text-sm text-muted-foreground">
-                    {{ features.from }}–{{ features.to }} / {{ features.total }} özellik
-                </p>
-                <div class="flex gap-2">
-                    <Button variant="outline" size="sm" :disabled="!features.links.prev" as-child>
-                        <Link v-if="features.links.prev" :href="features.links.prev">Önceki</Link>
-                        <span v-else>Önceki</span>
-                    </Button>
-                    <Button variant="outline" size="sm" :disabled="!features.links.next" as-child>
-                        <Link v-if="features.links.next" :href="features.links.next">Sonraki</Link>
-                        <span v-else>Sonraki</span>
-                    </Button>
-                </div>
-            </div>
-        </div>
+            <SimplePagination :data="features" label="özellik" />
+        </PlansLayout>
+        <ConfirmDialog v-model="showConfirm" description="Bu özelliği silmek istediğinize emin misiniz?" @confirm="onConfirmed" />
     </PanelLayout>
 </template>

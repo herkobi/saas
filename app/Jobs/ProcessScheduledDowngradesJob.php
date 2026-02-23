@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Contracts\App\Account\SubscriptionLifecycleServiceInterface;
+use App\Services\App\Account\SubscriptionLifecycleService;
 use App\Notifications\App\Account\PlanDowngradedNotification;
 use App\Notifications\App\Account\PlanUpgradedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,7 +17,7 @@ class ProcessScheduledDowngradesJob implements ShouldQueue
     public int $tries = 3;
     public int $timeout = 120;
 
-    public function handle(SubscriptionLifecycleServiceInterface $service): void
+    public function handle(SubscriptionLifecycleService $service): void
     {
         $subscriptions = $service->getSubscriptionsWithScheduledDowngrade();
 

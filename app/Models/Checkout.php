@@ -7,7 +7,7 @@ namespace App\Models;
 use App\Enums\CheckoutStatus;
 use App\Enums\CheckoutType;
 use App\Helpers\CurrencyHelper;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
@@ -53,7 +53,7 @@ class Checkout extends Model
     {
         static::creating(function (Model $model) {
             if (empty($model->tenant_id)) {
-                $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+                $tenant = app(TenantContextService::class)->currentTenant();
                 if ($tenant instanceof Tenant) {
                     $model->tenant_id = $tenant->id;
                 }
@@ -67,7 +67,7 @@ class Checkout extends Model
 
     public function scopeForCurrentTenant(Builder $query): Builder
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         if ($tenant instanceof Tenant) {
             return $query->where($this->getTable() . '.tenant_id', $tenant->id);

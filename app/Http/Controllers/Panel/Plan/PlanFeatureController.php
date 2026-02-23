@@ -19,8 +19,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Plan;
 
-use App\Contracts\Panel\Plan\FeatureServiceInterface;
-use App\Contracts\Panel\Plan\PlanServiceInterface;
+use App\Services\Panel\Plan\FeatureService;
+use App\Services\Panel\Plan\PlanService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Plan\SyncPlanFeaturesRequest;
 use App\Models\Plan;
@@ -38,11 +38,11 @@ class PlanFeatureController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param PlanServiceInterface $planService Service for plan operations
-     * @param FeatureServiceInterface $featureService Service for feature operations
+     * @param PlanService $planService Service for plan operations
+     * @param FeatureService $featureService Service for feature operations
      */
     public function __construct(
-        private readonly PlanServiceInterface $planService
+        private readonly PlanService $planService
     ) {}
 
     /**

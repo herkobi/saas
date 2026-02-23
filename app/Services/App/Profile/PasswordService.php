@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Profile;
 
-use App\Contracts\App\Profile\PasswordServiceInterface;
 use App\Events\TenantPasswordChanged;
 use App\Models\User;
 use App\Traits\HasTenantContext;
@@ -29,7 +28,7 @@ use App\Traits\HasTenantContext;
  * Service implementation for managing tenant user passwords
  * including update operations with event dispatching.
  */
-class PasswordService implements PasswordServiceInterface
+class PasswordService
 {
     use HasTenantContext;
 

@@ -18,8 +18,7 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Tenant;
 
-use App\Contracts\Panel\Tenant\TenantFeatureServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Events\PanelTenantFeatureOverrideUpdated;
 use App\Models\Tenant;
 use App\Models\TenantFeature;
@@ -32,10 +31,10 @@ use Illuminate\Support\Collection;
  * Provides methods for feature override CRUD operations with comprehensive
  * audit logging and event dispatching.
  */
-class TenantFeatureService implements TenantFeatureServiceInterface
+class TenantFeatureService
 {
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService
+        private readonly TenantContextService $tenantContextService
     ) {}
 
     /**

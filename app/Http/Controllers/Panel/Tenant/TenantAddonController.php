@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Tenant;
 
-use App\Contracts\Panel\Addon\TenantAddonServiceInterface;
+use App\Services\Panel\Addon\TenantAddonService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Tenant\ExtendAddonRequest;
 use App\Models\Addon;
@@ -18,7 +18,7 @@ use Inertia\Response;
 class TenantAddonController extends Controller
 {
     public function __construct(
-        protected TenantAddonServiceInterface $tenantAddonService
+        protected TenantAddonService $tenantAddonService
     ) {}
 
     /**

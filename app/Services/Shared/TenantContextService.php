@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Shared;
 
-use App\Contracts\Shared\TenantContextServiceInterface;
 use App\Enums\TenantUserRole;
 use App\Models\Feature;
 use App\Models\Tenant;
 use App\Models\User;
 
-class TenantContextService implements TenantContextServiceInterface
+class TenantContextService
 {
     protected ?Tenant $currentTenant = null;
 
@@ -110,8 +109,8 @@ class TenantContextService implements TenantContextServiceInterface
             return false;
         }
 
-        /** @var \App\Contracts\App\Account\FeatureUsageServiceInterface $featureUsageService */
-        $featureUsageService = app(\App\Contracts\App\Account\FeatureUsageServiceInterface::class);
+        /** @var \App\Services\App\Account\FeatureUsageService $featureUsageService */
+        $featureUsageService = app(\App\Services\App\Account\FeatureUsageService::class);
         $limitCheck = $featureUsageService->checkFeatureLimit($tenant, 'users');
 
         return $limitCheck['allowed'];

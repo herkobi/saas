@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\ProrationServiceInterface;
 use App\Enums\ProrationType;
 use App\Models\PlanPrice;
 use App\Models\Subscription;
@@ -29,7 +28,7 @@ use App\Models\Subscription;
  * Provides methods for calculating credits from unused subscription days
  * and determining the final amount for plan upgrades.
  */
-class ProrationService implements ProrationServiceInterface
+class ProrationService
 {
     /**
      * Calculate proration details for a subscription upgrade.

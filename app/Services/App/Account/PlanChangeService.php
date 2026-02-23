@@ -18,8 +18,7 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\PlanChangeServiceInterface;
-use App\Contracts\App\Account\ProrationServiceInterface;
+use App\Services\App\Account\ProrationService;
 use App\Enums\ProrationType;
 use App\Events\TenantSubscriptionDowngraded;
 use App\Events\TenantSubscriptionUpgraded;
@@ -37,15 +36,15 @@ use Illuminate\Support\Facades\DB;
  * Provides methods for calculating proration, processing upgrades,
  * and scheduling downgrades at period end.
  */
-class PlanChangeService implements PlanChangeServiceInterface
+class PlanChangeService
 {
     /**
      * Create a new plan change service instance.
      *
-     * @param ProrationServiceInterface $prorationService The proration service
+     * @param ProrationService $prorationService The proration service
      */
     public function __construct(
-        protected ProrationServiceInterface $prorationService
+        protected ProrationService $prorationService
     ) {}
 
     /**

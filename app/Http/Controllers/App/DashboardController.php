@@ -18,9 +18,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App;
 
-use App\Contracts\App\Account\FeatureUsageServiceInterface;
-use App\Contracts\App\Account\PaymentServiceInterface;
-use App\Contracts\App\Account\SubscriptionServiceInterface;
+use App\Services\App\Account\FeatureUsageService;
+use App\Services\App\Account\PaymentService;
+use App\Services\App\Account\SubscriptionService;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
@@ -38,14 +38,14 @@ class DashboardController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param SubscriptionServiceInterface $subscriptionService
-     * @param PaymentServiceInterface $paymentService
-     * @param FeatureUsageServiceInterface $featureUsageService
+     * @param SubscriptionService $subscriptionService
+     * @param PaymentService $paymentService
+     * @param FeatureUsageService $featureUsageService
      */
     public function __construct(
-        private readonly SubscriptionServiceInterface $subscriptionService,
-        private readonly PaymentServiceInterface $paymentService,
-        private readonly FeatureUsageServiceInterface $featureUsageService,
+        private readonly SubscriptionService $subscriptionService,
+        private readonly PaymentService $paymentService,
+        private readonly FeatureUsageService $featureUsageService,
     ) {}
 
     /**

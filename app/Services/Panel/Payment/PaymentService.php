@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Payment;
 
-use App\Contracts\Panel\Payment\PaymentServiceInterface;
 use App\Enums\PaymentStatus;
 use App\Events\PanelPaymentMarkedAsInvoiced;
 use App\Events\PanelPaymentStatusUpdated;
@@ -31,10 +30,10 @@ use Illuminate\Support\Facades\DB;
 /**
  * Service for payment management operations.
  *
- * Implements PaymentServiceInterface to provide payment
+ * Implements PaymentService to provide payment
  * listing, status updates, and invoice marking functionality.
  */
-class PaymentService implements PaymentServiceInterface
+class PaymentService
 {
     /**
      * Get paginated list of payments with optional filters.

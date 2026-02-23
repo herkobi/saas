@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Subscription;
 
-use App\Contracts\Panel\Subscription\SubscriptionServiceInterface;
 use App\Enums\SubscriptionStatus;
 use App\Enums\PaymentStatus;
 use App\Models\Payment;
@@ -13,7 +12,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class SubscriptionService implements SubscriptionServiceInterface
+class SubscriptionService
 {
     public function getPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {

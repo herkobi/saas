@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\BillingServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\BillingService;
+use App\Services\Shared\TenantContextService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\App\Account\UpdateBillingRequest;
 use Illuminate\Http\RedirectResponse;
@@ -38,10 +38,10 @@ class BillingController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param BillingServiceInterface $billingService Service for billing operations
+     * @param BillingService $billingService Service for billing operations
      */
     public function __construct(
-        private readonly BillingServiceInterface $billingService
+        private readonly BillingService $billingService
     ) {}
 
     /**
@@ -52,7 +52,7 @@ class BillingController extends Controller
      */
     public function index(Request $request): Response
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         return Inertia::render('app/Account/Billing/Index', [
             'account' => $this->billingService->getAccount($tenant),
@@ -69,7 +69,7 @@ class BillingController extends Controller
     public function update(UpdateBillingRequest $request): RedirectResponse
     {
         $this->billingService->updateBillingInfo(
-            app(TenantContextServiceInterface::class)->currentTenant(),
+            app(TenantContextService::class)->currentTenant(),
             $request->validated(),
             $request->user(),
             $request->ip(),

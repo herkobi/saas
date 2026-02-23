@@ -6,7 +6,7 @@ namespace App\Models;
 
 use App\Enums\UserType;
 use App\Helpers\MaskHelper;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -38,7 +38,7 @@ class Activity extends Model
     {
         static::creating(function (Model $model) {
             if (empty($model->tenant_id)) {
-                $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+                $tenant = app(TenantContextService::class)->currentTenant();
                 if ($tenant instanceof Tenant) {
                     $model->tenant_id = $tenant->id;
                 }
@@ -48,7 +48,7 @@ class Activity extends Model
 
     public function scopeForCurrentTenant(Builder $query): Builder
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         if ($tenant instanceof Tenant) {
             return $query->where($this->getTable() . '.tenant_id', $tenant->id);

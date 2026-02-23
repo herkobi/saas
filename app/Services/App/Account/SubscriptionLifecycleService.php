@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\SubscriptionLifecycleServiceInterface;
 use App\Models\PlanPrice;
 use App\Models\Subscription;
 use Carbon\Carbon;
@@ -30,7 +29,7 @@ use Illuminate\Support\Collection;
  * Provides methods for tracking expiring subscriptions and
  * processing scheduled plan changes.
  */
-class SubscriptionLifecycleService implements SubscriptionLifecycleServiceInterface
+class SubscriptionLifecycleService
 {
     /**
      * Get subscriptions expiring in the specified number of days.

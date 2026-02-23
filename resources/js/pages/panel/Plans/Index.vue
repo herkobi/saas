@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Archive, ArchiveRestore, Package, Pencil, Plus } from 'lucide-vue-next';
+import { ref } from 'vue';
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +21,7 @@ import {
 } from '@/components/ui/table';
 import { formatDate } from '@/composables/useFormatting';
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import PlansLayout from '@/pages/panel/Plans/layout/Layout.vue';
 import { index, create, edit, archive, restore } from '@/routes/panel/plans';
 import type { BreadcrumbItem } from '@/types';
 import type { PaginatedData } from '@/types/common';
@@ -37,6 +42,19 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const isArchived = props.filters.archived === '1';
 
+const showConfirm = ref(false);
+let pendingConfirmAction: (() => void) | null = null;
+
+function requestConfirm(action: () => void) {
+    pendingConfirmAction = action;
+    showConfirm.value = true;
+}
+
+function onConfirmed() {
+    pendingConfirmAction?.();
+    pendingConfirmAction = null;
+}
+
 function toggleArchived() {
     router.get(index().url, isArchived ? {} : { archived: '1' }, {
         preserveState: true,
@@ -45,9 +63,9 @@ function toggleArchived() {
 }
 
 function handleArchive(plan: PlanListItem) {
-    if (confirm('Bu planı arşivlemek istediğinize emin misiniz?')) {
+    requestConfirm(() => {
         router.post(archive(plan.id).url, {}, { preserveScroll: true });
-    }
+    });
 }
 
 function handleRestore(plan: PlanListItem) {
@@ -59,7 +77,7 @@ function handleRestore(plan: PlanListItem) {
     <Head title="Planlar" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
+        <PlansLayout>
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-lg font-semibold">Planlar</h1>
@@ -149,37 +167,23 @@ function handleRestore(plan: PlanListItem) {
                         </TableBody>
                     </Table>
 
-                    <div v-else class="flex flex-col items-center justify-center py-12 text-center">
-                        <Package class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p class="text-sm font-medium text-muted-foreground">
-                            {{ isArchived ? 'Arşivlenmiş plan bulunmuyor' : 'Henüz plan oluşturulmamış' }}
-                        </p>
-                        <Button v-if="!isArchived" variant="outline" size="sm" class="mt-4" as-child>
+                    <EmptyState
+                        v-else
+                        :icon="Package"
+                        :message="isArchived ? 'Arşivlenmiş plan bulunmuyor' : 'Henüz plan oluşturulmamış'"
+                    >
+                        <Button v-if="!isArchived" variant="outline" size="sm" as-child>
                             <Link :href="create().url">
                                 <Plus class="mr-1.5 h-4 w-4" />
                                 İlk Planı Oluştur
                             </Link>
                         </Button>
-                    </div>
+                    </EmptyState>
                 </CardContent>
             </Card>
 
-            <!-- Pagination -->
-            <div v-if="plans.last_page > 1" class="flex items-center justify-between">
-                <p class="text-sm text-muted-foreground">
-                    {{ plans.from }}–{{ plans.to }} / {{ plans.total }} plan
-                </p>
-                <div class="flex gap-2">
-                    <Button variant="outline" size="sm" :disabled="!plans.links.prev" as-child>
-                        <Link v-if="plans.links.prev" :href="plans.links.prev">Önceki</Link>
-                        <span v-else>Önceki</span>
-                    </Button>
-                    <Button variant="outline" size="sm" :disabled="!plans.links.next" as-child>
-                        <Link v-if="plans.links.next" :href="plans.links.next">Sonraki</Link>
-                        <span v-else>Sonraki</span>
-                    </Button>
-                </div>
-            </div>
-        </div>
+            <SimplePagination :data="plans" label="plan" />
+        </PlansLayout>
+        <ConfirmDialog v-model="showConfirm" description="Bu planı arşivlemek istediğinize emin misiniz?" @confirm="onConfirmed" />
     </PanelLayout>
 </template>

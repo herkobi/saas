@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\PaymentGatewayInterface;
 use App\Helpers\CurrencyHelper;
 use App\Models\Checkout;
 use Illuminate\Http\Client\Response;
@@ -30,7 +29,7 @@ use Illuminate\Support\Facades\Http;
  * Provides methods for creating payment tokens, verifying callbacks,
  * and processing refunds through the PayTR payment gateway.
  */
-class PayTRService implements PaymentGatewayInterface
+class PayTRService
 {
     /**
      * PayTR merchant ID.

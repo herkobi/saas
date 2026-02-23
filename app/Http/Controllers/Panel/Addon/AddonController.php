@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Addon;
 
-use App\Contracts\Panel\Addon\AddonServiceInterface;
+use App\Services\Panel\Addon\AddonService;
 use App\Enums\FeatureType;
 use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
@@ -20,7 +20,7 @@ use Inertia\Response;
 class AddonController extends Controller
 {
     public function __construct(
-        protected AddonServiceInterface $addonService
+        protected AddonService $addonService
     ) {}
 
     /**

@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Tenant;
 
-use App\Contracts\Panel\Tenant\TenantServiceInterface;
 use App\Enums\PaymentStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\TenantUserRole;
@@ -36,7 +35,7 @@ use Illuminate\Support\Collection;
  * Provides methods for tenant CRUD operations, activity retrieval,
  * user management, and statistics with comprehensive audit logging.
  */
-class TenantService implements TenantServiceInterface
+class TenantService
 {
     /**
      * Get paginated list of tenants with optional filters.

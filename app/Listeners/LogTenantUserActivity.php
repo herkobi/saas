@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Enums\TenantUserRole;
 use App\Events\TenantUserRemoved;
 use App\Events\TenantUserRoleChanged;
@@ -35,10 +35,10 @@ class LogTenantUserActivity
     /**
      * Create a new listener instance.
      *
-     * @param ActivityServiceInterface $activityService The activity service
+     * @param ActivityService $activityService The activity service
      */
     public function __construct(
-        private readonly ActivityServiceInterface $activityService
+        private readonly ActivityService $activityService
     ) {}
 
     /**

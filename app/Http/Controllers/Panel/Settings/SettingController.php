@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Settings;
 
-use App\Contracts\Panel\Settings\SettingServiceInterface;
+use App\Services\Panel\Settings\SettingService;
 use App\Events\PanelSettingUpdated;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Settings\UpdateSettingRequest;
@@ -37,10 +37,10 @@ class SettingController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param SettingServiceInterface $settingService
+     * @param SettingService $settingService
      */
     public function __construct(
-        private readonly SettingServiceInterface $settingService
+        private readonly SettingService $settingService
     ) {}
 
     /**

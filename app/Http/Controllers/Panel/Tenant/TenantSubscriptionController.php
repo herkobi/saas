@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel\Tenant;
 
-use App\Contracts\Panel\Tenant\TenantSubscriptionServiceInterface;
-use App\Contracts\Panel\Tenant\TenantServiceInterface;
+use App\Services\Panel\Tenant\TenantSubscriptionService;
+use App\Services\Panel\Tenant\TenantService;
 use App\Enums\SubscriptionStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Panel\Tenant\CancelSubscriptionRequest;
@@ -28,6 +28,7 @@ use App\Http\Requests\Panel\Tenant\CreateSubscriptionRequest;
 use App\Http\Requests\Panel\Tenant\ExtendGracePeriodRequest;
 use App\Http\Requests\Panel\Tenant\ExtendTrialRequest;
 use App\Http\Requests\Panel\Tenant\RenewSubscriptionRequest;
+use App\Http\Requests\Panel\Tenant\UpdateCustomPriceRequest;
 use App\Http\Requests\Panel\Tenant\UpdateSubscriptionStatusRequest;
 use App\Models\PlanPrice;
 use App\Models\Tenant;
@@ -46,12 +47,12 @@ class TenantSubscriptionController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param TenantSubscriptionServiceInterface $subscriptionService Service for subscription operations
-     * @param TenantServiceInterface $tenantService Service for tenant operations
+     * @param TenantSubscriptionService $subscriptionService Service for subscription operations
+     * @param TenantService $tenantService Service for tenant operations
      */
     public function __construct(
-        private readonly TenantSubscriptionServiceInterface $subscriptionService,
-        private readonly TenantServiceInterface $tenantService
+        private readonly TenantSubscriptionService $subscriptionService,
+        private readonly TenantService $tenantService
     ) {}
 
     /**
@@ -298,5 +299,40 @@ class TenantSubscriptionController extends Controller
         return redirect()
             ->route('panel.tenants.subscription.show', $tenant)
             ->with('success', 'Abonelik durumu başarıyla güncellendi.');
+    }
+
+    /**
+     * Update the custom price for a tenant's subscription.
+     */
+    public function updateCustomPrice(UpdateCustomPriceRequest $request, Tenant $tenant): RedirectResponse
+    {
+        $subscription = $tenant->subscription;
+
+        if (!$subscription) {
+            return redirect()
+                ->route('panel.tenants.subscription.show', $tenant)
+                ->with('error', 'Tenant\'ın aboneliği bulunmuyor.');
+        }
+
+        $customPrice = $request->validated('custom_price') !== null
+            ? (float) $request->validated('custom_price')
+            : null;
+
+        $this->subscriptionService->updateCustomPrice(
+            $subscription,
+            $customPrice,
+            $request->validated('custom_currency'),
+            $request->user(),
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        $message = $customPrice !== null
+            ? 'Özel fiyat başarıyla güncellendi.'
+            : 'Özel fiyat kaldırıldı, plan fiyatı geçerli olacak.';
+
+        return redirect()
+            ->route('panel.tenants.subscription.show', $tenant)
+            ->with('success', $message);
     }
 }

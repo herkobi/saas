@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use App\Enums\UserStatus;
 use Closure;
 use Illuminate\Http\Request;
@@ -58,7 +58,7 @@ class EnsureWriteAccess
             return $this->denyWriteAccess($request, 'Hesabınız kısıtlı modda. Yazma işlemi yapamazsınız.');
         }
 
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         if ($tenant) {
             $pivotStatus = $tenant->users()

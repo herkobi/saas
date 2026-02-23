@@ -160,6 +160,7 @@ Route::middleware(['auth', 'auth.session', 'verified', 'write.access'])->group(f
             Route::post('extend-trial', 'extendTrial')->name('extend-trial');
             Route::post('extend-grace-period', 'extendGracePeriod')->name('extend-grace-period');
             Route::put('status', 'updateStatus')->name('update-status');
+            Route::put('custom-price', 'updateCustomPrice')->name('update-custom-price');
         });
 
         /**

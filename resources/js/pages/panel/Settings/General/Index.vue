@@ -8,6 +8,7 @@ import {
     Upload,
 } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
+import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import InputError from '@/components/common/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +23,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import PanelLayout from '@/layouts/PanelLayout.vue';
+import SettingsLayout from '@/pages/panel/Settings/layout/Layout.vue';
 import { index, update, deleteFile } from '@/routes/panel/settings/general';
 import type { BreadcrumbItem } from '@/types';
 
@@ -79,10 +81,23 @@ function handleFileChange(field: 'logo_light' | 'logo_dark' | 'favicon', event: 
     reader.readAsDataURL(file);
 }
 
+const showConfirm = ref(false);
+let pendingConfirmAction: (() => void) | null = null;
+
+function requestConfirm(action: () => void) {
+    pendingConfirmAction = action;
+    showConfirm.value = true;
+}
+
+function onConfirmed() {
+    pendingConfirmAction?.();
+    pendingConfirmAction = null;
+}
+
 function handleDeleteFile(key: string) {
-    if (confirm('Bu dosyayı silmek istediğinize emin misiniz?')) {
+    requestConfirm(() => {
         router.delete(deleteFile(key).url, { preserveScroll: true });
-    }
+    });
 }
 
 function getStorageUrl(path: string | null): string | null {
@@ -116,12 +131,7 @@ function submitForm() {
     <Head title="Genel Ayarlar" />
 
     <PanelLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
-            <div>
-                <h1 class="text-lg font-semibold">Genel Ayarlar</h1>
-                <p class="text-sm text-muted-foreground">Platform genel ayarlarını yapılandırın</p>
-            </div>
-
+        <SettingsLayout>
             <form @submit.prevent="submitForm" class="space-y-6">
                 <!-- Site Info -->
                 <Card>
@@ -414,6 +424,7 @@ function submitForm() {
                     </Button>
                 </div>
             </form>
-        </div>
+        </SettingsLayout>
+        <ConfirmDialog v-model="showConfirm" description="Bu dosyayı silmek istediğinize emin misiniz?" @confirm="onConfirmed" />
     </PanelLayout>
 </template>

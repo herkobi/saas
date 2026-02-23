@@ -2,6 +2,8 @@
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Bell, BellOff, CheckCheck, ExternalLink, Archive } from 'lucide-vue-next';
 import Heading from '@/components/common/Heading.vue';
+import EmptyState from '@/components/common/EmptyState.vue';
+import SimplePagination from '@/components/common/SimplePagination.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -81,11 +83,13 @@ function handleMarkAllAsRead() {
                     okunmamış bildiriminiz var.
                 </div>
 
-                <div v-if="notifications.data.length === 0" class="flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center">
-                    <BellOff class="mb-3 h-10 w-10 text-muted-foreground/50" />
-                    <p class="text-sm font-medium text-muted-foreground">Bildirim bulunmuyor</p>
-                    <p class="mt-1 text-xs text-muted-foreground/70">Yeni bildirimler burada görünecek.</p>
-                </div>
+                <EmptyState
+                    v-if="notifications.data.length === 0"
+                    :icon="BellOff"
+                    message="Bildirim bulunmuyor"
+                    description="Yeni bildirimler burada görünecek."
+                    bordered
+                />
 
                 <div v-else class="space-y-3">
                     <Card
@@ -150,36 +154,7 @@ function handleMarkAllAsRead() {
                     </Card>
                 </div>
 
-                <!-- Pagination -->
-                <div v-if="notifications.last_page > 1" class="flex items-center justify-between pt-2">
-                    <p class="text-sm text-muted-foreground">
-                        {{ notifications.from }}–{{ notifications.to }} / {{ notifications.total }} bildirim
-                    </p>
-                    <div class="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            :disabled="!notifications.links.prev"
-                            as-child
-                        >
-                            <Link v-if="notifications.links.prev" :href="notifications.links.prev">
-                                Önceki
-                            </Link>
-                            <span v-else>Önceki</span>
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            :disabled="!notifications.links.next"
-                            as-child
-                        >
-                            <Link v-if="notifications.links.next" :href="notifications.links.next">
-                                Sonraki
-                            </Link>
-                            <span v-else>Sonraki</span>
-                        </Button>
-                    </div>
-                </div>
+                <SimplePagination :data="notifications" label="bildirim" class="pt-2" />
             </div>
         </SettingsLayout>
     </AppLayout>

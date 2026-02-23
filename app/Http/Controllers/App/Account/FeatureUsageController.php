@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\FeatureUsageServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\FeatureUsageService;
+use App\Services\Shared\TenantContextService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,10 +35,10 @@ class FeatureUsageController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param FeatureUsageServiceInterface $featureUsageService Service for feature usage operations
+     * @param FeatureUsageService $featureUsageService Service for feature usage operations
      */
     public function __construct(
-        private readonly FeatureUsageServiceInterface $featureUsageService
+        private readonly FeatureUsageService $featureUsageService
     ) {}
 
     /**
@@ -49,7 +49,7 @@ class FeatureUsageController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         return response()->json([
             'features' => $this->featureUsageService->getAllFeatures($tenant),
@@ -68,7 +68,7 @@ class FeatureUsageController extends Controller
      */
     public function show(Request $request, string $featureSlug): JsonResponse
     {
-        $usage = $this->featureUsageService->getFeatureUsage(app(TenantContextServiceInterface::class)->currentTenant(), $featureSlug);
+        $usage = $this->featureUsageService->getFeatureUsage(app(TenantContextService::class)->currentTenant(), $featureSlug);
 
         return response()->json($usage);
     }
@@ -82,7 +82,7 @@ class FeatureUsageController extends Controller
      */
     public function check(Request $request, string $featureSlug): JsonResponse
     {
-        $result = $this->featureUsageService->checkFeatureLimit(app(TenantContextServiceInterface::class)->currentTenant(), $featureSlug);
+        $result = $this->featureUsageService->checkFeatureLimit(app(TenantContextService::class)->currentTenant(), $featureSlug);
 
         return response()->json($result);
     }

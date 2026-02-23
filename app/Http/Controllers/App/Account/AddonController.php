@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\AddonPurchaseServiceInterface;
+use App\Services\App\Account\AddonPurchaseService;
 use App\Events\TenantAddonCancelled;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\App\Account\PurchaseAddonRequest;
@@ -17,7 +17,7 @@ use Inertia\Response;
 class AddonController extends Controller
 {
     public function __construct(
-        protected AddonPurchaseServiceInterface $addonPurchaseService
+        protected AddonPurchaseService $addonPurchaseService
     ) {}
 
     /**

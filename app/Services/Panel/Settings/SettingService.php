@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Settings;
 
-use App\Contracts\Panel\Settings\SettingServiceInterface;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Cache;
 
@@ -28,7 +27,7 @@ use Illuminate\Support\Facades\Cache;
  * Service implementation for managing system settings
  * with caching support for performance optimization.
  */
-class SettingService implements SettingServiceInterface
+class SettingService
 {
     /**
      * Cache key for all settings.

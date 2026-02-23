@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Events\TenantBillingUpdated;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class LogTenantBillingActivity implements ShouldQueue
 {
     public function __construct(
-        private readonly ActivityServiceInterface $activityService
+        private readonly ActivityService $activityService
     ) {}
 
     public function handle(TenantBillingUpdated $event): void

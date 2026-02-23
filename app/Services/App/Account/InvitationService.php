@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services\App\Account;
 
-use App\Contracts\App\Account\FeatureUsageServiceInterface;
-use App\Contracts\App\Account\InvitationServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\FeatureUsageService;
+use App\Services\Shared\TenantContextService;
 use App\Enums\InvitationStatus;
 use App\Events\TenantInvitationAccepted;
 use App\Events\TenantInvitationRevoked;
@@ -19,11 +18,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class InvitationService implements InvitationServiceInterface
+class InvitationService
 {
     public function __construct(
-        private readonly TenantContextServiceInterface $tenantContextService,
-        private readonly FeatureUsageServiceInterface $featureUsageService
+        private readonly TenantContextService $tenantContextService,
+        private readonly FeatureUsageService $featureUsageService
     ) {}
 
     public function invite(

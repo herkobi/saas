@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Listeners;
 
-use App\Contracts\Shared\ActivityServiceInterface;
+use App\Services\Shared\ActivityService;
 use App\Events\PanelSettingUpdated;
 
 class LogPanelSettingActivity
 {
     public function __construct(
-        private readonly ActivityServiceInterface $activityService
+        private readonly ActivityService $activityService
     ) {}
 
     public function handleUpdated(PanelSettingUpdated $event): void

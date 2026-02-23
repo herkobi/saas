@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\CheckoutServiceInterface;
+use App\Services\App\Account\CheckoutService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -34,10 +34,10 @@ class PaymentCallbackController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param CheckoutServiceInterface $checkoutService The checkout service
+     * @param CheckoutService $checkoutService The checkout service
      */
     public function __construct(
-        private readonly CheckoutServiceInterface $checkoutService
+        private readonly CheckoutService $checkoutService
     ) {}
 
     /**

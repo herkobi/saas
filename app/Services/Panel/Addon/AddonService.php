@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Addon;
 
-use App\Contracts\Panel\Addon\AddonServiceInterface;
 use App\Events\PanelAddonCreated;
 use App\Events\PanelAddonDeleted;
 use App\Events\PanelAddonUpdated;
@@ -14,7 +13,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
-class AddonService implements AddonServiceInterface
+class AddonService
 {
     public function getPaginated(array $filters, int $perPage): LengthAwarePaginator
     {

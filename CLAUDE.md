@@ -28,8 +28,7 @@ Herkobi, Laravel 12 uzerinde kurulu cok kiracili (multi-tenant) bir SaaS platfor
 
 ```
 app/
-├── Contracts/          # 37 interface (her servisin bir interface'i var)
-├── Services/           # 37 servis (App/, Panel/, Shared/ altinda)
+├── Services/           # 37 servis (App/, Panel/, Shared/ altinda) — interface yok, dogrudan concrete class kullaniyor
 ├── Http/
 │   ├── Controllers/    # App/ ve Panel/ altinda izole controller'lar
 │   ├── Middleware/      # 12 ozel middleware
@@ -98,9 +97,8 @@ resources/js/
 ### Servis Katmani
 
 - Tum is mantigi `app/Services/` icinde. Controller'lar ince tutulur, servis cagirir
-- Her servisin bir interface'i (`app/Contracts/`) vardir
-- Baglamalar `app/Providers/` altindaki service provider'larda yapilir
-- Yeni servis: Interface → Service → ServiceProvider binding sirasi
+- Interface/Contract kullanilmaz — controller ve diger siniflar dogrudan concrete service class'lari inject eder
+- Yeni servis: Service class olustur → controller'da inject et
 
 ### ID ve Enum
 
@@ -254,15 +252,13 @@ Checkout ──▸ Tenant, PlanPrice, Addon, Payment
 
 ## 8. Yeni Ozellik Ekleme Kontrol Listesi
 
-1. Interface (`app/Contracts/`) olustur veya guncelle
-2. Servis (`app/Services/`) implement et
-3. Service provider'da binding yap
-4. Migration ekle (ULID, enum varsayilanlari). `users`/`notifications` icin yeni dosya, digerleri mevcut dosyada
-5. Event + listener ekle (yan etkiler icin)
-6. Rotalari guncelle ve middleware uygula
-7. Config kontrollerinin rota guard'lari ile tutarli oldugunu dogrula
-8. Frontend sayfa/component olustur (shadcn-vue, Lucide, Tailwind)
-9. Test yaz (Pest) ve `composer test` calistir
+1. Servis (`app/Services/`) olustur
+2. Migration ekle (ULID, enum varsayilanlari). `users`/`notifications` icin yeni dosya, digerleri mevcut dosyada
+3. Event + listener ekle (yan etkiler icin)
+4. Rotalari guncelle ve middleware uygula
+5. Config kontrollerinin rota guard'lari ile tutarli oldugunu dogrula
+6. Frontend sayfa/component olustur (shadcn-vue, Lucide, Tailwind)
+7. Test yaz (Pest) ve `composer test` calistir
 
 ---
 

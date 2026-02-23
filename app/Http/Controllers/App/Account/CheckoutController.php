@@ -18,8 +18,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\CheckoutServiceInterface;
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\App\Account\CheckoutService;
+use App\Services\Shared\TenantContextService;
 use App\Enums\CheckoutType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\App\Account\InitiateCheckoutRequest;
@@ -40,10 +40,10 @@ class CheckoutController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param CheckoutServiceInterface $checkoutService The checkout service
+     * @param CheckoutService $checkoutService The checkout service
      */
     public function __construct(
-        private readonly CheckoutServiceInterface $checkoutService
+        private readonly CheckoutService $checkoutService
     ) {}
 
     /**
@@ -55,7 +55,7 @@ class CheckoutController extends Controller
      */
     public function index(string $planPriceId, string $type = 'new'): Response
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
         $planPrice = PlanPrice::with('plan')->findOrFail($planPriceId);
 
         $amounts = $this->checkoutService->calculateAmount($tenant, $planPrice, CheckoutType::from($type));
@@ -87,7 +87,7 @@ class CheckoutController extends Controller
      */
     public function initiate(InitiateCheckoutRequest $request): RedirectResponse
     {
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
         $planPrice = PlanPrice::findOrFail($request->validated('plan_price_id'));
 
         $checkout = $this->checkoutService->initiate(
@@ -108,6 +108,11 @@ class CheckoutController extends Controller
      */
     public function processing(string $checkoutId): Response|RedirectResponse
     {
+        if (!$this->isPaymentGatewayConfigured()) {
+            return redirect()->route('app.account.checkout.failed')
+                ->with('error', 'Ödeme altyapısı henüz yapılandırılmamış. Lütfen yönetici ile iletişime geçin.');
+        }
+
         $checkout = Checkout::with('planPrice.plan')->findOrFail($checkoutId);
 
         if ($checkout->isCompleted()) {
@@ -120,7 +125,7 @@ class CheckoutController extends Controller
         }
 
         $user = request()->user();
-        $tenant = app(TenantContextServiceInterface::class)->currentTenant();
+        $tenant = app(TenantContextService::class)->currentTenant();
 
         $result = $this->checkoutService->generatePaymentToken($checkout, [
             'user_ip' => request()->ip(),
@@ -188,5 +193,15 @@ class CheckoutController extends Controller
         ]);
 
         return implode(', ', $parts);
+    }
+
+    /**
+     * Check if payment gateway credentials are configured.
+     */
+    protected function isPaymentGatewayConfigured(): bool
+    {
+        return !empty(config('paytr.merchant_id'))
+            && !empty(config('paytr.merchant_key'))
+            && !empty(config('paytr.merchant_salt'));
     }
 }

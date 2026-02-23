@@ -18,9 +18,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Panel;
 
-use App\Contracts\Panel\Payment\PaymentServiceInterface;
-use App\Contracts\Panel\Subscription\SubscriptionServiceInterface;
-use App\Contracts\Panel\Tenant\TenantServiceInterface;
+use App\Services\Panel\Payment\PaymentService;
+use App\Services\Panel\Subscription\SubscriptionService;
+use App\Services\Panel\Tenant\TenantService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -37,14 +37,14 @@ class DashboardController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param TenantServiceInterface $tenantService
-     * @param PaymentServiceInterface $paymentService
-     * @param SubscriptionServiceInterface $subscriptionService
+     * @param TenantService $tenantService
+     * @param PaymentService $paymentService
+     * @param SubscriptionService $subscriptionService
      */
     public function __construct(
-        private readonly TenantServiceInterface $tenantService,
-        private readonly PaymentServiceInterface $paymentService,
-        private readonly SubscriptionServiceInterface $subscriptionService
+        private readonly TenantService $tenantService,
+        private readonly PaymentService $paymentService,
+        private readonly SubscriptionService $subscriptionService
     ) {}
 
     /**

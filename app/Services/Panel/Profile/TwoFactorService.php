@@ -18,7 +18,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Profile;
 
-use App\Contracts\Panel\Profile\TwoFactorServiceInterface;
 use App\Events\PanelTwoFactorDisabled;
 use App\Events\PanelTwoFactorEnabled;
 use App\Models\User;
@@ -29,7 +28,7 @@ use App\Models\User;
  * Service implementation for managing panel user two-factor authentication
  * including enable and disable operations with event dispatching.
  */
-class TwoFactorService implements TwoFactorServiceInterface
+class TwoFactorService
 {
     /**
      * Enable two-factor authentication for the user.

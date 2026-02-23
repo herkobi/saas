@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App;
 
-use App\Contracts\App\Account\InvitationServiceInterface;
+use App\Services\App\Account\InvitationService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ use Inertia\Response;
 class InvitationAcceptController extends Controller
 {
     public function __construct(
-        private readonly InvitationServiceInterface $invitationService
+        private readonly InvitationService $invitationService
     ) {}
 
     public function show(string $token): Response|RedirectResponse

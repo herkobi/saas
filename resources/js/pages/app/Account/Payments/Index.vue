@@ -36,14 +36,16 @@ import {
 } from '@/components/ui/table';
 import {
     Pagination,
-    PaginationList,
-    PaginationListItem,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
     PaginationNext,
-    PaginationPrev,
+    PaginationPrevious,
 } from '@/components/ui/pagination';
 import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import { usePaymentStatus } from '@/composables/usePaymentStatus';
 import AppLayout from '@/layouts/AppLayout.vue';
+import AccountLayout from '@/pages/app/Account/layout/Layout.vue';
 import { dashboard } from '@/routes/app';
 import { index as paymentsIndex, show } from '@/routes/app/account/payments';
 import type { BreadcrumbItem } from '@/types';
@@ -81,6 +83,7 @@ const { getStatusLabel, getStatusVariant } = usePaymentStatus();
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Başlangıç', href: dashboard().url },
+    { title: 'Hesap Yönetimi' },
     { title: 'Ödemeler', href: paymentsIndex().url },
 ];
 
@@ -117,7 +120,8 @@ function goToPage(page: number) {
     <Head title="Ödemeler" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="flex flex-col gap-6 p-4 md:p-6">
+        <AccountLayout>
+        <div class="flex flex-col gap-6">
             <!-- Statistics -->
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Card>
@@ -245,10 +249,11 @@ function goToPage(page: number) {
                     :default-page="payments.current_page"
                     @update:page="goToPage"
                 >
-                    <PaginationList v-slot="{ items }">
-                        <PaginationPrev />
+                    <PaginationContent v-slot="{ items }">
+                        <PaginationPrevious />
                         <template v-for="(item, index) in items" :key="index">
-                            <PaginationListItem v-if="item.type === 'page'" :value="item.value" as-child>
+                            <PaginationEllipsis v-if="item.type === 'ellipsis'" :index="index" />
+                            <PaginationItem v-else :value="item.value" as-child>
                                 <Button
                                     variant="outline"
                                     size="icon"
@@ -257,12 +262,13 @@ function goToPage(page: number) {
                                 >
                                     {{ item.value }}
                                 </Button>
-                            </PaginationListItem>
+                            </PaginationItem>
                         </template>
                         <PaginationNext />
-                    </PaginationList>
+                    </PaginationContent>
                 </Pagination>
             </div>
         </div>
+        </AccountLayout>
     </AppLayout>
 </template>

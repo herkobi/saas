@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Contracts\Shared\TenantContextServiceInterface;
+use App\Services\Shared\TenantContextService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -58,7 +58,7 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        $tenantContextService = app(TenantContextServiceInterface::class);
+        $tenantContextService = app(TenantContextService::class);
         $tenant = $tenantContextService->currentTenant();
 
         return array_merge(parent::share($request), [
@@ -71,6 +71,7 @@ class HandleInertiaRequests extends Middleware
             'site' => [
                 'name' => settings('site_name', config('app.name')),
                 'logo' => logo(),
+                'logo_dark' => logo('dark'),
                 'favicon' => favicon(),
                 'allow_team_members' => config('herkobi.tenant.allow_team_members', false),
                 'allow_multiple_tenants' => config('herkobi.tenant.allow_multiple_tenants', false),

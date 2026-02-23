@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\App\Account;
 
-use App\Contracts\App\Account\InvitationServiceInterface;
+use App\Services\App\Account\InvitationService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\App\Account\InviteTeamMemberRequest;
 use App\Traits\HasTenantContext;
@@ -18,7 +18,7 @@ class InvitationController extends Controller
     use HasTenantContext;
 
     public function __construct(
-        private readonly InvitationServiceInterface $invitationService
+        private readonly InvitationService $invitationService
     ) {}
 
     public function index(): Response|RedirectResponse

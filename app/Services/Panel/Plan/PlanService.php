@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Panel\Plan;
 
-use App\Contracts\Panel\Plan\PlanServiceInterface;
 use App\Events\PanelPlanArchived;
 use App\Events\PanelPlanCreated;
 use App\Events\PanelPlanUpdated;
@@ -15,7 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-class PlanService implements PlanServiceInterface
+class PlanService
 {
     public function getPaginated(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {

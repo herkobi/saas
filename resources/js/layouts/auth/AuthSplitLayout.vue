@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import AppLogoIcon from '@/components/common/AppLogoIcon.vue';
 import { home } from '@/routes';
 
 const page = usePage();
-const name = page.props.name;
+const siteName = computed(() => page.props.site?.name ?? 'Herkobi');
+const siteLogo = computed(() => page.props.site?.logo_dark ?? page.props.site?.logo ?? null);
 
 defineProps<{
     title?: string;
@@ -24,8 +26,14 @@ defineProps<{
                 :href="home()"
                 class="relative z-20 flex items-center text-lg font-medium"
             >
-                <AppLogoIcon class="mr-2 size-8 fill-current text-white" />
-                {{ name }}
+                <img
+                    v-if="siteLogo"
+                    :src="siteLogo"
+                    :alt="siteName"
+                    class="mr-2 size-8 object-contain"
+                />
+                <AppLogoIcon v-else class="mr-2 size-8 fill-current text-white" />
+                {{ siteName }}
             </Link>
         </div>
         <div class="lg:p-8">
