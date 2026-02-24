@@ -50,7 +50,6 @@ class PaymentFilterRequest extends FormRequest
             'status' => ['nullable', Rule::enum(PaymentStatus::class)],
             'tenant_id' => ['nullable', 'ulid', 'exists:tenants,id'],
             'invoiced' => ['nullable', 'boolean'],
-            'upcoming' => ['nullable', 'boolean'],
             'date_from' => ['nullable', 'date'],
             'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
             'amount_min' => ['nullable', 'numeric', 'min:0'],

@@ -152,9 +152,11 @@ const addonTypeLabels: Record<string, string> = {
                                     <div class="flex items-center justify-end gap-1">
                                         <Button variant="ghost" size="sm" @click="openExtendDialog(ta.id)">
                                             <Calendar class="h-4 w-4" />
+                                            <span class="hidden sm:inline">Uzat</span>
                                         </Button>
                                         <Button variant="ghost" size="sm" @click="handleCancel(ta.id)">
                                             <X class="h-4 w-4" />
+                                            <span class="hidden sm:inline">İptal</span>
                                         </Button>
                                     </div>
                                 </TableCell>

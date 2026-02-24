@@ -221,6 +221,7 @@ function formatValue(value: any, type: string): string {
                                         @click="handleRemoveOverride(feat.id)"
                                     >
                                         <Trash2 class="h-4 w-4" />
+                                        <span class="hidden sm:inline">Kaldır</span>
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -270,6 +271,7 @@ function formatValue(value: any, type: string): string {
                             @click="removeOverrideRow(idx)"
                         >
                             <Trash2 class="h-4 w-4" />
+                            <span class="hidden sm:inline">Sil</span>
                         </Button>
                     </div>
                     <Button type="button" variant="outline" size="sm" @click="addOverrideRow">

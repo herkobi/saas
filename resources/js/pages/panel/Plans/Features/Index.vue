@@ -184,6 +184,7 @@ function handleDelete(feature: FeatureListItem) {
                                         <Button variant="ghost" size="sm" as-child>
                                             <Link :href="edit(feature.id).url">
                                                 <Pencil class="h-4 w-4" />
+                                                <span class="hidden sm:inline">Düzenle</span>
                                             </Link>
                                         </Button>
                                         <Button
@@ -192,6 +193,7 @@ function handleDelete(feature: FeatureListItem) {
                                             @click="handleDelete(feature)"
                                         >
                                             <Trash2 class="h-4 w-4" />
+                                            <span class="hidden sm:inline">Sil</span>
                                         </Button>
                                     </div>
                                 </TableCell>

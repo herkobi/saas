@@ -152,6 +152,7 @@ function handleRestore(plan: PlanListItem) {
                                         <Button variant="ghost" size="sm" as-child>
                                             <Link :href="edit(plan.id).url">
                                                 <Pencil class="h-4 w-4" />
+                                                <span class="hidden sm:inline">Düzenle</span>
                                             </Link>
                                         </Button>
                                         <Button
@@ -161,6 +162,7 @@ function handleRestore(plan: PlanListItem) {
                                             @click="handleRestore(plan)"
                                         >
                                             <ArchiveRestore class="h-4 w-4" />
+                                            <span class="hidden sm:inline">Geri Al</span>
                                         </Button>
                                     </div>
                                 </TableCell>

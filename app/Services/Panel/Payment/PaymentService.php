@@ -86,14 +86,6 @@ class PaymentService
             $query->where('amount', '<=', $filters['amount_max']);
         }
 
-        if (!empty($filters['upcoming'])) {
-            $query->whereHas('subscription', function ($q) {
-                $q->whereNotNull('ends_at')
-                    ->where('ends_at', '>', now())
-                    ->where('ends_at', '<=', now()->addDays(30));
-            });
-        }
-
         $sortField = $filters['sort'] ?? 'created_at';
         $sortDirection = $filters['direction'] ?? 'desc';
 
@@ -210,6 +202,71 @@ class PaymentService
         }
 
         return $count;
+    }
+
+    /**
+     * Get paginated list of upcoming payments (subscriptions ending within 30 days).
+     *
+     * @param array<string, mixed> $filters Filter parameters
+     * @param int $perPage Number of items per page
+     * @return LengthAwarePaginator Paginated payment results
+     */
+    public function getUpcoming(array $filters = [], int $perPage = 15): LengthAwarePaginator
+    {
+        $query = Payment::withoutTenantScope()
+            ->with(['tenant', 'subscription.price.plan', 'addon.feature'])
+            ->whereHas('subscription', function ($q) {
+                $q->whereNotNull('ends_at')
+                    ->where('ends_at', '>', now())
+                    ->where('ends_at', '<=', now()->addDays(30));
+            });
+
+        if (!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $q->where('gateway_payment_id', 'like', "%{$filters['search']}%")
+                  ->orWhereHas('tenant', function ($q2) use ($filters) {
+                      $q2->where('code', 'like', "%{$filters['search']}%")
+                         ->orWhere('slug', 'like', "%{$filters['search']}%");
+                  });
+            });
+        }
+
+        $sortField = $filters['sort'] ?? 'created_at';
+        $sortDirection = $filters['direction'] ?? 'desc';
+
+        return $query->orderBy($sortField, $sortDirection)->paginate($perPage)
+            ->through(fn ($payment) => array_merge($payment->toArray(), [
+                'tenant_name' => $payment->tenant?->name ?? $payment->tenant?->code,
+                'status_label' => $payment->status->label(),
+                'status_badge' => $payment->status->badge(),
+                'subscription_ends_at' => $payment->subscription?->ends_at,
+            ]));
+    }
+
+    /**
+     * Get upcoming payment statistics.
+     *
+     * @return array<string, mixed> Statistics data
+     */
+    public function getUpcomingStatistics(): array
+    {
+        $query = Payment::withoutTenantScope()
+            ->whereHas('subscription', function ($q) {
+                $q->whereNotNull('ends_at')
+                    ->where('ends_at', '>', now())
+                    ->where('ends_at', '<=', now()->addDays(30));
+            });
+
+        return [
+            'total_count' => (clone $query)->count(),
+            'total_amount' => (clone $query)->sum('amount'),
+            'next_7_days' => (clone $query)->whereHas('subscription', function ($q) {
+                $q->where('ends_at', '<=', now()->addDays(7));
+            })->count(),
+            'next_14_days' => (clone $query)->whereHas('subscription', function ($q) {
+                $q->where('ends_at', '<=', now()->addDays(14));
+            })->count(),
+        ];
     }
 
     /**

@@ -247,6 +247,7 @@ function badgeVariant(status: string): 'default' | 'secondary' | 'destructive' |
                                     <Button variant="ghost" size="sm" as-child>
                                         <Link :href="show(sub.id).url">
                                             <Eye class="h-4 w-4" />
+                                            <span class="hidden sm:inline">Görüntüle</span>
                                         </Link>
                                     </Button>
                                 </TableCell>

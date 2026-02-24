@@ -74,6 +74,28 @@ class PaymentController extends Controller
     }
 
     /**
+     * Display a listing of upcoming payments.
+     *
+     * @param PaymentFilterRequest $request
+     * @return Response
+     */
+    public function upcoming(PaymentFilterRequest $request): Response
+    {
+        $payments = $this->paymentService->getUpcoming(
+            $request->validated(),
+            $request->integer('per_page', 15)
+        );
+
+        $statistics = $this->paymentService->getUpcomingStatistics();
+
+        return Inertia::render('panel/Payments/Upcoming', [
+            'payments' => $payments,
+            'statistics' => $statistics,
+            'filters' => $request->validated(),
+        ]);
+    }
+
+    /**
      * Display the specified payment.
      *
      * @param Payment $payment

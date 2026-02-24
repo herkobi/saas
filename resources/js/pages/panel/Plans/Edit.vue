@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import {
+    Archive,
     ArrowLeft,
     Check,
     Eye,
@@ -56,7 +57,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatCurrency } from '@/composables/useFormatting';
 import { useFeatureType } from '@/composables/useFeatureType';
 import PanelLayout from '@/layouts/PanelLayout.vue';
-import { index, update, publish, unpublish } from '@/routes/panel/plans';
+import { index, update, publish, unpublish, archive } from '@/routes/panel/plans';
 import { store as storePrice, update as updatePrice, destroy as destroyPrice } from '@/routes/panel/plans/prices';
 import { sync as syncFeatures } from '@/routes/panel/plans/plan-features';
 import type { BreadcrumbItem } from '@/types';
@@ -181,7 +182,7 @@ function handleDeletePrice(price: PlanPrice) {
         router.delete(destroyPrice({ plan: props.plan.id, price: price.id }).url, {
             preserveScroll: true,
         });
-    });
+    }, 'Bu fiyatı silmek istediğinize emin misiniz?');
 }
 
 // Features sync
@@ -208,6 +209,12 @@ function submitFeatures() {
 }
 
 // Publish/Unpublish
+function handleArchive() {
+    requestConfirm(() => {
+        router.post(archive(props.plan.id).url, {}, { preserveScroll: false });
+    }, 'Bu planı arşivlemek istediğinize emin misiniz?');
+}
+
 function handlePublish() {
     router.post(publish(props.plan.id).url, {}, { preserveScroll: true });
 }
@@ -217,10 +224,12 @@ function handleUnpublish() {
 }
 
 const showConfirm = ref(false);
+const confirmDescription = ref('Bu işlemi gerçekleştirmek istediğinize emin misiniz?');
 let pendingConfirmAction: (() => void) | null = null;
 
-function requestConfirm(action: () => void) {
+function requestConfirm(action: () => void, description?: string) {
     pendingConfirmAction = action;
+    if (description) confirmDescription.value = description;
     showConfirm.value = true;
 }
 
@@ -247,6 +256,7 @@ const intervalLabels: Record<string, string> = {
                     <Button variant="ghost" size="sm" as-child>
                         <Link :href="index().url">
                             <ArrowLeft class="h-4 w-4" />
+                            <span class="hidden sm:inline">Geri</span>
                         </Link>
                     </Button>
                     <div>
@@ -518,6 +528,7 @@ const intervalLabels: Record<string, string> = {
                                                 @click="handleDeletePrice(price)"
                                             >
                                                 <Trash2 class="h-4 w-4" />
+                                                <span class="hidden sm:inline">Sil</span>
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -621,9 +632,30 @@ const intervalLabels: Record<string, string> = {
                             <p v-else class="text-sm text-muted-foreground">Bu planı kullanan hesap yok</p>
                         </CardContent>
                     </Card>
+
+                    <!-- Archive -->
+                    <Card>
+                        <CardHeader>
+                            <CardTitle class="text-sm font-medium">Arşivleme</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p class="mb-3 text-sm text-muted-foreground">
+                                Arşivlenen plan yeni aboneliklerde kullanılamaz. Mevcut abonelikler etkilenmez.
+                            </p>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                class="w-full text-destructive hover:bg-destructive/10"
+                                @click="handleArchive"
+                            >
+                                <Archive class="mr-1.5 h-4 w-4" />
+                                Planı Arşivle
+                            </Button>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>
-        <ConfirmDialog v-model="showConfirm" description="Bu fiyatı silmek istediğinize emin misiniz?" @confirm="onConfirmed" />
+        <ConfirmDialog v-model="showConfirm" :description="confirmDescription" @confirm="onConfirmed" />
     </PanelLayout>
 </template>

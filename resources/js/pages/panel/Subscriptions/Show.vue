@@ -78,6 +78,7 @@ function intervalLabel(interval: string, count: number): string {
                 <Button variant="ghost" size="sm" as-child>
                     <Link :href="index().url">
                         <ArrowLeft class="h-4 w-4" />
+                        <span class="hidden sm:inline">Geri</span>
                     </Link>
                 </Button>
                 <div>

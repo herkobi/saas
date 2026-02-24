@@ -246,8 +246,9 @@ function intervalLabel(interval: string, count: number): string {
                                 <dd class="flex items-center gap-2 font-medium">
                                     {{ formatCurrency(subscription.custom_price ?? subscription.plan_price?.price ?? 0) }}
                                     <Badge v-if="subscription.custom_price" variant="outline" class="text-xs">Özel</Badge>
-                                    <Button variant="ghost" size="icon" class="h-5 w-5" @click="openCustomPriceDialog">
+                                    <Button variant="ghost" size="sm" class="h-6 px-1.5" @click="openCustomPriceDialog">
                                         <Pencil class="h-3 w-3" />
+                                        <span class="hidden sm:inline text-xs">Düzenle</span>
                                     </Button>
                                 </dd>
                             </div>

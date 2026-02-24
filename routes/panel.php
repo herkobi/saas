@@ -120,6 +120,7 @@ Route::middleware(['auth', 'auth.session', 'verified', 'write.access'])->group(f
      */
     Route::prefix('payments')->name('payments.')->controller(PaymentController::class)->group(function () {
         Route::get('/', 'index')->name('index');
+        Route::get('upcoming', 'upcoming')->name('upcoming');
 
         Route::get('statistics', 'statistics')->name('statistics');
         Route::get('revenue-chart', 'revenueChart')->name('revenue-chart');

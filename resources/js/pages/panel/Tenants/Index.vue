@@ -233,6 +233,7 @@ function subscriptionBadgeVariant(status?: string): 'default' | 'secondary' | 'd
                                     <Button variant="ghost" size="sm" as-child>
                                         <Link :href="show(tenant.id).url">
                                             <Eye class="h-4 w-4" />
+                                            <span class="hidden sm:inline">Görüntüle</span>
                                         </Link>
                                     </Button>
                                 </TableCell>

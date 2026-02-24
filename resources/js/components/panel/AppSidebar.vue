@@ -26,6 +26,7 @@ import { index as settingsIndex } from '@/routes/panel/settings/general';
 import { index as companySettingsIndex } from '@/routes/panel/settings/company';
 import { index as subscriptionsIndex } from '@/routes/panel/subscriptions';
 import { index as tenantsIndex } from '@/routes/panel/tenants';
+import { index as usersIndex } from '@/routes/panel/users';
 
 const props = withDefaults(defineProps<SidebarProps>(), {
     collapsible: 'icon',
@@ -47,7 +48,7 @@ const tenantsNav = [
         items: [
             { title: 'Hesaplar', url: tenantsIndex().url },
             { title: 'Abonelikler', url: subscriptionsIndex().url },
-            { title: 'Kullanıcılar', url: tenantsIndex().url },
+            { title: 'Kullanıcılar', url: usersIndex().url },
         ],
     },
 ];

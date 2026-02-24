@@ -171,10 +171,12 @@ const addonTypeLabels: Record<string, string> = {
                                         <Button variant="ghost" size="sm" as-child>
                                             <Link :href="edit(addon.id).url">
                                                 <Pencil class="h-4 w-4" />
+                                                <span class="hidden sm:inline">Düzenle</span>
                                             </Link>
                                         </Button>
                                         <Button variant="ghost" size="sm" @click="handleDelete(addon)">
                                             <Trash2 class="h-4 w-4" />
+                                            <span class="hidden sm:inline">Sil</span>
                                         </Button>
                                     </div>
                                 </TableCell>
