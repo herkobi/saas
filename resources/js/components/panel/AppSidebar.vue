@@ -5,6 +5,11 @@ import {
     LayoutGrid,
     Package,
     Settings2,
+    Users,
+    Clock,
+    Zap,
+    Plus,
+    Building,
 } from 'lucide-vue-next';
 import AppLogo from '@/components/common/AppLogo.vue';
 import NavMain from '@/components/panel/NavMain.vue';
@@ -49,12 +54,12 @@ const tenantsNav = [
     {
         title: 'Abonelikler',
         url: subscriptionsIndex().url,
-        icon: Building2,
+        icon: CreditCard,
     },
     {
         title: 'Kullanıcılar',
         url: usersIndex().url,
-        icon: Building2,
+        icon: Users,
     },
 ];
 
@@ -67,7 +72,7 @@ const paymentsNav = [
     {
         title: 'Yaklaşan Ödemeler',
         url: `${paymentsIndex().url}?upcoming=1`,
-        icon: CreditCard,
+        icon: Clock,
     },
 ];
 
@@ -80,12 +85,12 @@ const plansNav = [
     {
         title: 'Özellikler',
         url: featuresIndex().url,
-        icon: Package,
+        icon: Zap,
     },
     {
         title: 'Eklentiler',
         url: addonsIndex().url,
-        icon: Package,
+        icon: Plus,
     },
 ];
 
@@ -98,7 +103,7 @@ const managementNav = [
     {
         title: 'Firma Bilgileri',
         url: companySettingsIndex().url,
-        icon: Settings2,
+        icon: Building,
     },
 ];
 </script>

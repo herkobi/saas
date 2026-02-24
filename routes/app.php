@@ -22,6 +22,7 @@ use App\Http\Controllers\App\Account\BillingController;
 use App\Http\Controllers\App\Account\CheckoutController;
 use App\Http\Controllers\App\Account\FeatureUsageController;
 use App\Http\Controllers\App\Account\InvitationController;
+use App\Http\Controllers\App\Account\OverviewController;
 use App\Http\Controllers\App\Account\PaymentCallbackController;
 use App\Http\Controllers\App\Account\PaymentController;
 use App\Http\Controllers\App\Account\PlanChangeController;
@@ -164,6 +165,11 @@ Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
     */
 
     Route::prefix('account')->name('account.')->middleware(['tenant.owner', 'tenant.member_active'])->group(function () {
+
+        /**
+         * Overview Routes
+         */
+        Route::get('overview', [OverviewController::class, 'index'])->name('overview.index');
 
         /**
          * Subscription Routes

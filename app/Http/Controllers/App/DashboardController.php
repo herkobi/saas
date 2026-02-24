@@ -58,55 +58,8 @@ class DashboardController extends Controller
     {
         $tenant = app(Tenant::class);
 
-        $subscriptionDetails = $this->subscriptionService->getSubscriptionDetails($tenant);
-        $hasSubscription = $subscriptionDetails['has_subscription'];
-
-        $features = $hasSubscription
-            ? $this->featureUsageService->getAllFeatures($tenant)
-            : collect();
-
-        $canUpgrade = $this->subscriptionService->canUpgrade($tenant);
-        $statistics = $this->paymentService->getDashboardStatistics($tenant);
-        $recentPayments = $this->paymentService->getRecentPayments($tenant);
-
         return Inertia::render('app/Dashboard', [
-            'tenant' => $tenant,
-            'hasActiveSubscription' => $tenant->hasActiveSubscription(),
-            'subscription' => $hasSubscription
-                ? $this->formatSubscriptionForDashboard($subscriptionDetails)
-                : null,
-            'features' => $features,
-            'statistics' => $statistics,
-            'recentPayments' => $recentPayments,
-            'canUpgrade' => $canUpgrade,
+            'tenant' => $tenant
         ]);
-    }
-
-    /**
-     * Format subscription details for dashboard display.
-     *
-     * @param array<string, mixed> $details
-     * @return array<string, mixed>
-     */
-    private function formatSubscriptionForDashboard(array $details): array
-    {
-        $subscription = $details['subscription'];
-        $price = $details['price'];
-
-        return [
-            'status' => [
-                'label' => $subscription['status']['label'],
-                'badge' => $subscription['status']['badge'],
-            ],
-            'plan' => [
-                'name' => $details['plan']['name'] ?? '',
-            ],
-            'price' => [
-                'amount' => $subscription['custom_price'] ?? $price['amount'] ?? 0,
-                'currency' => $subscription['custom_currency'] ?? $price['currency'] ?? 'TRY',
-                'interval_label' => $price['interval_label'] ?? '',
-            ],
-            'ends_at' => $subscription['ends_at'],
-        ];
     }
 }

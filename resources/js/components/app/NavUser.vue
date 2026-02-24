@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { Bell, ChevronsUpDown, LogOut, User } from 'lucide-vue-next';
+import { Bell, ChevronsUpDown, CreditCard, LogOut, User } from 'lucide-vue-next';
 import { computed } from 'vue';
 import UserInfo from '@/components/common/UserInfo.vue';
 import {
@@ -21,6 +21,7 @@ import {
 import { logout } from '@/routes';
 import { edit } from '@/routes/app/profile';
 import { index as notificationsIndex } from '@/routes/app/profile/notifications';
+import { index as overviewIndex } from '@/routes/app/account/overview';
 
 const page = usePage();
 const auth = computed(() => page.props.auth);
@@ -70,11 +71,21 @@ const handleLogout = () => {
                         <DropdownMenuItem :as-child="true">
                             <Link
                                 class="block w-full cursor-pointer"
+                                :href="overviewIndex()"
+                                prefetch
+                            >
+                                <CreditCard class="mr-2 h-4 w-4" />
+                                Hesabım
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem :as-child="true">
+                            <Link
+                                class="block w-full cursor-pointer"
                                 :href="edit()"
                                 prefetch
                             >
                                 <User class="mr-2 h-4 w-4" />
-                                Profil Bilgileri
+                                Bilgilerim
                             </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem :as-child="true">

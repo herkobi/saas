@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
+import { index as overviewIndex } from '@/routes/app/account/overview';
 import { index as subscriptionIndex } from '@/routes/app/account/subscription';
 import { index as billingIndex } from '@/routes/app/account/billing';
 import { index as paymentsIndex } from '@/routes/app/account/payments';
@@ -15,6 +16,7 @@ import { index as invitationsIndex } from '@/routes/app/account/users/invitation
 import { type NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
+    { title: 'Genel Görünüm', href: overviewIndex() },
     { title: 'Abonelik', href: subscriptionIndex() },
     { title: 'Fatura Bilgileri', href: billingIndex() },
     { title: 'Ödemeler', href: paymentsIndex() },
