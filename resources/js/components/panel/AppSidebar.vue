@@ -22,8 +22,8 @@ import { index as paymentsIndex } from '@/routes/panel/payments';
 import { index as plansIndex } from '@/routes/panel/plans';
 import { index as addonsIndex } from '@/routes/panel/plans/addons';
 import { index as featuresIndex } from '@/routes/panel/plans/features';
-import { index as settingsIndex } from '@/routes/panel/settings/general';
 import { index as companySettingsIndex } from '@/routes/panel/settings/company';
+import { index as settingsIndex } from '@/routes/panel/settings/general';
 import { index as subscriptionsIndex } from '@/routes/panel/subscriptions';
 import { index as tenantsIndex } from '@/routes/panel/tenants';
 import { index as usersIndex } from '@/routes/panel/users';
@@ -42,51 +42,63 @@ const mainNav = [
 
 const tenantsNav = [
     {
-        title: 'Hesap Yönetimi',
-        url: '#',
+        title: 'Hesaplar',
+        url: tenantsIndex().url,
         icon: Building2,
-        items: [
-            { title: 'Hesaplar', url: tenantsIndex().url },
-            { title: 'Abonelikler', url: subscriptionsIndex().url },
-            { title: 'Kullanıcılar', url: usersIndex().url },
-        ],
+    },
+    {
+        title: 'Abonelikler',
+        url: subscriptionsIndex().url,
+        icon: Building2,
+    },
+    {
+        title: 'Kullanıcılar',
+        url: usersIndex().url,
+        icon: Building2,
     },
 ];
 
 const paymentsNav = [
     {
         title: 'Ödemeler',
-        url: '#',
+        url: paymentsIndex().url,
         icon: CreditCard,
-        items: [
-            { title: 'Ödemeler', url: paymentsIndex().url },
-            { title: 'Yaklaşan Ödemeler', url: `${paymentsIndex().url}?upcoming=1` },
-        ],
+    },
+    {
+        title: 'Yaklaşan Ödemeler',
+        url: `${paymentsIndex().url}?upcoming=1`,
+        icon: CreditCard,
     },
 ];
 
 const plansNav = [
     {
         title: 'Planlar',
-        url: '#',
+        url: plansIndex().url,
         icon: Package,
-        items: [
-            { title: 'Planlar', url: plansIndex().url },
-            { title: 'Özellikler', url: featuresIndex().url },
-            { title: 'Eklentiler', url: addonsIndex().url },
-        ],
+    },
+    {
+        title: 'Özellikler',
+        url: featuresIndex().url,
+        icon: Package,
+    },
+    {
+        title: 'Eklentiler',
+        url: addonsIndex().url,
+        icon: Package,
     },
 ];
 
 const managementNav = [
     {
-        title: 'Ayarlar',
-        url: '#',
+        title: 'Genel Ayarlar',
+        url: settingsIndex().url,
         icon: Settings2,
-        items: [
-            { title: 'Genel Ayarlar', url: settingsIndex().url },
-            { title: 'Firma Bilgileri', url: companySettingsIndex().url },
-        ],
+    },
+    {
+        title: 'Firma Bilgileri',
+        url: companySettingsIndex().url,
+        icon: Settings2,
     },
 ];
 </script>

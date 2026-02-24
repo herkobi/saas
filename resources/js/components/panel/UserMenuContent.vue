@@ -34,7 +34,7 @@ defineProps<Props>();
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
                 <Settings class="mr-2 h-4 w-4" />
-                Ayarlar
+                Bilgilerim
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>

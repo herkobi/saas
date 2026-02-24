@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
 import ProfileController from '@/actions/App/Http/Controllers/App/Profile/ProfileController';
-import DeleteUser from '@/components/app/DeleteUser.vue';
 import Heading from '@/components/common/Heading.vue';
 import InputError from '@/components/common/InputError.vue';
 import { Button } from '@/components/ui/button';
@@ -124,8 +123,6 @@ const user = page.props.auth.user;
                     </div>
                 </Form>
             </div>
-
-            <DeleteUser />
         </SettingsLayout>
     </AppLayout>
 </template>

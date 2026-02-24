@@ -6,9 +6,9 @@ import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
 import { edit as editProfile } from '@/routes/app/profile';
+import { show as showAppearance } from '@/routes/app/profile/appearance';
 import { index as notificationsIndex } from '@/routes/app/profile/notifications';
 import { edit as editPassword } from '@/routes/app/profile/password';
-import { show as showAppearance } from '@/routes/app/profile/appearance';
 import { show } from '@/routes/app/profile/two-factor';
 import { type NavItem } from '@/types';
 
