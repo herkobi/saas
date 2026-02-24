@@ -7,8 +7,11 @@ import {
     FileText,
     Hash,
     Receipt,
+    Save,
+    X,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import InputError from '@/components/common/InputError.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +20,16 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -37,6 +50,7 @@ type Props = {
     payment: Payment & {
         status_label?: string;
         status_badge?: string;
+        invoice_number?: string;
         tenant?: { id: string; name: string; code: string; slug: string };
         subscription?: Subscription & {
             price?: PlanPrice & { plan?: Plan };
@@ -55,6 +69,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const selectedStatus = ref(props.payment.status);
+const showInvoiceModal = ref(false);
+
+const invoiceForm = useForm({
+    invoice_number: '',
+});
 
 function handleStatusUpdate() {
     router.put(updateStatus(props.payment.id).url, {
@@ -63,7 +82,13 @@ function handleStatusUpdate() {
 }
 
 function handleMarkInvoiced() {
-    router.post(markAsInvoiced(props.payment.id).url, {}, { preserveScroll: true });
+    invoiceForm.post(markAsInvoiced(props.payment.id).url, {
+        preserveScroll: true,
+        onSuccess: () => {
+            showInvoiceModal.value = false;
+            invoiceForm.reset();
+        },
+    });
 }
 
 function payBadgeVariant(status: string): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -223,33 +248,41 @@ function payBadgeVariant(status: string): 'default' | 'secondary' | 'destructive
                 <!-- Right: Actions -->
                 <div class="space-y-6">
                     <!-- Status Update -->
-                    <Card>
+                    <Card :class="{ 'opacity-60': payment.invoiced_at }">
                         <CardHeader>
                             <CardTitle class="text-sm font-medium">Durum Güncelle</CardTitle>
                         </CardHeader>
                         <CardContent class="space-y-3">
-                            <Select v-model="selectedStatus">
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Durum seçin" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem
-                                        v-for="s in statuses"
-                                        :key="String(s.value)"
-                                        :value="String(s.value)"
-                                    >
-                                        {{ s.label }}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button
-                                class="w-full"
-                                size="sm"
-                                :disabled="selectedStatus === payment.status"
-                                @click="handleStatusUpdate"
-                            >
-                                Durumu Güncelle
-                            </Button>
+                            <template v-if="payment.invoiced_at">
+                                <p class="text-sm text-muted-foreground">
+                                    Faturalandırılmış ödemenin durumu değiştirilemez.
+                                </p>
+                            </template>
+                            <template v-else>
+                                <Select v-model="selectedStatus">
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Durum seçin" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem
+                                            v-for="s in statuses"
+                                            :key="String(s.value)"
+                                            :value="String(s.value)"
+                                        >
+                                            {{ s.label }}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Button
+                                    class="w-full"
+                                    size="sm"
+                                    :disabled="selectedStatus === payment.status"
+                                    @click="handleStatusUpdate"
+                                >
+                                    <Save class="mr-1.5 h-4 w-4" />
+                                    Durumu Güncelle
+                                </Button>
+                            </template>
                         </CardContent>
                     </Card>
 
@@ -259,26 +292,32 @@ function payBadgeVariant(status: string): 'default' | 'secondary' | 'destructive
                             <CardTitle class="text-sm font-medium">Faturalama</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div v-if="payment.invoiced_at" class="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                                <CheckCircle class="h-4 w-4" />
-                                <span>Faturalandı — {{ formatDate(payment.invoiced_at) }}</span>
+                            <div v-if="payment.invoiced_at" class="space-y-2">
+                                <div class="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                                    <CheckCircle class="h-4 w-4" />
+                                    <span>Faturalandı — {{ formatDate(payment.invoiced_at) }}</span>
+                                </div>
+                                <div v-if="payment.invoice_number" class="flex items-center gap-2 text-sm">
+                                    <Hash class="h-4 w-4 text-muted-foreground" />
+                                    <span class="font-mono text-xs font-medium">{{ payment.invoice_number }}</span>
+                                </div>
                             </div>
                             <div v-else class="space-y-2">
                                 <p class="text-sm text-muted-foreground">
-                                    Bu ödeme henüz faturalanmamış.
+                                    Bu ödeme henüz faturalandırılmamış.
                                 </p>
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     class="w-full"
                                     :disabled="payment.status !== 'completed'"
-                                    @click="handleMarkInvoiced"
+                                    @click="showInvoiceModal = true"
                                 >
                                     <FileText class="mr-1.5 h-4 w-4" />
-                                    Faturala
+                                    Faturalandır
                                 </Button>
                                 <p v-if="payment.status !== 'completed'" class="text-xs text-muted-foreground">
-                                    Sadece tamamlanmış ödemeler faturalanabilir.
+                                    Sadece tamamlanmış ödemeler faturalandırılabilir.
                                 </p>
                             </div>
                         </CardContent>
@@ -316,5 +355,47 @@ function payBadgeVariant(status: string): 'default' | 'secondary' | 'destructive
                 </div>
             </div>
         </div>
+
+        <!-- Invoice Number Modal -->
+        <Dialog v-model:open="showInvoiceModal">
+            <DialogContent class="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Faturalandır</DialogTitle>
+                    <DialogDescription>
+                        Bu ödemeyi faturalandırmak için fatura numarasını girin.
+                    </DialogDescription>
+                </DialogHeader>
+                <form @submit.prevent="handleMarkInvoiced" class="space-y-4">
+                    <div class="space-y-2">
+                        <Label for="invoice_number">Fatura Numarası</Label>
+                        <Input
+                            id="invoice_number"
+                            v-model="invoiceForm.invoice_number"
+                            placeholder="Örn: FTR-2026-001"
+                            :disabled="invoiceForm.processing"
+                        />
+                        <InputError :message="invoiceForm.errors.invoice_number" />
+                    </div>
+                    <DialogFooter>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            @click="showInvoiceModal = false"
+                            :disabled="invoiceForm.processing"
+                        >
+                            <X class="mr-1.5 h-4 w-4" />
+                            Vazgeç
+                        </Button>
+                        <Button
+                            type="submit"
+                            :disabled="invoiceForm.processing || !invoiceForm.invoice_number"
+                        >
+                            <FileText class="mr-1.5 h-4 w-4" />
+                            Faturalandır
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
     </PanelLayout>
 </template>

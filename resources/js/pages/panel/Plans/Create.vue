@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { ArrowLeft } from 'lucide-vue-next';
+import { ArrowLeft, Plus, X } from 'lucide-vue-next';
 import InputError from '@/components/common/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -227,10 +227,14 @@ function submit() {
 
                     <div class="flex gap-2">
                         <Button type="submit" class="flex-1" :disabled="form.processing">
+                            <Plus class="mr-1.5 h-4 w-4" />
                             Plan Oluştur
                         </Button>
                         <Button variant="outline" as-child>
-                            <Link :href="index().url">İptal</Link>
+                            <Link :href="index().url">
+                                <X class="mr-1.5 h-4 w-4" />
+                                İptal
+                            </Link>
                         </Button>
                     </div>
                 </div>

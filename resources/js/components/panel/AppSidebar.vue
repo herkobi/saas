@@ -4,7 +4,6 @@ import {
     CreditCard,
     LayoutGrid,
     Package,
-    RefreshCcw,
     Settings2,
 } from 'lucide-vue-next';
 import AppLogo from '@/components/common/AppLogo.vue';
@@ -24,6 +23,7 @@ import { index as plansIndex } from '@/routes/panel/plans';
 import { index as addonsIndex } from '@/routes/panel/plans/addons';
 import { index as featuresIndex } from '@/routes/panel/plans/features';
 import { index as settingsIndex } from '@/routes/panel/settings/general';
+import { index as companySettingsIndex } from '@/routes/panel/settings/company';
 import { index as subscriptionsIndex } from '@/routes/panel/subscriptions';
 import { index as tenantsIndex } from '@/routes/panel/tenants';
 
@@ -41,30 +41,25 @@ const mainNav = [
 
 const tenantsNav = [
     {
-        title: 'Hesaplar',
+        title: 'Hesap Yönetimi',
         url: '#',
         icon: Building2,
         items: [
             { title: 'Hesaplar', url: tenantsIndex().url },
+            { title: 'Abonelikler', url: subscriptionsIndex().url },
             { title: 'Kullanıcılar', url: tenantsIndex().url },
         ],
     },
-    {
-        title: 'Abonelikler',
-        url: '#',
-        icon: RefreshCcw,
-        items: [
-            { title: 'Aktif Abonelikler', url: subscriptionsIndex().url },
-            { title: 'Süresi Dolmuş Abonelikler', url: subscriptionsIndex().url },
-        ],
-    },
+];
+
+const paymentsNav = [
     {
         title: 'Ödemeler',
         url: '#',
         icon: CreditCard,
         items: [
-            { title: 'Yaklaşan Ödemeler', url: paymentsIndex().url },
-            { title: 'Tamamlanan Ödemeler', url: paymentsIndex().url },
+            { title: 'Ödemeler', url: paymentsIndex().url },
+            { title: 'Yaklaşan Ödemeler', url: `${paymentsIndex().url}?upcoming=1` },
         ],
     },
 ];
@@ -84,9 +79,13 @@ const plansNav = [
 
 const managementNav = [
     {
-        title: 'Genel Ayarlar',
-        url: settingsIndex().url,
-        icon: Settings2
+        title: 'Ayarlar',
+        url: '#',
+        icon: Settings2,
+        items: [
+            { title: 'Genel Ayarlar', url: settingsIndex().url },
+            { title: 'Firma Bilgileri', url: companySettingsIndex().url },
+        ],
     },
 ];
 </script>
@@ -101,8 +100,9 @@ const managementNav = [
         <SidebarContent>
             <NavMain :items="mainNav" />
             <NavMain label="Hesap Yönetimi" :items="tenantsNav" />
+            <NavMain label="Ödemeler" :items="paymentsNav" />
             <NavMain label="Plan Yönetimi" :items="plansNav" />
-            <NavMain label="Sistem Ayarları" :items="managementNav" />
+            <NavMain label="Sistem" :items="managementNav" />
         </SidebarContent>
         <SidebarFooter>
             <NavUser />

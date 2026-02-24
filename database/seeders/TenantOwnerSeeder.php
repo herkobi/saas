@@ -26,6 +26,8 @@ use Illuminate\Support\Str;
 
 final class TenantOwnerSeeder extends Seeder
 {
+    private int $invoiceCounter = 100;
+
     public function run(): void
     {
         DB::transaction(function () {
@@ -266,6 +268,7 @@ final class TenantOwnerSeeder extends Seeder
             'metadata' => ['type' => 'subscription', 'merchant_oid' => $oid],
             'paid_at' => $paymentStatus === PaymentStatus::COMPLETED ? $at : null,
             'invoiced_at' => $paymentStatus === PaymentStatus::COMPLETED ? $at : null,
+            'invoice_number' => $paymentStatus === PaymentStatus::COMPLETED ? 'INV-'.str_pad((string) $this->invoiceCounter++, 6, '0', STR_PAD_LEFT) : null,
             'created_at' => $at,
             'updated_at' => $at,
         ]);

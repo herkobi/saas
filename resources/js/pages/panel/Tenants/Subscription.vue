@@ -3,12 +3,14 @@ import { Head, router, useForm } from '@inertiajs/vue3';
 import {
     Ban,
     Calendar,
+    Check,
     Clock,
     CreditCard,
     Pencil,
     Plus,
     RefreshCw,
     Repeat,
+    Save,
     X,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -408,8 +410,8 @@ function intervalLabel(interval: string, count: number): string {
                         <InputError :message="createForm.errors.trial_days" />
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="showCreateDialog = false">İptal</Button>
-                        <Button type="submit" :disabled="createForm.processing">Oluştur</Button>
+                        <Button type="button" variant="outline" @click="showCreateDialog = false"><X class="mr-1.5 h-4 w-4" />İptal</Button>
+                        <Button type="submit" :disabled="createForm.processing"><Plus class="mr-1.5 h-4 w-4" />Oluştur</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
@@ -429,8 +431,8 @@ function intervalLabel(interval: string, count: number): string {
                         <InputError :message="cancelForm.errors.reason" />
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="showCancelDialog = false">Vazgeç</Button>
-                        <Button type="submit" variant="destructive" :disabled="cancelForm.processing">İptal Et</Button>
+                        <Button type="button" variant="outline" @click="showCancelDialog = false"><X class="mr-1.5 h-4 w-4" />Vazgeç</Button>
+                        <Button type="submit" variant="destructive" :disabled="cancelForm.processing"><Ban class="mr-1.5 h-4 w-4" />İptal Et</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
@@ -449,8 +451,8 @@ function intervalLabel(interval: string, count: number): string {
                         <InputError :message="extendTrialForm.errors.days" />
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="showExtendTrialDialog = false">İptal</Button>
-                        <Button type="submit" :disabled="extendTrialForm.processing">Uzat</Button>
+                        <Button type="button" variant="outline" @click="showExtendTrialDialog = false"><X class="mr-1.5 h-4 w-4" />İptal</Button>
+                        <Button type="submit" :disabled="extendTrialForm.processing"><Clock class="mr-1.5 h-4 w-4" />Uzat</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
@@ -469,8 +471,8 @@ function intervalLabel(interval: string, count: number): string {
                         <InputError :message="extendGraceForm.errors.days" />
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="showExtendGraceDialog = false">İptal</Button>
-                        <Button type="submit" :disabled="extendGraceForm.processing">Uzat</Button>
+                        <Button type="button" variant="outline" @click="showExtendGraceDialog = false"><X class="mr-1.5 h-4 w-4" />İptal</Button>
+                        <Button type="submit" :disabled="extendGraceForm.processing"><Clock class="mr-1.5 h-4 w-4" />Uzat</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
@@ -505,8 +507,8 @@ function intervalLabel(interval: string, count: number): string {
                         <InputError :message="changePlanForm.errors.plan_price_id" />
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="showChangePlanDialog = false">İptal</Button>
-                        <Button type="submit" :disabled="changePlanForm.processing">Değiştir</Button>
+                        <Button type="button" variant="outline" @click="showChangePlanDialog = false"><X class="mr-1.5 h-4 w-4" />İptal</Button>
+                        <Button type="submit" :disabled="changePlanForm.processing"><Check class="mr-1.5 h-4 w-4" />Değiştir</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
@@ -555,8 +557,8 @@ function intervalLabel(interval: string, count: number): string {
                             <X class="mr-1.5 h-4 w-4" />
                             Özel Fiyatı Kaldır
                         </Button>
-                        <Button type="button" variant="outline" @click="showCustomPriceDialog = false">İptal</Button>
-                        <Button type="submit" :disabled="customPriceForm.processing">Kaydet</Button>
+                        <Button type="button" variant="outline" @click="showCustomPriceDialog = false"><X class="mr-1.5 h-4 w-4" />İptal</Button>
+                        <Button type="submit" :disabled="customPriceForm.processing"><Save class="mr-1.5 h-4 w-4" />Kaydet</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

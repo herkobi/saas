@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head, Link, usePage } from '@inertiajs/vue3';
+import { Save } from 'lucide-vue-next';
 import ProfileController from '@/actions/App/Http/Controllers/Panel/Profile/ProfileController';
 import Heading from '@/components/common/Heading.vue';
 import InputError from '@/components/common/InputError.vue';
@@ -104,8 +105,10 @@ const user = page.props.auth.user;
                         <Button
                             :disabled="processing"
                             data-test="update-profile-button"
-                            >Kaydet</Button
                         >
+                            <Save class="mr-1.5 h-4 w-4" />
+                            Kaydet
+                        </Button>
 
                         <Transition
                             enter-active-class="transition ease-in-out"

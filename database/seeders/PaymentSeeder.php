@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 
 final class PaymentSeeder extends Seeder
 {
+    private int $invoiceCounter = 1000;
+
     public function run(): void
     {
         DB::transaction(function () {
@@ -68,6 +70,7 @@ final class PaymentSeeder extends Seeder
             'metadata' => ['type' => CheckoutType::RENEW->value, 'merchant_oid' => $oid],
             'paid_at' => $status === PaymentStatus::COMPLETED ? now()->subDays($daysAgo) : null,
             'invoiced_at' => ($status === PaymentStatus::COMPLETED && $invoiced) ? now()->subDays($daysAgo) : null,
+            'invoice_number' => ($status === PaymentStatus::COMPLETED && $invoiced) ? 'INV-'.str_pad((string) $this->invoiceCounter++, 6, '0', STR_PAD_LEFT) : null,
         ]);
 
         Checkout::create([

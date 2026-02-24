@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { Plus, SlidersHorizontal, Trash2 } from 'lucide-vue-next';
+import { Plus, Save, SlidersHorizontal, Trash2, X } from 'lucide-vue-next';
 import { ref } from 'vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
@@ -164,6 +164,7 @@ function formatValue(value: any, type: string): string {
                     size="sm"
                     @click="handleClearAll"
                 >
+                    <Trash2 class="mr-1.5 h-4 w-4" />
                     Tümünü Temizle
                 </Button>
             </div>
@@ -277,8 +278,8 @@ function formatValue(value: any, type: string): string {
                     </Button>
                     <InputError :message="addForm.errors.overrides" />
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="showAddDialog = false">İptal</Button>
-                        <Button type="submit" :disabled="addForm.processing">Kaydet</Button>
+                        <Button type="button" variant="outline" @click="showAddDialog = false"><X class="mr-1.5 h-4 w-4" />İptal</Button>
+                        <Button type="submit" :disabled="addForm.processing"><Save class="mr-1.5 h-4 w-4" />Kaydet</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

@@ -98,6 +98,42 @@ class SettingController extends Controller
     }
 
     /**
+     * Display company settings.
+     *
+     * @return Response
+     */
+    public function companyIndex(): Response
+    {
+        return Inertia::render('panel/Settings/Company/Index', [
+            'settings' => $this->settingService->all(),
+        ]);
+    }
+
+    /**
+     * Update company settings.
+     *
+     * @param UpdateSettingRequest $request
+     * @return RedirectResponse
+     */
+    public function updateCompany(UpdateSettingRequest $request): RedirectResponse
+    {
+        $oldData = $this->settingService->all();
+        $validated = $request->validated();
+
+        $this->settingService->updateMany($validated);
+
+        PanelSettingUpdated::dispatch(
+            $oldData,
+            $validated,
+            $request->user(),
+            $request->ip(),
+            $request->userAgent()
+        );
+
+        return back()->with('success', 'Firma bilgileri güncellendi.');
+    }
+
+    /**
      * Delete a file setting.
      *
      * @param string $key

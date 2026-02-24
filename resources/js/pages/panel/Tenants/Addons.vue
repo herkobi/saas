@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, router, useForm } from '@inertiajs/vue3';
-import { Calendar, Package, X } from 'lucide-vue-next';
+import { Calendar, Clock, Package, X } from 'lucide-vue-next';
 import { ref } from 'vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
@@ -215,8 +215,8 @@ const addonTypeLabels: Record<string, string> = {
                         <InputError :message="extendForm.errors.days" />
                     </div>
                     <DialogFooter>
-                        <Button type="button" variant="outline" @click="showExtendDialog = false">İptal</Button>
-                        <Button type="submit" :disabled="extendForm.processing">Uzat</Button>
+                        <Button type="button" variant="outline" @click="showExtendDialog = false"><X class="mr-1.5 h-4 w-4" />İptal</Button>
+                        <Button type="submit" :disabled="extendForm.processing"><Clock class="mr-1.5 h-4 w-4" />Uzat</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

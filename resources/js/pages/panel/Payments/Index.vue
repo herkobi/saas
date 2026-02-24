@@ -165,7 +165,7 @@ function payBadgeVariant(status: string): 'default' | 'secondary' | 'destructive
                     @click="handleBulkInvoice"
                 >
                     <FileText class="mr-1.5 h-4 w-4" />
-                    Seçilenleri Faturala ({{ selectedIds.length }})
+                    Seçilenleri Faturalandır ({{ selectedIds.length }})
                 </Button>
             </div>
 
@@ -287,7 +287,8 @@ function payBadgeVariant(status: string): 'default' | 'secondary' | 'destructive
                                         class="h-6 px-2 text-xs"
                                         @click="handleMarkInvoiced(payment.id)"
                                     >
-                                        Faturala
+                                        <FileText class="mr-1 h-3 w-3" />
+                                        Faturalandır
                                     </Button>
                                 </TableCell>
                                 <TableCell class="text-sm text-muted-foreground">

@@ -19,7 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { formatDate } from '@/composables/useFormatting';
+import { formatCurrency, formatDate } from '@/composables/useFormatting';
 import PanelLayout from '@/layouts/PanelLayout.vue';
 import PlansLayout from '@/pages/panel/Plans/layout/Layout.vue';
 import { index, create, edit, archive, restore } from '@/routes/panel/plans';
@@ -129,8 +129,17 @@ function handleRestore(plan: PlanListItem) {
                                         <Badge v-if="!plan.is_public" variant="outline">Özel</Badge>
                                     </div>
                                 </TableCell>
-                                <TableCell class="text-center">
-                                    {{ plan.prices_count }}
+                                <TableCell>
+                                    <div v-if="plan.prices && plan.prices.length > 0" class="flex flex-col gap-0.5">
+                                        <span
+                                            v-for="price in plan.prices"
+                                            :key="price.id"
+                                            class="text-xs"
+                                        >
+                                            {{ formatCurrency(price.amount) }}<span class="text-muted-foreground">/{{ price.interval === 'month' ? 'ay' : price.interval === 'year' ? 'yıl' : 'gün' }}</span>
+                                        </span>
+                                    </div>
+                                    <span v-else class="text-xs text-muted-foreground">—</span>
                                 </TableCell>
                                 <TableCell class="text-center">
                                     {{ plan.features_count }}
@@ -146,15 +155,7 @@ function handleRestore(plan: PlanListItem) {
                                             </Link>
                                         </Button>
                                         <Button
-                                            v-if="!isArchived"
-                                            variant="ghost"
-                                            size="sm"
-                                            @click="handleArchive(plan)"
-                                        >
-                                            <Archive class="h-4 w-4" />
-                                        </Button>
-                                        <Button
-                                            v-else
+                                            v-if="isArchived"
                                             variant="ghost"
                                             size="sm"
                                             @click="handleRestore(plan)"

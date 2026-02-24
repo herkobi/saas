@@ -1,58 +1,38 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import Heading from '@/components/common/Heading.vue';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
 import { index as generalIndex } from '@/routes/panel/settings/general';
-import { type NavItem } from '@/types';
+import { index as companyIndex } from '@/routes/panel/settings/company';
+import type { NavItem } from '@/types';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Genel',
-        href: generalIndex(),
-    },
+const tabs: NavItem[] = [
+    { title: 'Genel', href: generalIndex() },
+    { title: 'Firma Bilgileri', href: companyIndex() },
 ];
 
 const { isCurrentUrl } = useCurrentUrl();
 </script>
 
 <template>
-    <div class="px-4 py-6">
-        <Heading
-            title="Ayarlar"
-            description="Platform ayarlarını yapılandırın"
-        />
-
-        <div class="flex flex-col lg:flex-row lg:space-x-12">
-            <aside class="w-full max-w-xl lg:w-48">
-                <nav
-                    class="flex flex-col space-y-1 space-x-0"
-                    aria-label="Ayarlar"
-                >
-                    <Button
-                        v-for="item in sidebarNavItems"
-                        :key="toUrl(item.href)"
-                        variant="ghost"
-                        :class="[
-                            'w-full justify-start',
-                            { 'bg-muted': isCurrentUrl(item.href) },
-                        ]"
-                        as-child
-                    >
-                        <Link :href="item.href">
-                            {{ item.title }}
-                        </Link>
-                    </Button>
-                </nav>
-            </aside>
-
-            <Separator class="my-6 lg:hidden" />
-
-            <div class="flex-1">
-                <slot />
-            </div>
+    <div class="flex flex-col gap-6 p-4 md:p-6">
+        <!-- Tab Navigation -->
+        <div class="flex gap-1 overflow-x-auto border-b">
+            <Link
+                v-for="tab in tabs"
+                :key="toUrl(tab.href)"
+                :href="tab.href"
+                class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium transition-colors"
+                :class="
+                    isCurrentUrl(tab.href)
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:border-muted-foreground/30 hover:text-foreground'
+                "
+            >
+                {{ tab.title }}
+            </Link>
         </div>
+
+        <slot />
     </div>
 </template>

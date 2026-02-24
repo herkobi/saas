@@ -86,11 +86,20 @@ class PaymentService
             $query->where('amount', '<=', $filters['amount_max']);
         }
 
+        if (!empty($filters['upcoming'])) {
+            $query->whereHas('subscription', function ($q) {
+                $q->whereNotNull('ends_at')
+                    ->where('ends_at', '>', now())
+                    ->where('ends_at', '<=', now()->addDays(30));
+            });
+        }
+
         $sortField = $filters['sort'] ?? 'created_at';
         $sortDirection = $filters['direction'] ?? 'desc';
 
         return $query->orderBy($sortField, $sortDirection)->paginate($perPage)
             ->through(fn ($payment) => array_merge($payment->toArray(), [
+                'tenant_name' => $payment->tenant?->name ?? $payment->tenant?->code,
                 'status_label' => $payment->status->label(),
                 'status_badge' => $payment->status->badge(),
             ]));
@@ -124,6 +133,10 @@ class PaymentService
         string $ipAddress,
         string $userAgent
     ): Payment {
+        if ($payment->isInvoiced()) {
+            throw new \RuntimeException('Faturalandırılmış ödemenin durumu değiştirilemez.');
+        }
+
         $oldStatus = $payment->status;
 
         $updateData = ['status' => $status];
@@ -154,11 +167,15 @@ class PaymentService
      */
     public function markAsInvoiced(
         Payment $payment,
+        string $invoiceNumber,
         User $markedBy,
         string $ipAddress,
         string $userAgent
     ): Payment {
-        $payment->update(['invoiced_at' => now()]);
+        $payment->update([
+            'invoiced_at' => now(),
+            'invoice_number' => $invoiceNumber,
+        ]);
 
         PanelPaymentMarkedAsInvoiced::dispatch($payment, $markedBy, $ipAddress, $userAgent);
 

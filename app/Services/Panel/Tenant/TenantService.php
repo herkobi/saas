@@ -278,6 +278,35 @@ class TenantService
         ];
     }
 
+    /**
+     * Get index-level statistics for all tenants.
+     *
+     * @return array<string, mixed>
+     */
+    public function getIndexStatistics(): array
+    {
+        $totalTenants = Tenant::count();
+
+        $withActiveSubscription = Tenant::whereHas('subscription', function ($q) {
+            $q->where('status', SubscriptionStatus::ACTIVE);
+        })->count();
+
+        $withTrialing = Tenant::whereHas('subscription', function ($q) {
+            $q->where('status', SubscriptionStatus::TRIALING);
+        })->count();
+
+        $withExpired = Tenant::whereHas('subscription', function ($q) {
+            $q->where('status', SubscriptionStatus::EXPIRED);
+        })->count();
+
+        return [
+            'total_count' => $totalTenants,
+            'active_count' => $withActiveSubscription,
+            'trialing_count' => $withTrialing,
+            'expired_count' => $withExpired,
+        ];
+    }
+
     public function getRecentActivities(int $limit = 15): Collection
     {
         return Activity::with('user')

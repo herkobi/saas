@@ -8,6 +8,7 @@ import {
     Plus,
     Trash2,
     Users,
+    X,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
@@ -137,17 +138,22 @@ const form = useForm({
     name: props.plan.name,
     slug: props.plan.slug,
     description: props.plan.description ?? '',
-    tenant_id: props.plan.tenant_id ?? '',
+    tenant_id: props.plan.tenant_id ?? 'all',
     is_free: props.plan.is_free,
     is_active: props.plan.is_active,
     is_public: props.plan.is_public,
     grace_period_days: props.plan.grace_period_days,
-    upgrade_proration_type: props.plan.upgrade_proration_type ?? '',
-    downgrade_proration_type: props.plan.downgrade_proration_type ?? '',
+    upgrade_proration_type: props.plan.upgrade_proration_type ?? 'default',
+    downgrade_proration_type: props.plan.downgrade_proration_type ?? 'default',
 });
 
 function submitPlan() {
-    form.put(update(props.plan.id).url);
+    form.transform((data) => ({
+        ...data,
+        tenant_id: data.tenant_id === 'all' ? null : data.tenant_id,
+        upgrade_proration_type: data.upgrade_proration_type === 'default' ? null : data.upgrade_proration_type,
+        downgrade_proration_type: data.downgrade_proration_type === 'default' ? null : data.downgrade_proration_type,
+    })).put(update(props.plan.id).url);
 }
 
 // Price form
@@ -325,6 +331,7 @@ const intervalLabels: Record<string, string> = {
                                                 <SelectValue placeholder="Tüm hesaplar" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value="all">Tüm hesaplar</SelectItem>
                                                 <SelectItem v-for="tenant in tenants" :key="tenant.id" :value="tenant.id">
                                                     {{ tenant.name }}
                                                 </SelectItem>
@@ -342,6 +349,7 @@ const intervalLabels: Record<string, string> = {
                                                 <SelectValue placeholder="Varsayılan" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value="default">Varsayılan</SelectItem>
                                                 <SelectItem value="immediate">Anında Geçiş</SelectItem>
                                                 <SelectItem value="end_of_period">Dönem Sonunda Geçiş</SelectItem>
                                             </SelectContent>
@@ -356,6 +364,7 @@ const intervalLabels: Record<string, string> = {
                                                 <SelectValue placeholder="Varsayılan" />
                                             </SelectTrigger>
                                             <SelectContent>
+                                                <SelectItem value="default">Varsayılan</SelectItem>
                                                 <SelectItem value="immediate">Anında Geçiş</SelectItem>
                                                 <SelectItem value="end_of_period">Dönem Sonunda Geçiş</SelectItem>
                                             </SelectContent>
@@ -382,7 +391,10 @@ const intervalLabels: Record<string, string> = {
                                 </div>
 
                                 <div class="flex justify-end">
-                                    <Button type="submit" :disabled="form.processing">Planı Güncelle</Button>
+                                    <Button type="submit" :disabled="form.processing">
+                                        <Check class="mr-1.5 h-4 w-4" />
+                                        Planı Güncelle
+                                    </Button>
                                 </div>
                             </form>
                         </CardContent>
@@ -464,9 +476,15 @@ const intervalLabels: Record<string, string> = {
 
                                         <DialogFooter>
                                             <DialogClose as-child>
-                                                <Button variant="outline" type="button">İptal</Button>
+                                                <Button variant="outline" type="button">
+                                                    <X class="mr-1.5 h-4 w-4" />
+                                                    İptal
+                                                </Button>
                                             </DialogClose>
-                                            <Button type="submit" :disabled="priceForm.processing">Ekle</Button>
+                                            <Button type="submit" :disabled="priceForm.processing">
+                                                <Plus class="mr-1.5 h-4 w-4" />
+                                                Ekle
+                                            </Button>
                                         </DialogFooter>
                                     </form>
                                 </DialogContent>

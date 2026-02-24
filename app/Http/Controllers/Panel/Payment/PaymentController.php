@@ -101,6 +101,10 @@ class PaymentController extends Controller
      */
     public function updateStatus(UpdatePaymentRequest $request, Payment $payment): RedirectResponse
     {
+        if ($payment->isInvoiced()) {
+            return back()->with('error', 'Faturalandırılmış ödemenin durumu değiştirilemez.');
+        }
+
         $status = PaymentStatus::from($request->validated('status'));
 
         $this->paymentService->updateStatus(
@@ -131,8 +135,16 @@ class PaymentController extends Controller
             return back()->with('error', 'Sadece tamamlanmış ödemeler faturalandırılabilir.');
         }
 
+        $request->validate([
+            'invoice_number' => ['required', 'string', 'max:100'],
+        ], [
+            'invoice_number.required' => 'Fatura numarası zorunludur.',
+            'invoice_number.max' => 'Fatura numarası en fazla 100 karakter olabilir.',
+        ]);
+
         $this->paymentService->markAsInvoiced(
             $payment,
+            $request->input('invoice_number'),
             $request->user(),
             $request->ip(),
             $request->userAgent()

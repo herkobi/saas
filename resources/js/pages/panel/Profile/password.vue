@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
+import { Save } from 'lucide-vue-next';
 import PasswordController from '@/actions/App/Http/Controllers/Panel/Profile/PasswordController';
 import Heading from '@/components/common/Heading.vue';
 import InputError from '@/components/common/InputError.vue';
@@ -92,8 +93,10 @@ const breadcrumbItems: BreadcrumbItem[] = [
                         <Button
                             :disabled="processing"
                             data-test="update-password-button"
-                            >Parolayı kaydet</Button
                         >
+                            <Save class="mr-1.5 h-4 w-4" />
+                            Parolayı kaydet
+                        </Button>
 
                         <Transition
                             enter-active-class="transition ease-in-out"

@@ -74,10 +74,13 @@ class TenantController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'slug']);
 
+        $statistics = $this->tenantService->getIndexStatistics();
+
         return Inertia::render('panel/Tenants/Index', [
             'tenants' => $tenants,
             'plans' => $plans,
             'filters' => $filters,
+            'statistics' => $statistics,
         ]);
     }
 

@@ -30,6 +30,8 @@ use Illuminate\Support\Str;
 
 final class TenantAddonSeeder extends Seeder
 {
+    private int $invoiceCounter = 2000;
+
     /**
      * Run the database seeds.
      *
@@ -117,6 +119,7 @@ final class TenantAddonSeeder extends Seeder
             ],
             'paid_at' => now()->subDays($daysAgo),
             'invoiced_at' => now()->subDays($daysAgo),
+            'invoice_number' => 'INV-'.str_pad((string) $this->invoiceCounter++, 6, '0', STR_PAD_LEFT),
         ]);
 
         // Checkout kaydı

@@ -45,6 +45,7 @@ use App\Http\Controllers\Panel\Tenant\{
     TenantSubscriptionController,
     TenantUserController
 };
+use App\Http\Controllers\Panel\User\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -138,6 +139,13 @@ Route::middleware(['auth', 'auth.session', 'verified', 'write.access'])->group(f
     });
 
     /**
+     * Users Routes
+     */
+    Route::prefix('users')->name('users.')->controller(UserController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+    });
+
+    /**
      * Tenants Routes
      */
     Route::prefix('tenants')->name('tenants.')->group(function () {
@@ -217,6 +225,11 @@ Route::middleware(['auth', 'auth.session', 'verified', 'write.access'])->group(f
             Route::get('/', 'index')->name('index');
             Route::put('/', 'update')->name('update');
             Route::delete('/file/{key}', 'deleteFile')->name('delete-file');
+        });
+
+        Route::prefix('company')->name('company.')->controller(SettingController::class)->group(function () {
+            Route::get('/', 'companyIndex')->name('index');
+            Route::put('/', 'updateCompany')->name('update');
         });
     });
 

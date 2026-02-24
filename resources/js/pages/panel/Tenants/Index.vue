@@ -50,6 +50,12 @@ type Props = {
         created_from?: string;
         created_to?: string;
     };
+    statistics: {
+        total_count: number;
+        active_count: number;
+        trialing_count: number;
+        expired_count: number;
+    };
 };
 
 const props = defineProps<Props>();
@@ -117,6 +123,34 @@ function subscriptionBadgeVariant(status?: string): 'default' | 'secondary' | 'd
                     <h1 class="text-lg font-semibold">Müşteriler</h1>
                     <p class="text-sm text-muted-foreground">Tüm hesapları görüntüleyin ve yönetin</p>
                 </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <Card>
+                    <CardContent class="p-4">
+                        <p class="text-sm text-muted-foreground">Toplam Hesap</p>
+                        <p class="text-2xl font-bold">{{ statistics.total_count }}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent class="p-4">
+                        <p class="text-sm text-muted-foreground">Aktif Abonelik</p>
+                        <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ statistics.active_count }}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent class="p-4">
+                        <p class="text-sm text-muted-foreground">Deneme</p>
+                        <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ statistics.trialing_count }}</p>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardContent class="p-4">
+                        <p class="text-sm text-muted-foreground">Süresi Dolmuş</p>
+                        <p class="text-2xl font-bold text-red-600 dark:text-red-400">{{ statistics.expired_count }}</p>
+                    </CardContent>
+                </Card>
             </div>
 
             <!-- Filters -->

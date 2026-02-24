@@ -40,6 +40,7 @@ export interface PlanListItem {
     is_free: boolean;
     prices_count: number;
     features_count: number;
+    prices: { id: string; amount: number; interval: string; interval_label?: string }[];
     created_at: string;
 }
 

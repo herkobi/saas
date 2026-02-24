@@ -31,6 +31,7 @@ class Payment extends BaseTenant
         'paid_at',
         'refunded_at',
         'invoiced_at',
+        'invoice_number',
     ];
 
     protected $casts = [
@@ -91,6 +92,16 @@ class Payment extends BaseTenant
     public function canCancel(): bool
     {
         return $this->status->canCancel();
+    }
+
+    public function isCompleted(): bool
+    {
+        return $this->status === PaymentStatus::COMPLETED;
+    }
+
+    public function isInvoiced(): bool
+    {
+        return $this->invoiced_at !== null;
     }
 
     public function markAsCompleted(?string $gatewayPaymentId = null, ?array $gatewayResponse = null): void
